@@ -12,11 +12,14 @@ class Command():
 		self.message = message
 		self.bot = bot
 
+		# Defined commands
+		self.commands = ['/start', '/help', '/stopBot', '/privacy']
+
 	# Used to find the requested command
 	def find_command(self, message):
 		text = message.text
 		print(text)
-		if text in self.bot.commands:
+		if text in self.commands:
 			self.performCommand(text, message)
 		else:
 			self.sendMessage(message.user.chatID, "Unknown command. Say what?")
@@ -24,9 +27,9 @@ class Command():
 	def performCommand(self, command, message):
 		if command == '/help':
 			if str(message.user.chatID) == str(patrickID.chatID):
-				self.bot.sendMessage(message.user.chatID, "/start\n/help\n/stopBot")
+				self.bot.sendMessage(message.user.chatID, "/start\n/help\n/stopBot\n/privacy")
 			else:
-				self.bot.sendMessage(message.user.chatID, "Perform one of the following commands:\n/start\n/help")
+				self.bot.sendMessage(message.user.chatID, "Perform one of the following commands:\n/start\n/help\nFor privacy information, typ\n/privacy")
 		elif command == '/start':
 			self.bot.sendMessage(message.user.chatID, "Please send me your name so we get to know each other")
 			message.user.setExpectedMessageType('name')
@@ -37,6 +40,8 @@ class Command():
 			else:
 				self.bot.log("Wrong user " + str(message.user.chatID) + ", entered name " + str(
 					message.user.name) + " tried to stop the bot.")
+		elif command == '/privacy':
+			self.bot.sendMessage(message.user.chatID, "We save everything you provide us for you to get the best experience.")
 
 	def interpretMessage(self, message):
 		type = message.user.getExpectedMessageType()

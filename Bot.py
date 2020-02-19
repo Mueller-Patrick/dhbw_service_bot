@@ -28,9 +28,6 @@ class Bot:
 		# Get update offset
 		self.getOffset()
 
-		# Defined commands
-		self.commands = ['/start', '/help', '/stopBot']
-
 		# Messages sent to the bot that have to be handles
 		self.messages = []
 

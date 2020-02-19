@@ -23,8 +23,10 @@ class Command():
 
 	def performCommand(self, command, message):
 		if command == '/help':
-			# TODO
-			self.bot.log("User wants help")
+			if str(message.user.chatID) == str(patrickID.chatID):
+				self.bot.sendMessage(message.user.chatID, "/start\n/help\n/stopBot")
+			else:
+				self.bot.sendMessage(message.user.chatID, "Perform one of the following commands:\n/start\n/help")
 		elif command == '/start':
 			self.bot.sendMessage(message.user.chatID, "Please send me your name so we get to know each other")
 			message.user.setExpectedMessageType('name')

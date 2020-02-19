@@ -15,3 +15,9 @@ If you have any ideas on how to extend the functionality, feel free to create
 a PR. Please make sure to document it appropriate and tell us wich commands you added
 so we can add the to the bot properly.
 
+Used libraries are
+`requests`<br>
+`requests_html`<br>
+`json`<br>
+`asyncio`.<br>
+These are not specifically important for development, just for us to run the bot.

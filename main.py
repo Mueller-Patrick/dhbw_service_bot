@@ -6,6 +6,7 @@ import json
 import asyncio
 import Bot as bt
 import User as usr
+import patrickID
 
 
 class main:
@@ -26,10 +27,7 @@ class main:
 		self.close()
 
 	def get_token(self):
-		with open('telegram_token.txt', 'r') as tokenFile:
-			token = tokenFile.read()
-		tokenFile.close()
-		return token
+		return patrickID.token
 
 	def get_users(self):
 		with open('userDict.json', 'r') as userFile:

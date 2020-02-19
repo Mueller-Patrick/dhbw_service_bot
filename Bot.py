@@ -6,6 +6,7 @@ import json
 import asyncio
 import Message as msg
 import User as usr
+import patrickID
 
 
 class Bot:
@@ -27,7 +28,7 @@ class Bot:
 		self.getOffset()
 
 		# Defined commands
-		self.commands = ['/start', '/help', '/stop']
+		self.commands = ['/start', '/help', '/stopBot']
 
 		# Messages sent to the bot that have to be handles
 		self.messages = []
@@ -41,15 +42,11 @@ class Bot:
 
 	# External File handlers
 	def getOffset(self):
-		with open('updateOffset.txt', 'r') as offsetFile:
-			self.offsetParam['offset'] = int(offsetFile.read())
-		offsetFile.close()
+		self.offsetParam['offset'] = int(patrickID.offset)
 
 	def setOffset(self, newOffset):
 		if newOffset != '':
-			with open('updateOffset.txt', 'w') as offsetFile:
-				offsetFile.write(str(newOffset))
-			offsetFile.close()
+			patrickID.offset = str(newOffset)
 
 	# Api Handlers
 	def sendMessage(self, chat, text):
@@ -109,7 +106,8 @@ class Bot:
 
 	# Used to find the requested command
 	def find_command(self, message):
-		text = message.text.lower()
+		text = message.text
+		print(text)
 		if text in self.commands:
 			self.performCommand(text, message)
 		else:
@@ -118,14 +116,16 @@ class Bot:
 	def performCommand(self, command, message):
 		if command == '/help':
 			#TODO
-			print("User wants help")
+			self.log("User wants help")
 		elif command == '/start':
 			self.sendMessage(message.user.chatID, "Please send me your name so we get to know each other")
 			message.user.setExpectedMessageType('name')
-		elif command == '/stop':
-			if message.user.chatID == '230970888':
-				self.sendMessage(message.user.chatID, 'Bot is now stopping.')
+		elif command == '/stopBot':
+			if str(message.user.chatID) == str(patrickID.chatID):
+				self.log("Stopping the bot now.")
 				self.tellMainToClose = True
+			else:
+				self.log("Wrong user "+str(message.user.chatID)+", entered name "+str(message.user.name)+" tried to stop the bot.")
 
 	def interpretMessage(self, message):
 		type = message.user.getExpectedMessageType()
@@ -138,6 +138,11 @@ class Bot:
 			self.sendMessage(message.user.chatID, welcomeMsg)
 
 		message.user.setExpectedMessageType('')
+
+	def log(self, message):
+		print(message)
+		self.sendMessage(patrickID.chatID, message)
+		self.sendMessage(patrickID.davidID, message)
 
 	# Used to tell the bot to accept no more commands because it is about to be closed
 	def close(self):

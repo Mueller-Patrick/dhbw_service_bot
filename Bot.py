@@ -7,6 +7,7 @@ import asyncio
 import Message as msg
 import User as usr
 import patrickID
+import Command as cmd
 
 
 class Bot:
@@ -42,11 +43,15 @@ class Bot:
 
 	# External File handlers
 	def getOffset(self):
-		self.offsetParam['offset'] = int(patrickID.offset)
+		with open('offsetFile.txt', 'r') as offsetFile:
+			self.offsetParam['offset'] = int(offsetFile.read())
+		offsetFile.close()
 
 	def setOffset(self, newOffset):
 		if newOffset != '':
-			patrickID.offset = str(newOffset)
+			with open('offsetFile.txt', 'w') as offsetFile:
+				offsetFile.write(str(newOffset))
+			offsetFile.close()
 
 	# Api Handlers
 	def sendMessage(self, chat, text):
@@ -99,45 +104,10 @@ class Bot:
 	def handleMessages(self):
 		for message in self.messages:
 			if message.isCommand:
-				self.find_command(message)
+				cmd.Command(message, self).find_command(message)
 			else:
-				self.interpretMessage(message)
+				cmd.Command(message, self).interpretMessage(message)
 			self.messages.remove(message)
-
-	# Used to find the requested command
-	def find_command(self, message):
-		text = message.text
-		print(text)
-		if text in self.commands:
-			self.performCommand(text, message)
-		else:
-			self.sendMessage(message.user.chatID, "Unknown command. Say what?")
-
-	def performCommand(self, command, message):
-		if command == '/help':
-			#TODO
-			self.log("User wants help")
-		elif command == '/start':
-			self.sendMessage(message.user.chatID, "Please send me your name so we get to know each other")
-			message.user.setExpectedMessageType('name')
-		elif command == '/stopBot':
-			if str(message.user.chatID) == str(patrickID.chatID):
-				self.log("Stopping the bot now.")
-				self.tellMainToClose = True
-			else:
-				self.log("Wrong user "+str(message.user.chatID)+", entered name "+str(message.user.name)+" tried to stop the bot.")
-
-	def interpretMessage(self, message):
-		type = message.user.getExpectedMessageType()
-
-		if type == '':
-			self.sendMessage(message.user.chatID, 'I don\'t know what to do with your input :(')
-		elif type == 'name':
-			message.user.setName(message.text)
-			welcomeMsg = 'Hello, ' + message.text + '! Pleased to meet you!'
-			self.sendMessage(message.user.chatID, welcomeMsg)
-
-		message.user.setExpectedMessageType('')
 
 	def log(self, message):
 		print(message)

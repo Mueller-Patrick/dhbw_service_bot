@@ -21,3 +21,10 @@ Used libraries are
 `json`<br>
 `asyncio`.<br>
 These are not specifically important for development, just for us to run the bot.
+To install them, run `pip install [LIBRARY_NAME]`on your machine, given that you have already installed pip.
+<br><br>
+Supported commands of the bot are:<br>
+`/start`- Starts the bot <br>
+`/help> - Prints the most important commands <br>
+`/subscribeMenu`- Subscribes you to the daily canteen menu newsletter <br>
+`/unsubscribeMenu`- You might have an idea what this does.

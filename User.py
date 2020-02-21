@@ -8,7 +8,7 @@ class User:
 		self.chatID = chatID
 		self.name = ''
 		self.expectedMessageType = ''
-
+		self.wantsMenu = False
 
 	def setName(self, name):
 		self.name = name

@@ -80,16 +80,20 @@ class Bot:
 					text = res.get('message').get('text')
 
 				if not text:
-					self.sendMessage(chat, "False input. Please try again with normal input.")
+					self.sendMessage(chat, "Unknown input format. Don't mess with me, fella!")
 				else:
-					currentUser = usr.User('0')
+					currentUser = usr.User('0') # Creates an empty user object to be populated later
 					for user in self.users:
 						if user.chatID == chat:
 							currentUser = user
 
 					if not currentUser.chatID == '0':
+						# If it is an existing user, get record for this user and create a new message entity
+						# with the user as parameter.
 						self.messages.append(msg.Message(currentUser, text))
 					else:
+						# If unknown user, create a new user and write it to users list. Also create a new message
+						# entity with the user as parameter.
 						newUser = usr.User(chat)
 						self.users.append(newUser)
 						self.messages.append(msg.Message(newUser, text))
@@ -109,7 +113,7 @@ class Bot:
 	def log(self, message):
 		print(message)
 		self.sendMessage(patrickID.chatID, message)
-		self.sendMessage(patrickID.davidID, message)
+		#self.sendMessage(patrickID.davidID, message)
 
 	# Used to tell the bot to accept no more commands because it is about to be closed
 	def close(self):

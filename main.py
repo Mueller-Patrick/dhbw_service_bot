@@ -7,6 +7,8 @@ import asyncio
 import Bot as bt
 import User as usr
 import patrickID
+from datetime import datetime
+#import Requests as req
 
 
 class main:
@@ -14,17 +16,56 @@ class main:
 		self.token = self.get_token()
 		self.users = self.get_users()
 		self.bot = bt.Bot(telegram_token=self.token, users=self.users)
-		asyncio.run(self.mainLoop())
+		self.sentMenuToday = False
+
+		# Runs both loops independent from each other
+		loop = asyncio.get_event_loop()
+		cors = asyncio.wait([self.mainLoop(), self.pushLoop()])
+		loop.run_until_complete(cors)
 
 	async def mainLoop(self):
-		run = True
-		while(run):
+		while True:
 			await asyncio.sleep(1)
+			# Wait for commands by users
 			self.bot.getUpdates()
 			self.bot.handleMessages()
+
+			# Check if it should stop
 			if self.bot.tellMainToClose:
-				run = False
+				break
+
 		self.close()
+
+	async def pushLoop(self):
+		while True:
+			await asyncio.sleep(1.5)
+			now = datetime.now()
+			timeString = now.strftime("%H:%M")
+			weekday = now.weekday()
+			if weekday < 6:
+				canteenOpen = True
+			else:
+				canteenOpen = False
+
+			# run daily at 06:00 for all users that want the menu
+			if str(timeString) == '12:28' and not self.sentMenuToday and canteenOpen:
+				self.sentMenuToday = True
+				self.sendMenu()
+			# Reset the boolean to send the menu for today again
+			elif timeString == '00:01':
+				self.sentMenuToday = False
+
+			# Check if it should stop
+			if self.bot.tellMainToClose:
+				break
+		self.close()
+
+	def sendMenu(self):
+		for user in self.users:
+			if user.wantsMenu:
+				#fetchedMenu = req.getMenu TODO: Implement David's request for the menu here
+				self.bot.sendMessage(user.chatID, "Good morning, "+user.name+", here is the menu for today:")
+				self.bot.sendMessage(user.chatID, "FETCHED_MENU")
 
 	def get_token(self):
 		return patrickID.token
@@ -41,9 +82,11 @@ class main:
 			chatID = user.get('chatID')
 			name = user.get('name')
 			expectedMsgType = user.get('expectedMsgType')
+			wantsMenu = user.get('wantsMenu')
 			currentUser = usr.User(chatID)
 			currentUser.setName(name)
 			currentUser.setExpectedMessageType(expectedMsgType)
+			currentUser.wantsMenu = wantsMenu
 			users.append(currentUser)
 
 		return users
@@ -55,7 +98,8 @@ class main:
 			toAppend = {
 				"chatID": user.chatID,
 				"name": user.name,
-				"expectedMsgType": user.expectedMessageType
+				"expectedMsgType": user.expectedMessageType,
+				"wantsMenu": user.wantsMenu
 			}
 			usersList.append(toAppend)
 		usersJson = json.dumps(usersList)

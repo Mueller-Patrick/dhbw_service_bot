@@ -13,12 +13,11 @@ class Command():
 		self.bot = bot
 
 		# Defined commands
-		self.commands = ['/start', '/help', '/stopBot', '/privacy']
+		self.commands = ['/start', '/help', '/stopBot', '/privacy', '/subscribeMenu', '/unsubscribeMenu']
 
 	# Used to find the requested command
 	def find_command(self, message):
 		text = message.text
-		print(text)
 		if text in self.commands:
 			self.performCommand(text, message)
 		else:
@@ -27,9 +26,10 @@ class Command():
 	def performCommand(self, command, message):
 		if command == '/help':
 			if str(message.user.chatID) == str(patrickID.chatID):
-				self.bot.sendMessage(message.user.chatID, "/start\n/help\n/stopBot\n/privacy")
+				self.bot.sendMessage(message.user.chatID, "/start\n/help\n/stopBot\n\n/subscribeMenu\n/unsubscribeMenu\n\n/privacy")
 			else:
-				self.bot.sendMessage(message.user.chatID, "Perform one of the following commands:\n/start\n/help\nFor privacy information, typ\n/privacy")
+				self.bot.sendMessage(message.user.chatID,
+									 "Basic commands:\n/start\n/help\n\nMenu commands:\n/subscribeMenu\n/unsubscribeMenu\n\nFor privacy information, type\n/privacy")
 		elif command == '/start':
 			self.bot.sendMessage(message.user.chatID, "Please send me your name so we get to know each other")
 			message.user.setExpectedMessageType('name')
@@ -41,7 +41,16 @@ class Command():
 				self.bot.log("Wrong user " + str(message.user.chatID) + ", entered name " + str(
 					message.user.name) + " tried to stop the bot.")
 		elif command == '/privacy':
-			self.bot.sendMessage(message.user.chatID, "We save everything you provide us for you to get the best experience.")
+			self.bot.sendMessage(message.user.chatID,
+								 "We save everything you provide us for you to get the best experience.")
+		elif command == '/subscribeMenu':
+			message.user.wantsMenu = True
+			self.bot.sendMessage(message.user.chatID,
+								 "You successfully subscribed to the daily menu push-service. Welcome aboard!")
+		elif command == '/unsubscribeMenu':
+			message.user.wantsMenu = False
+			self.bot.sendMessage(message.user.chatID,
+								 "We are sorry to loose you as a subscriber and hope to see you here again.")
 
 	def interpretMessage(self, message):
 		type = message.user.getExpectedMessageType()

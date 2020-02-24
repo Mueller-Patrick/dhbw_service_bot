@@ -8,6 +8,7 @@ import Message as msg
 import User as usr
 import patrickID
 import Command as cmd
+import asyncio
 
 
 class Bot:
@@ -61,14 +62,18 @@ class Bot:
 		self.sendParams = {'chat_id': '',
 						   'text': ''}
 
-	def getUpdates(self):
+	async def getUpdates(self):
 		if not self.closeNow:
 			# Wait for update
 			self.getOffset()
 			reqUrl = (self.telegramUrl + self.telegram_token + "getUpdates")
 			update = requests.post(url=reqUrl, params=self.offsetParam)
 			if update.json().get('ok'):
+				# While no new messages have been received, fetch updates again. No offset needed because if you send an
+				# offset one time, all 'older' messages get deleted.
 				while len(update.json().get('result')) == 0:
+					# Wait 1 second before fetching updates again to enable other asynchronous funtions to work
+					await asyncio.sleep(1)
 					update = requests.post(url=reqUrl)
 
 				# Set offset to be one higher than the offset of the latest update
@@ -99,6 +104,7 @@ class Bot:
 						self.messages.append(msg.Message(newUser, text))
 
 			else:
+				self.log(update.json.get('error_code'))
 				return update.json().get('error_code')
 
 	# Used to handle all new commands and messages

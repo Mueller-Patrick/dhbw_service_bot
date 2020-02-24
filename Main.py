@@ -11,7 +11,7 @@ from datetime import datetime
 #import Requests as req
 
 
-class main:
+class Main:
 	def __init__(self):
 		self.token = self.get_token()
 		self.users = self.get_users()
@@ -48,7 +48,7 @@ class main:
 				canteenOpen = False
 
 			# run daily at 06:00 for all users that want the menu
-			if str(timeString) == '11:07' and not self.sentMenuToday and canteenOpen:
+			if str(timeString) == '06:00' and not self.sentMenuToday and canteenOpen:
 				self.sentMenuToday = True
 				self.sendMenu()
 			# Reset the boolean to send the menu for today again

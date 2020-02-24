@@ -1,4 +1,4 @@
 # Default ignored files
 /workspace.xml
-userDict.json
-patrickID.py
+../userDict.json
+../patrickID.py

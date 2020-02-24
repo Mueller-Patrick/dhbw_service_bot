@@ -16,7 +16,7 @@ class Command():
 		self.commands = ['/start', '/help', '/stopbot', '/privacy', '/subscribemenu', '/unsubscribemenu']
 
 	# Used to find the requested command
-	def find_command(self, message):
+	def findCommand(self, message):
 		text = message.text.lower()
 		if text in self.commands:
 			self.performCommand(text, message)

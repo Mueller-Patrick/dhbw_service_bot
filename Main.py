@@ -13,8 +13,8 @@ from datetime import datetime
 
 class Main:
 	def __init__(self):
-		self.token = self.get_token()
-		self.users = self.get_users()
+		self.token = self.getToken()
+		self.users = self.getUsers()
 		self.bot = bt.Bot(telegram_token=self.token, users=self.users)
 		self.sentMenuToday = False
 
@@ -67,10 +67,10 @@ class Main:
 				self.bot.sendMessage(user.chatID, "Good morning, "+user.name+", here is the menu for today:")
 				self.bot.sendMessage(user.chatID, "FETCHED_MENU")
 
-	def get_token(self):
+	def getToken(self):
 		return patrickID.token
 
-	def get_users(self):
+	def getUsers(self):
 		with open('userDict.json', 'r') as userFile:
 			usersJson = userFile.read()
 		userFile.close()

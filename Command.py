@@ -13,11 +13,11 @@ class Command():
 		self.bot = bot
 
 		# Defined commands
-		self.commands = ['/start', '/help', '/stopBot', '/privacy', '/subscribeMenu', '/unsubscribeMenu']
+		self.commands = ['/start', '/help', '/stopbot', '/privacy', '/subscribemenu', '/unsubscribemenu']
 
 	# Used to find the requested command
 	def find_command(self, message):
-		text = message.text
+		text = message.text.lower()
 		if text in self.commands:
 			self.performCommand(text, message)
 		else:
@@ -25,6 +25,7 @@ class Command():
 
 	def performCommand(self, command, message):
 		if command == '/help':
+			# Provide help list for patrick with full command list and for other users with commands they can use.
 			if str(message.user.chatID) == str(patrickID.chatID):
 				self.bot.sendMessage(message.user.chatID, "/start\n/help\n/stopBot\n\n/subscribeMenu\n/unsubscribeMenu\n\n/privacy")
 			else:
@@ -33,7 +34,7 @@ class Command():
 		elif command == '/start':
 			self.bot.sendMessage(message.user.chatID, "Please send me your name so we get to know each other")
 			message.user.setExpectedMessageType('name')
-		elif command == '/stopBot':
+		elif command == '/stopbot':
 			if str(message.user.chatID) == str(patrickID.chatID):
 				self.bot.log("Stopping the bot now.")
 				self.bot.tellMainToClose = True
@@ -43,11 +44,11 @@ class Command():
 		elif command == '/privacy':
 			self.bot.sendMessage(message.user.chatID,
 								 "We save everything you provide us for you to get the best experience.")
-		elif command == '/subscribeMenu':
+		elif command == '/subscribemenu':
 			message.user.wantsMenu = True
 			self.bot.sendMessage(message.user.chatID,
 								 "You successfully subscribed to the daily menu push-service. Welcome aboard!")
-		elif command == '/unsubscribeMenu':
+		elif command == '/unsubscribemenu':
 			message.user.wantsMenu = False
 			self.bot.sendMessage(message.user.chatID,
 								 "We are sorry to loose you as a subscriber and hope to see you here again.")

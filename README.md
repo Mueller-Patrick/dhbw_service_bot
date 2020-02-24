@@ -26,5 +26,5 @@ To install them, run `pip install [LIBRARY_NAME]`on your machine, given that you
 Supported commands of the bot are:<br>
 `/start`- Starts the bot <br>
 `/help` - Prints the most important commands <br>
-`/subscribeMenu` - Subscribes you to the daily canteen menu newsletter <br>
-`/unsubscribeMenu` - You might have an idea what this does.
+`/subscribemenu` - Subscribes you to the daily canteen menu newsletter <br>
+`/unsubscribemenu` - You might have an idea what this does.

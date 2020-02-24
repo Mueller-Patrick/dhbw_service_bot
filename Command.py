@@ -27,10 +27,10 @@ class Command():
 		if command == '/help':
 			# Provide help list for patrick with full command list and for other users with commands they can use.
 			if str(message.user.chatID) == str(patrickID.chatID):
-				self.bot.sendMessage(message.user.chatID, "/start\n/help\n/stopBot\n\n/subscribeMenu\n/unsubscribeMenu\n\n/privacy")
+				self.bot.sendMessage(message.user.chatID, "/start\n/help\n/stopbot\n\n/subscribemenu\n/unsubscribemenu\n\n/privacy")
 			else:
 				self.bot.sendMessage(message.user.chatID,
-									 "Basic commands:\n/start\n/help\n\nMenu commands:\n/subscribeMenu\n/unsubscribeMenu\n\nFor privacy information, type\n/privacy")
+									 "Basic commands:\n/start\n/help\n\nMenu commands:\n/subscribemenu\n/unsubscribemenu\n\nFor privacy information, type\n/privacy")
 		elif command == '/start':
 			self.bot.sendMessage(message.user.chatID, "Please send me your name so we get to know each other")
 			message.user.setExpectedMessageType('name')

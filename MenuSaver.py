@@ -52,12 +52,17 @@ class Reader(object):
             if self.day == x['day']:
                 self.menu = x['menu']
 
-    def get_menu(self):
+    def get_menu_as_str(self):
         return self.menu
+
+    def get_menu_as_arr(self):
+        menu = str(self.menu)
+        array = menu.split("%i%")
+
+        return array
 
     def get_day(self):
         return self.day
-
 
 '''
 def check_if_in_file():

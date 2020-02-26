@@ -22,7 +22,7 @@ class Command:
 		if text in self.commands:
 			self.performCommand(text)
 		else:
-			self.sendMessage(self.message.user.chatID, "Unknown command. Say what?")
+			self.bot.sendMessage(self.message.user.chatID, "Unknown command. Say what?")
 
 	def performCommand(self, command):
 		callCommandFunctions = {
@@ -71,8 +71,9 @@ class Command:
 			self.bot.log("Stopping the bot now.")
 			self.bot.tellMainToClose = True
 		else:
-			self.bot.log("Wrong user " + str(self.message.user.chatID) + ", entered name " + str(
-				self.message.user.name) + " tried to stop the bot.")
+			self.bot.log(("Wrong user " + str(self.message.user.chatID) + ", entered name " + str(
+				self.message.user.name) + " tried to stop the bot."))
+			self.bot.sendMessage(self.message.user.chatID, "You are not allowed to do this.")
 
 	def command_privacy(self):
 		self.bot.sendMessage(self.message.user.chatID,
@@ -98,9 +99,11 @@ class Command:
 		else:
 			self.bot.sendMessage(self.message.user.chatID, "You don't want to receive the daily canteen newsletter")
 
-		# Message types
+	# Message types
 	def message_unknown(self):
-		self.bot.sendMessage(self.message.user.chatID, 'I don\'t know what to do with your input :(')
+		self.bot.sendMessage(self.message.user.chatID,
+							 ('I don\'t know what to do with your input :( I\'m just gonna send it back to you:\n' +
+							  self.message.text))
 
 	def message_name(self):
 		self.message.user.setName(self.message.text)

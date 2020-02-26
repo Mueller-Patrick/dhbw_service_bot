@@ -25,7 +25,6 @@ class Main:
 
 	async def mainLoop(self):
 		while True:
-			await asyncio.sleep(1)
 			# Wait for commands by users
 			await self.bot.getUpdates()
 			self.bot.handleMessages()
@@ -48,7 +47,7 @@ class Main:
 				canteenOpen = False
 
 			# run daily at 06:00 for all users that want the menu
-			if str(timeString) == '16:14' and not self.sentMenuToday and canteenOpen:
+			if str(timeString) == '16:25' and not self.sentMenuToday and canteenOpen:
 				self.sentMenuToday = True
 				self.sendMenu()
 			# Reset the boolean to send the menu for today again
@@ -63,9 +62,10 @@ class Main:
 	def sendMenu(self):
 		for user in self.users:
 			if user.wantsMenu:
-				fetchedMenu = menu.Reader(1).get_menu()
+				fetchedMenu = menu.Reader(1).get_menu_as_arr()
 				self.bot.sendMessage(user.chatID, "Good morning "+user.name+", here is the menu for today:")
-				self.bot.sendMessage(user.chatID, fetchedMenu)
+				for oneMenu in fetchedMenu:
+					self.bot.sendMessage(user.chatID, oneMenu)
 
 	def getToken(self):
 		return patrickID.token

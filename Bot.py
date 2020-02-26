@@ -6,6 +6,9 @@ import json
 import asyncio
 import Message as msg
 import User as usr
+import patrickID
+import Command as cmd
+import asyncio
 
 
 class Bot:
@@ -26,9 +29,6 @@ class Bot:
 		# Get update offset
 		self.getOffset()
 
-		# Defined commands
-		self.commands = ['/start', '/help', '/stop']
-
 		# Messages sent to the bot that have to be handles
 		self.messages = []
 
@@ -41,13 +41,13 @@ class Bot:
 
 	# External File handlers
 	def getOffset(self):
-		with open('updateOffset.txt', 'r') as offsetFile:
+		with open('offsetFile.txt', 'r') as offsetFile:
 			self.offsetParam['offset'] = int(offsetFile.read())
 		offsetFile.close()
 
 	def setOffset(self, newOffset):
 		if newOffset != '':
-			with open('updateOffset.txt', 'w') as offsetFile:
+			with open('offsetFile.txt', 'w') as offsetFile:
 				offsetFile.write(str(newOffset))
 			offsetFile.close()
 
@@ -62,14 +62,18 @@ class Bot:
 		self.sendParams = {'chat_id': '',
 						   'text': ''}
 
-	def getUpdates(self):
+	async def getUpdates(self):
 		if not self.closeNow:
 			# Wait for update
 			self.getOffset()
 			reqUrl = (self.telegramUrl + self.telegram_token + "getUpdates")
 			update = requests.post(url=reqUrl, params=self.offsetParam)
 			if update.json().get('ok'):
+				# While no new messages have been received, fetch updates again. No offset needed because if you send an
+				# offset one time, all 'older' messages get deleted.
 				while len(update.json().get('result')) == 0:
+					# Wait 1 second before fetching updates again to enable other asynchronous funtions to work
+					await asyncio.sleep(1)
 					update = requests.post(url=reqUrl)
 
 				# Set offset to be one higher than the offset of the latest update
@@ -81,63 +85,41 @@ class Bot:
 					text = res.get('message').get('text')
 
 				if not text:
-					self.sendMessage(chat, "False input. Please try again with normal input.")
+					self.sendMessage(chat, "Unknown input format. Don't mess with me, fella!")
 				else:
-					currentUser = usr.User('0')
+					currentUser = usr.User('0') # Creates an empty user object to be populated later
 					for user in self.users:
 						if user.chatID == chat:
 							currentUser = user
 
 					if not currentUser.chatID == '0':
+						# If it is an existing user, get record for this user and create a new message entity
+						# with the user as parameter.
 						self.messages.append(msg.Message(currentUser, text))
 					else:
+						# If unknown user, create a new user and write it to users list. Also create a new message
+						# entity with the user as parameter.
 						newUser = usr.User(chat)
 						self.users.append(newUser)
 						self.messages.append(msg.Message(newUser, text))
 
 			else:
+				self.log(update.json.get('error_code'))
 				return update.json().get('error_code')
 
 	# Used to handle all new commands and messages
 	def handleMessages(self):
 		for message in self.messages:
 			if message.isCommand:
-				self.find_command(message)
+				cmd.Command(message, self).findCommand(message)
 			else:
-				self.interpretMessage(message)
+				cmd.Command(message, self).interpretMessage(message)
 			self.messages.remove(message)
 
-	# Used to find the requested command
-	def find_command(self, message):
-		text = message.text.lower()
-		if text in self.commands:
-			self.performCommand(text, message)
-		else:
-			self.sendMessage(message.user.chatID, "Unknown command. Say what?")
-
-	def performCommand(self, command, message):
-		if command == '/help':
-			#TODO
-			print("User wants help")
-		elif command == '/start':
-			self.sendMessage(message.user.chatID, "Please send me your name so we get to know each other")
-			message.user.setExpectedMessageType('name')
-		elif command == '/stop':
-			if message.user.chatID == '230970888':
-				self.sendMessage(message.user.chatID, 'Bot is now stopping.')
-				self.tellMainToClose = True
-
-	def interpretMessage(self, message):
-		type = message.user.getExpectedMessageType()
-
-		if type == '':
-			self.sendMessage(message.user.chatID, 'I don\'t know what to do with your input :(')
-		elif type == 'name':
-			message.user.setName(message.text)
-			welcomeMsg = 'Hello, ' + message.text + '! Pleased to meet you!'
-			self.sendMessage(message.user.chatID, welcomeMsg)
-
-		message.user.setExpectedMessageType('')
+	def log(self, message):
+		print(message)
+		self.sendMessage(patrickID.chatID, message)
+		#self.sendMessage(patrickID.davidID, message)
 
 	# Used to tell the bot to accept no more commands because it is about to be closed
 	def close(self):

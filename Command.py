@@ -13,7 +13,8 @@ class Command:
 		self.bot = bot
 
 		# Defined commands
-		self.commands = ['/start', '/help', '/stopbot', '/privacy', '/subscribemenu', '/unsubscribemenu']
+		self.commands = ['/start', '/help', '/stopbot', '/privacy', '/whatdoyouknowaboutme', '/subscribemenu',
+						 '/unsubscribemenu']
 
 	# Used to find the requested command
 	def findCommand(self):
@@ -30,7 +31,8 @@ class Command:
 			'/stopbot': self.command_stopbot,
 			'/privacy': self.command_privacy,
 			'/subscribemenu': self.command_subscribemenu,
-			'/unsubscribemenu': self.command_unsubscribemenu
+			'/unsubscribemenu': self.command_unsubscribemenu,
+			'/whatdoyouknowaboutme': self.command_whatdoyouknowaboutme
 		}
 
 		commandFunc = callCommandFunctions.get(command)
@@ -85,7 +87,17 @@ class Command:
 		self.bot.sendMessage(self.message.user.chatID,
 							 "We are sorry to loose you as a subscriber and hope to see you here again.")
 
-	# Message types
+	def command_whatdoyouknowaboutme(self):
+		self.bot.sendMessage(self.message.user.chatID, "I know the following things about you:")
+		self.bot.sendMessage(self.message.user.chatID, ("Your Telegram chat id is " + str(self.message.user.chatID)))
+		self.bot.sendMessage(self.message.user.chatID, ("Your name is " + str(self.message.user.name)))
+
+		if self.message.user.wantsMenu:
+			self.bot.sendMessage(self.message.user.chatID, "You want to receive the daily canteen newsletter")
+		else:
+			self.bot.sendMessage(self.message.user.chatID, "You don't want to receive the daily canteen newsletter")
+
+		# Message types
 	def message_unknown(self):
 		self.bot.sendMessage(self.message.user.chatID, 'I don\'t know what to do with your input :(')
 

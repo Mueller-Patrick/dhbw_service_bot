@@ -110,7 +110,7 @@ class Main:
 
 		self.bot.close()
 		if len(self.bot.messages) > 0:
-			print("Bot has to handle some more commands, please wait.")
+			self.bot.log("Bot has to handle some more commands, please wait.")
 
 
 # Starting method

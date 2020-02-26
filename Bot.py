@@ -63,6 +63,7 @@ class Bot:
 						   'text': ''}
 
 	async def getUpdates(self):
+		# If the bot is not about to be closed
 		if not self.closeNow:
 			# Wait for update
 			self.getOffset()
@@ -75,6 +76,10 @@ class Bot:
 					# Wait 1 second before fetching updates again to enable other asynchronous funtions to work
 					await asyncio.sleep(1)
 					update = requests.post(url=reqUrl)
+
+					# Check if bot should close now
+					if self.closeNow:
+						break
 
 				# Set offset to be one higher than the offset of the latest update
 				self.setOffset(update.json().get('result')[len(update.json().get('result')) - 1].get('update_id') + 1)

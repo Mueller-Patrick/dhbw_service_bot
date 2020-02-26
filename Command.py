@@ -13,7 +13,8 @@ class Command:
 		self.bot = bot
 
 		# Defined commands
-		self.commands = ['/start', '/help', '/stopbot', '/privacy', '/subscribemenu', '/unsubscribemenu']
+		self.commands = ['/start', '/help', '/stopbot', '/privacy', '/whatdoyouknowaboutme', '/subscribemenu',
+						 '/unsubscribemenu']
 
 	# Used to find the requested command
 	def findCommand(self):
@@ -30,7 +31,8 @@ class Command:
 			'/stopbot': self.command_stopbot,
 			'/privacy': self.command_privacy,
 			'/subscribemenu': self.command_subscribemenu,
-			'/unsubscribemenu': self.command_unsubscribemenu
+			'/unsubscribemenu': self.command_unsubscribemenu,
+			'/whatdoyouknowaboutme': self.command_whatdoyouknowaboutme
 		}
 
 		commandFunc = callCommandFunctions.get(command)
@@ -54,10 +56,11 @@ class Command:
 		# Provide help list for patrick with full command list and for other users with commands they can use.
 		if str(self.message.user.chatID) == str(patrickID.chatID):
 			self.bot.sendMessage(self.message.user.chatID,
-								 "/start\n/help\n/stopbot\n\n/subscribemenu\n/unsubscribemenu\n\n/privacy")
+								 "/start\n/help\n/stopbot\n\n/subscribemenu\n/unsubscribemenu\n\n/privacy\n/whatdoyouknowaboutme")
 		else:
 			self.bot.sendMessage(self.message.user.chatID,
-								 "Basic commands:\n/start\n/help\n\nMenu commands:\n/subscribemenu\n/unsubscribemenu\n\nFor privacy information, type\n/privacy")
+								 "Basic commands:\n/start\n/help\n\nMenu commands:\n/subscribemenu\n/unsubscribemenu\n\nFor privacy information, type\n/privacy\n"
+								 "To get all information we have about you, type\n/whatdoyouknowaboutme")
 
 	def command_start(self):
 		self.bot.sendMessage(self.message.user.chatID, "Please send me your name so we get to know each other")
@@ -85,7 +88,17 @@ class Command:
 		self.bot.sendMessage(self.message.user.chatID,
 							 "We are sorry to loose you as a subscriber and hope to see you here again.")
 
-	# Message types
+	def command_whatdoyouknowaboutme(self):
+		self.bot.sendMessage(self.message.user.chatID, "I know the following things about you:")
+		self.bot.sendMessage(self.message.user.chatID, ("Your Telegram chat id is " + str(self.message.user.chatID)))
+		self.bot.sendMessage(self.message.user.chatID, ("Your name is " + str(self.message.user.name)))
+
+		if self.message.user.wantsMenu:
+			self.bot.sendMessage(self.message.user.chatID, "You want to receive the daily canteen newsletter")
+		else:
+			self.bot.sendMessage(self.message.user.chatID, "You don't want to receive the daily canteen newsletter")
+
+		# Message types
 	def message_unknown(self):
 		self.bot.sendMessage(self.message.user.chatID, 'I don\'t know what to do with your input :(')
 

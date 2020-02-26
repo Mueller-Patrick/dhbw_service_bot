@@ -60,7 +60,6 @@ class Menu(object):
 
         x = 0
         for i in range(1, 4):
-            return_string += "====================\n"
+            return_string += "%i%"
             return_string += string[string.find("Wahlessen " + str(i)):string.find("Wahlessen " + (str(i + 1)))] + "\n"
-        return_string += "====================\n"
         return re.sub("\n\n+", "\n\n", return_string)

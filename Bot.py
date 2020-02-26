@@ -111,9 +111,9 @@ class Bot:
 	def handleMessages(self):
 		for message in self.messages:
 			if message.isCommand:
-				cmd.Command(message, self).findCommand(message)
+				cmd.Command(message, self).findCommand()
 			else:
-				cmd.Command(message, self).interpretMessage(message)
+				cmd.Command(message, self).interpretMessage()
 			self.messages.remove(message)
 
 	def log(self, message):

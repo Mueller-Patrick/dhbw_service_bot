@@ -7,7 +7,7 @@ import Bot as bt
 import patrickID
 
 
-class Command():
+class Command:
 	def __init__(self, message, bot):
 		self.message = message
 		self.bot = bot
@@ -16,51 +16,80 @@ class Command():
 		self.commands = ['/start', '/help', '/stopbot', '/privacy', '/subscribemenu', '/unsubscribemenu']
 
 	# Used to find the requested command
-	def findCommand(self, message):
-		text = message.text.lower()
+	def findCommand(self):
+		text = self.message.text.lower()
 		if text in self.commands:
-			self.performCommand(text, message)
+			self.performCommand(text)
 		else:
-			self.sendMessage(message.user.chatID, "Unknown command. Say what?")
+			self.sendMessage(self.message.user.chatID, "Unknown command. Say what?")
 
-	def performCommand(self, command, message):
-		if command == '/help':
-			# Provide help list for patrick with full command list and for other users with commands they can use.
-			if str(message.user.chatID) == str(patrickID.chatID):
-				self.bot.sendMessage(message.user.chatID, "/start\n/help\n/stopbot\n\n/subscribemenu\n/unsubscribemenu\n\n/privacy")
-			else:
-				self.bot.sendMessage(message.user.chatID,
-									 "Basic commands:\n/start\n/help\n\nMenu commands:\n/subscribemenu\n/unsubscribemenu\n\nFor privacy information, type\n/privacy")
-		elif command == '/start':
-			self.bot.sendMessage(message.user.chatID, "Please send me your name so we get to know each other")
-			message.user.setExpectedMessageType('name')
-		elif command == '/stopbot':
-			if str(message.user.chatID) == str(patrickID.chatID):
-				self.bot.log("Stopping the bot now.")
-				self.bot.tellMainToClose = True
-			else:
-				self.bot.log("Wrong user " + str(message.user.chatID) + ", entered name " + str(
-					message.user.name) + " tried to stop the bot.")
-		elif command == '/privacy':
-			self.bot.sendMessage(message.user.chatID,
-								 "We save everything you provide us for you to get the best experience.")
-		elif command == '/subscribemenu':
-			message.user.wantsMenu = True
-			self.bot.sendMessage(message.user.chatID,
-								 "You successfully subscribed to the daily menu push-service. Welcome aboard!")
-		elif command == '/unsubscribemenu':
-			message.user.wantsMenu = False
-			self.bot.sendMessage(message.user.chatID,
-								 "We are sorry to loose you as a subscriber and hope to see you here again.")
+	def performCommand(self, command):
+		callCommandFunctions = {
+			'/help': self.command_help,
+			'/start': self.command_start,
+			'/stopbot': self.command_stopbot,
+			'/privacy': self.command_privacy,
+			'/subscribemenu': self.command_subscribemenu,
+			'/unsubscribemenu': self.command_unsubscribemenu
+		}
 
-	def interpretMessage(self, message):
-		type = message.user.getExpectedMessageType()
+		commandFunc = callCommandFunctions.get(command)
+		commandFunc()
 
-		if type == '':
-			self.bot.sendMessage(message.user.chatID, 'I don\'t know what to do with your input :(')
-		elif type == 'name':
-			message.user.setName(message.text)
-			welcomeMsg = 'Hello, ' + message.text + '! Pleased to meet you!'
-			self.bot.sendMessage(message.user.chatID, welcomeMsg)
+	def interpretMessage(self):
+		type = self.message.user.getExpectedMessageType()
 
-		message.user.setExpectedMessageType('')
+		callMessageFunctions = {
+			'': self.message_unknown,
+			'name': self.message_name
+		}
+
+		messageFunc = callMessageFunctions.get(type)
+		messageFunc()
+
+		self.message.user.setExpectedMessageType('')
+
+	# Commands
+	def command_help(self):
+		# Provide help list for patrick with full command list and for other users with commands they can use.
+		if str(self.message.user.chatID) == str(patrickID.chatID):
+			self.bot.sendMessage(self.message.user.chatID,
+								 "/start\n/help\n/stopbot\n\n/subscribemenu\n/unsubscribemenu\n\n/privacy")
+		else:
+			self.bot.sendMessage(self.message.user.chatID,
+								 "Basic commands:\n/start\n/help\n\nMenu commands:\n/subscribemenu\n/unsubscribemenu\n\nFor privacy information, type\n/privacy")
+
+	def command_start(self):
+		self.bot.sendMessage(self.message.user.chatID, "Please send me your name so we get to know each other")
+		self.message.user.setExpectedMessageType('name')
+
+	def command_stopbot(self):
+		if str(self.message.user.chatID) == str(patrickID.chatID):
+			self.bot.log("Stopping the bot now.")
+			self.bot.tellMainToClose = True
+		else:
+			self.bot.log("Wrong user " + str(self.message.user.chatID) + ", entered name " + str(
+				self.message.user.name) + " tried to stop the bot.")
+
+	def command_privacy(self):
+		self.bot.sendMessage(self.message.user.chatID,
+							 "We save everything you provide us for you to get the best experience.")
+
+	def command_subscribemenu(self):
+		self.message.user.wantsMenu = True
+		self.bot.sendMessage(self.message.user.chatID,
+							 "You successfully subscribed to the daily menu push-service. Welcome aboard!")
+
+	def command_unsubscribemenu(self):
+		self.message.user.wantsMenu = False
+		self.bot.sendMessage(self.message.user.chatID,
+							 "We are sorry to loose you as a subscriber and hope to see you here again.")
+
+	# Message types
+	def message_unknown(self):
+		self.bot.sendMessage(self.message.user.chatID, 'I don\'t know what to do with your input :(')
+
+	def message_name(self):
+		self.message.user.setName(self.message.text)
+		welcomeMsg = 'Hello, ' + self.message.text + '! Pleased to meet you!'
+		self.bot.sendMessage(self.message.user.chatID, welcomeMsg)

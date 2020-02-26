@@ -6,7 +6,7 @@ The following steps are required of you to contribute by adding a command to our
 4. If needed, add any message types to the `Command.interpretMessage` list and add the required functions.
 Make sure the message type specifier you add is not already in use.
 5. In your pull request, provide a complete list of commands you added in the following format:
-[command] - [description].
+`[command] - [description]`.
 Please keep in mind that commands have to be all-lowercase.
 <br><br>
 Any modifications that go beyond adding commands can be discussed with us. You then get provided

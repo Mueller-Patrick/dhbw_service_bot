@@ -8,50 +8,59 @@ import re
 from datetime import timedelta
 from requests_html import HTMLSession
 
-# STARTUP
-day = 1  # 1 equals today, 2 equals tomorrow, etc.
-today = datetime.datetime.today()
-if (today.weekday() + day) > 5:
-    print("Datum außerhalb des möglichen Bereiches! (max. die aktuelle Woche)")
-    exit()
-session = HTMLSession()
-resp = session.get("https://www.sw-ka.de/de/essen/")
-table = resp.html.find("#fragment-c3-" + str(day), first=True)
-day = today + timedelta(days=day - 1)
-day = day.date()
 
+class Menu(object):
+    def __init__(self, day):
+        self.valid = True
+        if not self.check_if_valid(day):
+            print("Datum außerhalb des möglichen Bereiches! (max. die aktuelle Woche)")
+            self.valid = False
 
-# CREATION OF STRING
-def create_string(menu):
-    string = ""
-    return_string = "Am " + str(day.day) + "." + str(day.month) + "." + str(
-        day.year) + " gibt es folgendes zum Essen: \n\n"
-    y = 0
-    remove_first = 0
-    remove_second = 0
-    for x in range(len(menu)):
-        if menu[x] == '[':
-            remove_first = x
+        if self.valid:
+            self.create_session(day)
 
-        if menu[x] == ']':
-            remove_second = x + 1
+    def create_session(self, day):
+        self.session = HTMLSession()
+        self.resp = self.session.get("https://www.sw-ka.de/de/essen/")
+        self.menu = self.resp.html.find("#fragment-c3-" + str(day), first=True).text
 
-        if menu[x] == '€':
-            if len(menu[y:x + 1]) > 10:
-                if remove_first != 0 and remove_second != 0:
-                    string += (menu[y:remove_first] + menu[remove_second:x + 1])
-                else:
-                    string += (menu[y:x + 1])
-            y = x + 1
-            remove_first = 0
-            remove_second = 0
+        self.day = datetime.datetime.today() + timedelta(days=day - 1)
+        self.day = self.day.date()
 
-    x = 0
-    for i in range(1, 4):
-        return_string += string[string.find("Wahlessen " + str(i)):string.find("Wahlessen " + (str(i + 1)))] + "\n"
-    return re.sub("\n\n+", "\n\n", return_string)
+    def check_if_valid(self, day):
+        self.day = day
+        self.today = datetime.datetime.today()
+        return (self.today.weekday() + self.day) <= 5
 
+    def create_date_string(self):
+        return str(self.day.day) + "." + str(self.day.month) + "." + str(self.day.year)
 
-# OUTPUT
-final_string = create_string(table.text)
-print(final_string)
+    def create_string(self):
+        string = ""
+        return_string = "Am " + self.create_date_string() + " gibt es folgendes zum Essen: \n\n"
+        y = 0
+        remove_first = 0
+        remove_second = 0
+        for x in range(len(self.menu)):
+            if self.menu[x] == '[':
+                remove_first = x
+
+            if self.menu[x] == ']':
+                remove_second = x + 1
+
+            if self.menu[x] == '€':
+                if len(self.menu[y:x + 1]) > 10:
+                    if remove_first != 0 and remove_second != 0:
+                        string += (self.menu[y:remove_first] + self.menu[remove_second:x + 1])
+                    else:
+                        string += (self.menu[y:x + 1])
+                y = x + 1
+                remove_first = 0
+                remove_second = 0
+
+        x = 0
+        for i in range(1, 4):
+            return_string += "====================\n"
+            return_string += string[string.find("Wahlessen " + str(i)):string.find("Wahlessen " + (str(i + 1)))] + "\n"
+        return_string += "====================\n"
+        return re.sub("\n\n+", "\n\n", return_string)

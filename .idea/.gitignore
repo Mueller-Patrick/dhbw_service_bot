@@ -1,5 +1,4 @@
 # Default ignored files
 /workspace.xml
-telegram_token.txt
-userDict.json
-updateOffset.txt
+../userDict.json
+../patrickID.py

@@ -8,7 +8,7 @@ import Bot as bt
 import User as usr
 import patrickID
 from datetime import datetime
-#import Requests as req
+import MenuSaver as menu
 
 
 class Main:
@@ -25,7 +25,6 @@ class Main:
 
 	async def mainLoop(self):
 		while True:
-			await asyncio.sleep(1)
 			# Wait for commands by users
 			await self.bot.getUpdates()
 			self.bot.handleMessages()
@@ -38,7 +37,7 @@ class Main:
 
 	async def pushLoop(self):
 		while True:
-			await asyncio.sleep(1.5)
+			await asyncio.sleep(30)
 			now = datetime.now()
 			timeString = now.strftime("%H:%M")
 			weekday = now.weekday()
@@ -48,7 +47,7 @@ class Main:
 				canteenOpen = False
 
 			# run daily at 06:00 for all users that want the menu
-			if str(timeString) == '06:00' and not self.sentMenuToday and canteenOpen:
+			if str(timeString) == '16:25' and not self.sentMenuToday and canteenOpen:
 				self.sentMenuToday = True
 				self.sendMenu()
 			# Reset the boolean to send the menu for today again
@@ -63,9 +62,10 @@ class Main:
 	def sendMenu(self):
 		for user in self.users:
 			if user.wantsMenu:
-				#fetchedMenu = req.getMenu TODO: Implement David's request for the menu here
-				self.bot.sendMessage(user.chatID, "Good morning, "+user.name+", here is the menu for today:")
-				self.bot.sendMessage(user.chatID, "FETCHED_MENU")
+				fetchedMenu = menu.Reader(1).get_menu_as_arr()
+				self.bot.sendMessage(user.chatID, "Good morning "+user.name+", here is the menu for today:")
+				for oneMenu in fetchedMenu:
+					self.bot.sendMessage(user.chatID, oneMenu)
 
 	def getToken(self):
 		return patrickID.token

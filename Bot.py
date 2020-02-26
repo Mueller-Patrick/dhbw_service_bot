@@ -73,7 +73,7 @@ class Bot:
 				# While no new messages have been received, fetch updates again. No offset needed because if you send an
 				# offset one time, all 'older' messages get deleted.
 				while len(update.json().get('result')) == 0:
-					# Wait 1 second before fetching updates again to enable other asynchronous funtions to work
+					# Wait 1 second before fetching updates again to enable other asynchronous functions to work
 					await asyncio.sleep(1)
 					update = requests.post(url=reqUrl)
 
@@ -116,9 +116,9 @@ class Bot:
 	def handleMessages(self):
 		for message in self.messages:
 			if message.isCommand:
-				cmd.Command(message, self).findCommand(message)
+				cmd.Command(message, self).findCommand()
 			else:
-				cmd.Command(message, self).interpretMessage(message)
+				cmd.Command(message, self).interpretMessage()
 			self.messages.remove(message)
 
 	def log(self, message):

@@ -1,14 +1,13 @@
 """
  Main file. Handles the bot activity.
 """
-import requests
 import json
 import asyncio
-import Bot as bt
-import User as usr
+from bot import Bot as bt
+from bot import User as usr
 import patrickID
 from datetime import datetime
-import MenuSaver as menu
+from menu import MenuSaver as menu
 
 
 class Main:
@@ -71,7 +70,7 @@ class Main:
 		return patrickID.token
 
 	def getUsers(self):
-		with open('userDict.json', 'r') as userFile:
+		with open('bot/userDict.json', 'r') as userFile:
 			usersJson = userFile.read()
 		userFile.close()
 
@@ -104,7 +103,7 @@ class Main:
 			usersList.append(toAppend)
 		usersJson = json.dumps(usersList)
 
-		with open('userDict.json', 'w') as userFile:
+		with open('bot/userDict.json', 'w') as userFile:
 			userFile.write(usersJson)
 		userFile.close()
 

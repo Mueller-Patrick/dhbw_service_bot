@@ -1,4 +1,4 @@
-import Requests
+from menu import Requests
 import json
 import os
 import datetime
@@ -19,14 +19,14 @@ class Saver(object):
 
             if not self.check_if_in_file():
                 self.menus.append(self.unsaved_menu)
-                with open('savedMenus.json', 'w') as outfile:
+                with open('menu/savedMenus.json', 'w') as outfile:
                     outfile.write(json.dumps(self.menus, indent=4))
                 outfile.close()
 
     def check_if_in_file(self):
-        if os.stat("savedMenus.json").st_size == 0:
+        if os.stat("menu/savedMenus.json").st_size == 0:
             return False
-        with open('savedMenus.json') as infile:
+        with open('menu/savedMenus.json') as infile:
             self.data = json.loads(infile.read())
         infile.close()
 
@@ -42,7 +42,7 @@ class Saver(object):
 class Reader(object):
     def __init__(self, day):
         Saver(day)
-        with open('savedMenus.json', 'r') as testfile:
+        with open('menu/savedMenus.json', 'r') as testfile:
             data = json.loads(testfile.read())
         testfile.close()
         self.day = datetime.datetime.today() + timedelta(days=day - 1)
@@ -66,9 +66,9 @@ class Reader(object):
 
 '''
 def check_if_in_file():
-    if os.stat("savedMenus.json").st_size == 0:
+    if os.stat("menu/savedMenus.json").st_size == 0:
         return False
-    with open('savedMenus.json') as infile:
+    with open('menu/savedMenus.json') as infile:
         data = json.loads(infile.read())
     infile.close()
 
@@ -93,7 +93,7 @@ if menu.valid:
 
     if not check_if_in_file():
         menus.append(unsaved_menu)
-        with open('savedMenus.json', 'w') as outfile:
+        with open('menu/savedMenus.json', 'w') as outfile:
             outfile.write(json.dumps(menus, indent=4))
         outfile.close()
 '''

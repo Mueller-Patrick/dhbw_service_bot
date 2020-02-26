@@ -2,11 +2,8 @@
  Bot class, an object of type bot is created in main.init() at startup with the required parameters.
 """
 import requests
-import json
-import Message as msg
-import User as usr
 import patrickID
-import Command as cmd
+from bot import Command as cmd, Message as msg, User as usr
 import asyncio
 
 
@@ -40,13 +37,13 @@ class Bot:
 
 	# External File handlers
 	def getOffset(self):
-		with open('offsetFile.txt', 'r') as offsetFile:
+		with open('bot/offsetFile.txt', 'r') as offsetFile:
 			self.offsetParam['offset'] = int(offsetFile.read())
 		offsetFile.close()
 
 	def setOffset(self, newOffset):
 		if newOffset != '':
-			with open('offsetFile.txt', 'w') as offsetFile:
+			with open('bot/offsetFile.txt', 'w') as offsetFile:
 				offsetFile.write(str(newOffset))
 			offsetFile.close()
 

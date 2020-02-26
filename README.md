@@ -31,4 +31,4 @@ We also used the `os` library, but this should come with vanilla python.
 
 
 For a list of supported commands, see 
-`Documentation/telegram_command_description.md`
+`docs/telegram_command_description.md`

@@ -1,9 +1,6 @@
 """
  This class is used by the bot to run the commands.
 """
-import Message as msg
-import User as usr
-import Bot as bt
 import patrickID
 
 

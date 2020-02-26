@@ -3,7 +3,6 @@
  The message is then put in a list to be handeled. This way, its quite easy to handle multiple requests
  at the same time.
 """
-import User as usr
 
 
 class Message:

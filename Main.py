@@ -47,7 +47,7 @@ class Main:
 				canteenOpen = False
 
 			# run daily at 06:00 for all users that want the menu
-			if str(timeString) == '16:25' and not self.sentMenuToday and canteenOpen:
+			if str(timeString) == '16:40' and not self.sentMenuToday and canteenOpen:
 				self.sentMenuToday = True
 				self.sendMenu()
 			# Reset the boolean to send the menu for today again

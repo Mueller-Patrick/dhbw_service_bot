@@ -3,7 +3,6 @@
 """
 import requests
 import json
-import asyncio
 import Message as msg
 import User as usr
 import patrickID

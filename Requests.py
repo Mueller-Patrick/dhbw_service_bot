@@ -37,7 +37,7 @@ class Menu(object):
 
     def create_string(self):
         string = ""
-        return_string = "Am " + self.create_date_string() + " gibt es folgendes zum Essen: \n\n"
+        return_string = ""
         y = 0
         remove_first = 0
         remove_second = 0
@@ -59,7 +59,6 @@ class Menu(object):
                 remove_second = 0
 
         x = 0
-        for i in range(1, 4):
-            return_string += "%i%"
+        for i in range(1, 4): #Wahlessen 1 - 3
             return_string += string[string.find("Wahlessen " + str(i)):string.find("Wahlessen " + (str(i + 1)))] + "\n"
         return re.sub("\n\n+", "\n\n", return_string)

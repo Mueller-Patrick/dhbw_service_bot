@@ -19,7 +19,7 @@ class Main:
 
 		# Runs both loops independent from each other
 		loop = asyncio.get_event_loop()
-		cors = asyncio.wait([self.mainLoop(), self.pushLoop()])
+		cors = asyncio.wait([self.mainLoop(), self.pushLoop(), self.saveLoop()])
 		loop.run_until_complete(cors)
 
 	async def mainLoop(self):
@@ -46,12 +46,40 @@ class Main:
 				canteenOpen = False
 
 			# run daily at 06:00 for all users that want the menu
-			if str(timeString) == '16:40' and not self.sentMenuToday and canteenOpen:
+			if str(timeString) == '06:00' and not self.sentMenuToday and canteenOpen:
 				self.sentMenuToday = True
 				self.sendMenu()
 			# Reset the boolean to send the menu for today again
 			elif timeString == '00:01':
 				self.sentMenuToday = False
+
+			# Check if it should stop
+			if self.bot.tellMainToClose:
+				break
+		self.close()
+
+	# Used to save the current users all hour to minimize data loss in case of a server failure.
+	async def saveLoop(self):
+		while True:
+			await asyncio.sleep(59)
+			now = datetime.now()
+			timeString = now.strftime("%H:%M")
+			# run every full our (so at xx:00)
+			if ':00' in str(timeString):
+				usersList = []
+				for user in self.bot.users:
+					toAppend = {
+						"chatID": user.chatID,
+						"name": user.name,
+						"expectedMsgType": user.expectedMessageType,
+						"wantsMenu": user.wantsMenu
+					}
+					usersList.append(toAppend)
+				usersJson = json.dumps(usersList)
+
+				with open('bot/userDict.json', 'w') as userFile:
+					userFile.write(usersJson)
+				userFile.close()
 
 			# Check if it should stop
 			if self.bot.tellMainToClose:

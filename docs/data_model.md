@@ -16,3 +16,5 @@ It then removes the now handled message from the list and continues with the nex
 The menu newsletter is currently handled inside `Main.py`'s function `pushLoop`. It checks
 for a specified time and if it is that time, uses `Request.py` to fetch the daily menu 
 from the website of the DHBW and afterwards sends this to every user that wants to have it.
+<br><br>
+We use the `saveLoop` of `Main.py`to save the current users state.

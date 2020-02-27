@@ -5,6 +5,9 @@
 `async` `pushLoop`: The asynchronous loop that sends push notifications to all users that want them
 at a specified time.
 <br><br>
+`async` `saveLoop`: The asynchronous loop that saves all current users with theit preferences every
+full our to minimize data loss.
+<br><br>
 `sendMenu`: The method that fetches the menu and sends it to users that want it.
 <br><br>
 `getToken`: Reads the Telegram token from specified file.

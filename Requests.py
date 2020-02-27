@@ -59,6 +59,8 @@ class Menu(object):
                 remove_second = 0
 
         x = 0
-        for i in range(1, 4): #Wahlessen 1 - 3
+        for i in range(1, 4):  # Wahlessen 1 - 3
             return_string += string[string.find("Wahlessen " + str(i)):string.find("Wahlessen " + (str(i + 1)))] + "\n"
+            return_string += "%i%"
+        return_string = return_string[:-3]
         return re.sub("\n\n+", "\n\n", return_string)

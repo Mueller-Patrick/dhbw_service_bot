@@ -63,37 +63,3 @@ class Reader(object):
 
     def get_day(self):
         return self.day
-
-'''
-def check_if_in_file():
-    if os.stat("savedMenus.json").st_size == 0:
-        return False
-    with open('savedMenus.json') as infile:
-        data = json.loads(infile.read())
-    infile.close()
-
-    for saved_menu in data:
-        if saved_menu == unsaved_menu:
-            return True
-
-    for dataset in data:
-        menus.append(dataset)
-    return False
-
-
-menu = Requests.Menu(2)
-
-if menu.valid:
-    unsaved_menu = {
-        "day": str(menu.create_date_string()),
-        "menu": str(menu.create_string())
-    }
-
-    menus = []
-
-    if not check_if_in_file():
-        menus.append(unsaved_menu)
-        with open('savedMenus.json', 'w') as outfile:
-            outfile.write(json.dumps(menus, indent=4))
-        outfile.close()
-'''

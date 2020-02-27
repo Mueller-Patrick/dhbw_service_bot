@@ -1,6 +1,7 @@
 **DHBW Service Bot - WIP**
 
-This is a telegram bot for students at DHBW Karlsruhe.
+This is a telegram bot for students at DHBW Karlsruhe. It is made by students of the DHBW Karlsruhe 
+and not affiliated with the DHBW.
 In the future, it will be capable of things like automatically sending you the daily menu in the 
 canteen in the morning or informing you when your first lecture will begin the next day.
 

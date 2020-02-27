@@ -5,7 +5,7 @@ import json
 import asyncio
 from bot import Bot as bt
 from bot import User as usr
-import patrickID
+import telegram_secrets
 from datetime import datetime
 from menu import MenuSaver as menu
 
@@ -95,7 +95,7 @@ class Main:
 					self.bot.sendMessage(user.chatID, oneMenu)
 
 	def getToken(self):
-		return patrickID.token
+		return telegram_secrets.token
 
 	def getUsers(self):
 		with open('bot/userDict.json', 'r') as userFile:

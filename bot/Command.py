@@ -1,7 +1,7 @@
 """
  This class is used by the bot to run the commands.
 """
-import patrickID
+import telegram_secrets
 
 
 class Command:
@@ -51,7 +51,7 @@ class Command:
 	# Commands
 	def command_help(self):
 		# Provide help list for patrick with full command list and for other users with commands they can use.
-		if str(self.message.user.chatID) == str(patrickID.chatID):
+		if str(self.message.user.chatID) == str(telegram_secrets.patrick_telegram_id):
 			self.bot.sendMessage(self.message.user.chatID,
 								 "/start\n/help\n/stopbot\n\n/subscribemenu\n/unsubscribemenu\n\n/privacy\n/whatdoyouknowaboutme")
 		else:
@@ -64,7 +64,7 @@ class Command:
 		self.message.user.setExpectedMessageType('name')
 
 	def command_stopbot(self):
-		if str(self.message.user.chatID) == str(patrickID.chatID):
+		if str(self.message.user.chatID) == str(telegram_secrets.patrick_telegram_id):
 			self.bot.log("Stopping the bot now.")
 			self.bot.tellMainToClose = True
 		else:

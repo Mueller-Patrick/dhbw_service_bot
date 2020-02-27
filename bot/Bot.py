@@ -2,7 +2,7 @@
  Bot class, an object of type bot is created in main.init() at startup with the required parameters.
 """
 import requests
-import patrickID
+import telegram_secrets
 from bot import Command as cmd, Message as msg, User as usr
 import asyncio
 
@@ -119,8 +119,8 @@ class Bot:
 
 	def log(self, message):
 		print(message)
-		self.sendMessage(patrickID.chatID, message)
-		#self.sendMessage(patrickID.davidID, message)
+		self.sendMessage(telegram_secrets.patrick_telegram_id, message)
+		#self.sendMessage(patrickID.david_telegram_id, message)
 
 	# Used to tell the bot to accept no more commands because it is about to be closed
 	def close(self):

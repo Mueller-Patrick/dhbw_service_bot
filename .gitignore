@@ -2,5 +2,5 @@
 .idea/
 /bot/userDict.json
 /menu/savedMenus.json
-/patrickID.py
+/telegram_secrets.py
 /bot/offsetFile.txt

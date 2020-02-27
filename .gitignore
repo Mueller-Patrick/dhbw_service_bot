@@ -1,6 +1,6 @@
 # Default ignored files
 .idea/
-/userDict.json
-/savedMenus.json
+/bot/userDict.json
+/menu/savedMenus.json
 /patrickID.py
-/offsetFile.txt
+/bot/offsetFile.txt

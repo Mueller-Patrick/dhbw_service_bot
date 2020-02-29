@@ -3,6 +3,7 @@
 """
 import telegram_secrets
 from menu import MenuSaver as menu
+from datetime import datetime
 
 
 class Command:
@@ -99,10 +100,15 @@ class Command:
 			self.bot.sendMessage(self.message.user.chatID, "You don't want to receive the daily canteen newsletter")
 
 	def command_getmenu(self):
-		fetchedMenu = menu.Reader(1).get_menu_as_arr()
-		self.bot.sendMessage(self.message.user.chatID, "Here you go: ")
-		for oneMenu in fetchedMenu:
-			self.bot.sendMessage(self.message.user.chatID, oneMenu)
+		now = datetime.now()
+		weekday = now.weekday()
+		if weekday < 6:
+			fetchedMenu = menu.Reader(1).get_menu_as_arr()
+			self.bot.sendMessage(self.message.user.chatID, "Here you go: ")
+			for oneMenu in fetchedMenu:
+				self.bot.sendMessage(self.message.user.chatID, oneMenu)
+		else:
+			self.bot.sendMessage(self.message.user.chatID, "The canteen is closed today. Hence no menu for you. \xF0\x9F\x98\x9C")
 
 	# Message types
 	def message_unknown(self):

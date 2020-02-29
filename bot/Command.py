@@ -56,10 +56,10 @@ class Command:
 		# Provide help list for patrick with full command list and for other users with commands they can use.
 		if str(self.message.user.chatID) == str(telegram_secrets.patrick_telegram_id):
 			self.bot.sendMessage(self.message.user.chatID,
-								 "/start\n/help\n/stopbot\n\n/subscribemenu\n/unsubscribemenu\n\n/privacy\n/whatdoyouknowaboutme")
+								 "/start\n/help\n/stopbot\n\n/subscribemenu\n/unsubscribemenu\n/getmenu\n\n/privacy\n/whatdoyouknowaboutme")
 		else:
 			self.bot.sendMessage(self.message.user.chatID,
-								 "Basic commands:\n/start\n/help\n\nMenu commands:\n/subscribemenu\n/unsubscribemenu\n\nFor privacy information, type\n/privacy\n"
+								 "Basic commands:\n/start\n/help\n\nMenu commands:\n/subscribemenu\n/unsubscribemenu\n/getmenu\n\nFor privacy information, type\n/privacy\n"
 								 "To get all information we have about you, type\n/whatdoyouknowaboutme")
 
 	def command_start(self):
@@ -102,7 +102,7 @@ class Command:
 	def command_getmenu(self):
 		now = datetime.now()
 		weekday = now.weekday()
-		if weekday < 6:
+		if weekday < 5: # Because monday is 0...
 			fetchedMenu = menu.Reader(1).get_menu_as_arr()
 			self.bot.sendMessage(self.message.user.chatID, "Here you go: ")
 			for oneMenu in fetchedMenu:

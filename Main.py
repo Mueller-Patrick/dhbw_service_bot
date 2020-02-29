@@ -40,7 +40,7 @@ class Main:
 			now = datetime.now()
 			timeString = now.strftime("%H:%M")
 			weekday = now.weekday()
-			if weekday < 6:
+			if weekday < 5: # Because monday is 0...
 				canteenOpen = True
 			else:
 				canteenOpen = False

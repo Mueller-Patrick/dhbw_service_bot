@@ -8,7 +8,7 @@ import asyncio
 
 
 class Bot:
-	def __init__(self, telegram_token, users):
+	def __init__(self, telegram_token, users, lectureFetcher):
 		# Given parameters
 		self.telegram_token = telegram_token
 
@@ -34,6 +34,9 @@ class Bot:
 		# If the bot should now close
 		self.closeNow = False
 		self.tellMainToClose = False
+
+		# The LectureFetcher instance
+		self.lectureFetcher = lectureFetcher
 
 	# External File handlers
 	def getOffset(self):

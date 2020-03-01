@@ -51,9 +51,7 @@ class Main:
 				self.sendMenu()
 			# Reset the boolean to send the menu for today again
 			elif timeString == '00:01':
-				self.bot.log(("About to reset the sentMenuToday variable at " + now.strftime("%H:%M:%S")))
 				self.sentMenuToday = False
-				self.bot.log(("Reset complete at " + now.strftime("%H:%M:%S")))
 
 			# Check if it should stop
 			if self.bot.tellMainToClose:
@@ -82,7 +80,6 @@ class Main:
 				with open('bot/userDict.json', 'w') as userFile:
 					userFile.write(usersJson)
 				userFile.close()
-				self.bot.log(("Saved all users at " + now.strftime("%H:%M:%S")))
 
 			# Check if it should stop
 			if self.bot.tellMainToClose:

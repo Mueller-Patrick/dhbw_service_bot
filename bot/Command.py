@@ -118,8 +118,13 @@ class Command:
 			self.bot.sendMessage(self.message.user.chatID, "The canteen is closed today. Hence no menu for you.")
 
 	def command_subscribelectureplan(self):
-		self.bot.sendMessage(self.message.user.chatID, "Please send me your course name in this format: TINF19B4")
-		self.message.user.expectedMessageType = 'coursename'
+		if self.message.user.course == '':
+			self.bot.sendMessage(self.message.user.chatID, "Please send me your course name in this format: TINF19B4")
+			self.message.user.expectedMessageType = 'coursename'
+		else:
+			self.message.user.wantsLecturePlan = True
+			self.bot.sendMessage(self.message.user.chatID, "You successfully subscribed to the daily lecture plan push."
+								 + " May the RaPla be with you!")
 
 	def command_unsubscribelectureplan(self):
 		self.bot.sendMessage(self.message.user.chatID, "What did I do wrong? :(((( I'm so sad now :(((( But since "

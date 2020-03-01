@@ -61,7 +61,7 @@ class Main:
 			if str(timeString) == '06:00' and not self.sentMenuToday and canteenOpen:
 				self.sentMenuToday = True
 				self.sendMenu()
-			elif str(timeString) == '21:14' and not self.sentLecturesToday and sendPlanToday:
+			elif str(timeString) == '18:00' and not self.sentLecturesToday and sendPlanToday:
 				self.sentLecturesToday = True
 				self.sendLectures()
 			# Reset the boolean to send the menu for today again

@@ -156,7 +156,7 @@ class Command:
 			self.message.user.expectedMessageType = ''
 		else:
 			self.bot.sendMessage(self.message.user.chatID, "Unknown course. Please send me the link to your courses"
-								 + "iCal calendar:")
+								 + " iCal calendar:")
 			self.message.user.expectedMessageType = "raplalink"
 
 	def message_raplalink(self):
@@ -172,7 +172,7 @@ class Command:
 									 + " May the RaPla be with you!")
 				self.message.user.expectedMessageType = ''
 			else:
-				self.bot.sendMessage("Invalid link. Please try again. Write stop to cancel setup.")
+				self.bot.sendMessage(self.message.user.chatID, "Invalid link. Please try again. Write stop to cancel setup.")
 				self.message.user.expectedMessageType = 'raplalink'
 
 	def message_broadcastmessage(self):

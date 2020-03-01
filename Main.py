@@ -20,7 +20,6 @@ class Main:
 		self.sentMenuToday = False
 		self.sentLecturesToday = False
 
-
 		# Runs both loops independent from each other
 		loop = asyncio.get_event_loop()
 		cors = asyncio.wait([self.mainLoop(), self.pushLoop(), self.saveLoop()])

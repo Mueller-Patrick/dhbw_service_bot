@@ -14,7 +14,7 @@ class Message:
 
 	def checkCommand(self):
 		# Look for commands
-		if '/' in self.text:
+		if self.text[0] == '/':
 			self.isCommand = True
 		else:
 			self.isCommand = False

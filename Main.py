@@ -120,7 +120,7 @@ class Main:
 		dateString = tomorrow.strftime("%Y-%m-%d")  # to get the YYYY-MM-DD format that is required
 
 		for user in self.bot.users:
-			if user.wantsLecuturePlan:
+			if user.wantsLecturePlan:
 				plan = self.lfetcher.getFormattedLectures(user.course, dateString)
 				firstLectureTime = self.lfetcher.getFirstLectureTime(user.course, dateString)
 

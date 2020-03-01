@@ -128,7 +128,7 @@ class Command:
 	def command_sendmessagetoeveryone(self):
 		if str(self.message.user.chatID) == str(telegram_secrets.patrick_telegram_id):
 			self.bot.sendMessage(self.message.user.chatID, "What do you want to broadcast?")
-			self.message.user.expectedMessageType = "broadcastMessage"
+			self.message.user.expectedMessageType = "broadcastmessage"
 		else:
 			self.bot.log(("Wrong user " + str(self.message.user.chatID) + ", entered name " + str(
 				self.message.user.name) + " tried to broadcast a message"))

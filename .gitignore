@@ -4,3 +4,5 @@
 /menu/savedMenus.json
 /telegram_secrets.py
 /bot/offsetFile.txt
+/lecturePlan/.cache
+/lecturePlan/raplaLinks.json

@@ -5,4 +5,5 @@ help - Prints a list with the most important commands<br>
 privacy - Get information on what data we save<br>
 whatdoyouknowaboutme - Get everything we know about you<br>
 subscribemenu - Subscribes you to the daily canteen menu newsletter<br>
-unsubscribemenu - Unsubscribes you from the menu newsletter
+unsubscribemenu - Unsubscribes you from the menu newsletter<br>
+getmenu - Get todays menu

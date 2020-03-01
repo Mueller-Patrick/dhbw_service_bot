@@ -2,6 +2,7 @@
  This class is used by the bot to run the commands.
 """
 import telegram_secrets
+from menu import MenuSaver as menu
 
 
 class Command:
@@ -11,7 +12,7 @@ class Command:
 
 		# Defined commands
 		self.commands = ['/start', '/help', '/stopbot', '/privacy', '/whatdoyouknowaboutme', '/subscribemenu',
-						 '/unsubscribemenu']
+						 '/unsubscribemenu', '/getmenu']
 
 	# Used to find the requested command
 	def findCommand(self):
@@ -29,7 +30,8 @@ class Command:
 			'/privacy': self.command_privacy,
 			'/subscribemenu': self.command_subscribemenu,
 			'/unsubscribemenu': self.command_unsubscribemenu,
-			'/whatdoyouknowaboutme': self.command_whatdoyouknowaboutme
+			'/whatdoyouknowaboutme': self.command_whatdoyouknowaboutme,
+			'/getmenu': self.command_getmenu
 		}
 
 		commandFunc = callCommandFunctions.get(command)
@@ -95,6 +97,12 @@ class Command:
 			self.bot.sendMessage(self.message.user.chatID, "You want to receive the daily canteen newsletter")
 		else:
 			self.bot.sendMessage(self.message.user.chatID, "You don't want to receive the daily canteen newsletter")
+
+	def command_getmenu(self):
+		fetchedMenu = menu.Reader(1).get_menu_as_arr()
+		self.bot.sendMessage(self.message.user.chatID, "Here you go: ")
+		for oneMenu in fetchedMenu:
+			self.bot.sendMessage(self.message.user.chatID, oneMenu)
 
 	# Message types
 	def message_unknown(self):

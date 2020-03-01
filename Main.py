@@ -61,13 +61,15 @@ class Main:
 			if str(timeString) == '06:00' and not self.sentMenuToday and canteenOpen:
 				self.sentMenuToday = True
 				self.sendMenu()
-			elif str(timeString) == '18:00' and not self.sentLecturesToday and sendPlanToday:
+			elif str(timeString) == '21:14' and not self.sentLecturesToday and sendPlanToday:
 				self.sentLecturesToday = True
 				self.sendLectures()
 			# Reset the boolean to send the menu for today again
 			elif timeString == '00:01':
+				self.bot.log(("About to reset the sentMenuToday variable at " + now.strftime("%H:%M:%S")))
 				self.sentMenuToday = False
 				self.sentLecturesToday = False
+				self.bot.log(("Reset complete at " + now.strftime("%H:%M:%S")))
 
 			# Check if it should stop
 			if self.bot.tellMainToClose:
@@ -101,6 +103,8 @@ class Main:
 				# save rapla links
 				self.lfetcher.writeLinksToJson()
 
+				self.bot.log(("Saved all preferences at " + now.strftime("%H:%M:%S")))
+
 			# Check if it should stop
 			if self.bot.tellMainToClose:
 				break
@@ -120,7 +124,7 @@ class Main:
 		dateString = tomorrow.strftime("%Y-%m-%d")  # to get the YYYY-MM-DD format that is required
 
 		for user in self.bot.users:
-			if user.wantsLecuturePlan:
+			if user.wantsLecturePlan:
 				plan = self.lfetcher.getFormattedLectures(user.course, dateString)
 				firstLectureTime = self.lfetcher.getFirstLectureTime(user.course, dateString)
 

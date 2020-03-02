@@ -23,7 +23,9 @@ Used libraries are <br>
 `requests_html`<br>
 `datetime`<br>
 `json`<br>
-`asyncio`.<br>
+`asyncio`<br>
+`icalendar`<br>
+`icalevents`.<br>
 
 These are not specifically important for development, just for us to run the bot.
 To install them, run `pip install [LIBRARY_NAME]`on your machine, given that you have already installed pip.

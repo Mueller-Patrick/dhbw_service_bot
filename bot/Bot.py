@@ -91,6 +91,7 @@ class Bot:
 				if not text:
 					self.sendMessage(chat, "Unknown input format. Don't mess with me, fella!")
 				else:
+					self.log("Received message")
 					currentUser = usr.User('0') # Creates an empty user object to be populated later
 					for user in self.users:
 						if user.chatID == chat:

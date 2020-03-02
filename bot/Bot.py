@@ -69,6 +69,7 @@ class Bot:
 			reqUrl = (self.telegramUrl + self.telegram_token + "getUpdates")
 			update = requests.post(url=reqUrl, params=self.offsetParam)
 			if update.json().get('ok'):
+				self.log(update.json())
 				# While no new messages have been received, fetch updates again. No offset needed because if you send an
 				# offset one time, all 'older' messages get deleted.
 				while len(update.json().get('result')) == 0:

@@ -88,6 +88,7 @@ class Bot:
 				for res in update.json().get('result'):
 					chat = res.get('message').get('chat').get('id')
 					text = res.get('message').get('text')
+					#TODO Only the last message is saved, every other message in this update is deleted here!
 
 				if not text:
 					self.sendMessage(chat, "Unknown input format. Don't mess with me, fella!")

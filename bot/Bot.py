@@ -88,6 +88,8 @@ class Bot:
 					chat = res.get('message').get('chat').get('id')
 					text = res.get('message').get('text')
 
+					self.log("Received message")
+
 					if not text:
 						self.sendMessage(chat, "Unknown input format. Don't mess with me, fella!")
 					else:
@@ -114,12 +116,13 @@ class Bot:
 	# Used to handle all new commands and messages
 	def handleMessages(self):
 		for message in self.messages:
+			self.log(("Handling message by "+message.user.name))
 			if message.isCommand:
 				cmd.Command(message, self).findCommand()
 			else:
 				cmd.Command(message, self).interpretMessage()
-			self.messages.remove(message)
 		self.messages.clear()
+		self.log("Handled all current messages")
 
 	def log(self, message):
 		print(message)

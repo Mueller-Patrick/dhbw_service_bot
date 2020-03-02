@@ -118,7 +118,7 @@ class Command:
 			self.bot.sendMessage(self.message.user.chatID, "The canteen is closed today. Hence no menu for you.")
 
 	def command_subscribelectureplan(self):
-		if self.message.user.course == '':
+		if self.message.user.course == '' or self.message.user.course == None:
 			self.bot.sendMessage(self.message.user.chatID, "Please send me your course name in this format: TINF19B4")
 			self.message.user.expectedMessageType = 'coursename'
 		else:

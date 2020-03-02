@@ -82,7 +82,7 @@ class Main:
 			now = datetime.now()
 			timeString = now.strftime("%H:%M")
 			# run every full our (so at xx:00)
-			if ':00' in str(timeString):
+			if ':05' in str(timeString):
 				# Save user data
 				usersList = []
 				for user in self.bot.users:

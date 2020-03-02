@@ -40,9 +40,14 @@ class Bot:
 
 	# External File handlers
 	def getOffset(self):
-		with open('bot/offsetFile.txt', 'r') as offsetFile:
-			self.offsetParam['offset'] = int(offsetFile.read())
-		offsetFile.close()
+		try:
+			with open('bot/offsetFile.txt', 'r') as offsetFile:
+				self.offsetParam['offset'] = int(offsetFile.read())
+			offsetFile.close()
+		except:
+			with open('bot/offsetFile.txt', 'w') as offsetFile:
+				offsetFile.close()
+			self.offsetParam['offset'] = 0
 
 	def setOffset(self, newOffset):
 		if newOffset != '':
@@ -93,7 +98,7 @@ class Bot:
 					if not text:
 						self.sendMessage(chat, "Unknown input format. Don't mess with me, fella!")
 					else:
-						currentUser = usr.User('0') # Creates an empty user object to be populated later
+						currentUser = usr.User('0')  # Creates an empty user object to be populated later
 						for user in self.users:
 							if user.chatID == chat:
 								currentUser = user
@@ -116,7 +121,7 @@ class Bot:
 	# Used to handle all new commands and messages
 	def handleMessages(self):
 		for message in self.messages:
-			self.log(("Handling message by "+message.user.name))
+			self.log(("Handling message by " + message.user.name))
 			if message.isCommand:
 				cmd.Command(message, self).findCommand()
 			else:
@@ -127,7 +132,8 @@ class Bot:
 	def log(self, message):
 		print(message)
 		self.sendMessage(telegram_secrets.patrick_telegram_id, message)
-		#self.sendMessage(patrickID.david_telegram_id, message)
+
+	# self.sendMessage(patrickID.david_telegram_id, message)
 
 	# Used to tell the bot to accept no more commands because it is about to be closed
 	def close(self):

@@ -135,11 +135,16 @@ class Main:
 		return telegram_secrets.token
 
 	def getUsers(self):
-		with open('bot/userDict.json', 'r') as userFile:
-			usersJson = userFile.read()
-		userFile.close()
+		try:
+			with open('bot/userDict.json', 'r') as userFile:
+				usersJson = userFile.read()
+			userFile.close()
 
-		usersList = json.loads(usersJson)
+			usersList = json.loads(usersJson)
+		except:
+			with open('bot/userDict.json', 'w') as userFile:
+				userFile.close()
+			usersList = []
 
 		users = []
 		for user in usersList:

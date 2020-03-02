@@ -11,11 +11,16 @@ class LectureFetcher:
 		self.linkDict = self.getRaplaLinks()
 
 	def getRaplaLinks(self):
-		with open('lecturePlan/raplaLinks.json', 'r') as raplaFile:
-			raplaJson = raplaFile.read()
-		raplaFile.close()
+		try:
+			with open('lecturePlan/raplaLinks.json', 'r') as raplaFile:
+				raplaJson = raplaFile.read()
+			raplaFile.close()
 
-		linkList = json.loads(raplaJson)
+			linkList = json.loads(raplaJson)
+		except:
+			with open('lecturePlan/raplaLinks.json', 'w') as raplaFile:
+				raplaFile.close()
+			linkList = []
 
 		return linkList
 

@@ -90,7 +90,9 @@ class Main:
 						"chatID": user.chatID,
 						"name": user.name,
 						"expectedMsgType": user.expectedMessageType,
-						"wantsMenu": user.wantsMenu
+						"wantsMenu": user.wantsMenu,
+						"course": user.course,
+						"wantsLecturePlan": user.wantsLecturePlan
 					}
 					usersList.append(toAppend)
 				usersJson = json.dumps(usersList)

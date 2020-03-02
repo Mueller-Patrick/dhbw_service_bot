@@ -114,11 +114,13 @@ class Bot:
 	# Used to handle all new commands and messages
 	def handleMessages(self):
 		for message in self.messages:
+			self.log(("Handling message by" + message.user.name))
 			if message.isCommand:
 				cmd.Command(message, self).findCommand()
 			else:
 				cmd.Command(message, self).interpretMessage()
 			self.messages.remove(message)
+			self.log("Handling done")
 
 	def log(self, message):
 		print(message)

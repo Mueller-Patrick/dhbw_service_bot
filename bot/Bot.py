@@ -69,7 +69,6 @@ class Bot:
 			reqUrl = (self.telegramUrl + self.telegram_token + "getUpdates")
 			update = requests.post(url=reqUrl, params=self.offsetParam)
 			if update.json().get('ok'):
-				self.log(update.json())
 				# While no new messages have been received, fetch updates again. No offset needed because if you send an
 				# offset one time, all 'older' messages get deleted.
 				while len(update.json().get('result')) == 0:
@@ -89,25 +88,24 @@ class Bot:
 					chat = res.get('message').get('chat').get('id')
 					text = res.get('message').get('text')
 
-				if not text:
-					self.sendMessage(chat, "Unknown input format. Don't mess with me, fella!")
-				else:
-					self.log("Received message")
-					currentUser = usr.User('0') # Creates an empty user object to be populated later
-					for user in self.users:
-						if user.chatID == chat:
-							currentUser = user
-
-					if not currentUser.chatID == '0':
-						# If it is an existing user, get record for this user and create a new message entity
-						# with the user as parameter.
-						self.messages.append(msg.Message(currentUser, text))
+					if not text:
+						self.sendMessage(chat, "Unknown input format. Don't mess with me, fella!")
 					else:
-						# If unknown user, create a new user and write it to users list. Also create a new message
-						# entity with the user as parameter.
-						newUser = usr.User(chat)
-						self.users.append(newUser)
-						self.messages.append(msg.Message(newUser, text))
+						currentUser = usr.User('0') # Creates an empty user object to be populated later
+						for user in self.users:
+							if user.chatID == chat:
+								currentUser = user
+
+						if not currentUser.chatID == '0':
+							# If it is an existing user, get record for this user and create a new message entity
+							# with the user as parameter.
+							self.messages.append(msg.Message(currentUser, text))
+						else:
+							# If unknown user, create a new user and write it to users list. Also create a new message
+							# entity with the user as parameter.
+							newUser = usr.User(chat)
+							self.users.append(newUser)
+							self.messages.append(msg.Message(newUser, text))
 
 			else:
 				self.log(update.json.get('error_code'))
@@ -116,14 +114,12 @@ class Bot:
 	# Used to handle all new commands and messages
 	def handleMessages(self):
 		for message in self.messages:
-			self.log(("Handling message by" + message.user.name))
 			if message.isCommand:
 				cmd.Command(message, self).findCommand()
 			else:
 				cmd.Command(message, self).interpretMessage()
 			self.messages.remove(message)
 		self.messages.clear()
-		self.log("Handling of all messages done")
 
 	def log(self, message):
 		print(message)

@@ -39,7 +39,7 @@ class Main:
 
 	async def pushLoop(self):
 		while True:
-			await asyncio.sleep(30)
+			await asyncio.sleep(29)
 			now = datetime.now()
 			timeString = now.strftime("%H:%M")
 			weekday = now.weekday()
@@ -65,10 +65,8 @@ class Main:
 				self.sendLectures()
 			# Reset the boolean to send the menu for today again
 			elif timeString == '00:01':
-				self.bot.log(("About to reset the sentMenuToday variable at " + now.strftime("%H:%M:%S")))
 				self.sentMenuToday = False
 				self.sentLecturesToday = False
-				self.bot.log(("Reset complete at " + now.strftime("%H:%M:%S")))
 
 			# Check if it should stop
 			if self.bot.tellMainToClose:

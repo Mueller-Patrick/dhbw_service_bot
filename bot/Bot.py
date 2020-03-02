@@ -90,25 +90,25 @@ class Bot:
 					text = res.get('message').get('text')
 					#TODO Only the last message is saved, every other message in this update is deleted here!
 
-				if not text:
-					self.sendMessage(chat, "Unknown input format. Don't mess with me, fella!")
-				else:
-					self.log("Received message")
-					currentUser = usr.User('0') # Creates an empty user object to be populated later
-					for user in self.users:
-						if user.chatID == chat:
-							currentUser = user
-
-					if not currentUser.chatID == '0':
-						# If it is an existing user, get record for this user and create a new message entity
-						# with the user as parameter.
-						self.messages.append(msg.Message(currentUser, text))
+					if not text:
+						self.sendMessage(chat, "Unknown input format. Don't mess with me, fella!")
 					else:
-						# If unknown user, create a new user and write it to users list. Also create a new message
-						# entity with the user as parameter.
-						newUser = usr.User(chat)
-						self.users.append(newUser)
-						self.messages.append(msg.Message(newUser, text))
+						self.log("Received message")
+						currentUser = usr.User('0') # Creates an empty user object to be populated later
+						for user in self.users:
+							if user.chatID == chat:
+								currentUser = user
+
+						if not currentUser.chatID == '0':
+							# If it is an existing user, get record for this user and create a new message entity
+							# with the user as parameter.
+							self.messages.append(msg.Message(currentUser, text))
+						else:
+							# If unknown user, create a new user and write it to users list. Also create a new message
+							# entity with the user as parameter.
+							newUser = usr.User(chat)
+							self.users.append(newUser)
+							self.messages.append(msg.Message(newUser, text))
 
 			else:
 				self.log(update.json.get('error_code'))

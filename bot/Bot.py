@@ -120,7 +120,8 @@ class Bot:
 			else:
 				cmd.Command(message, self).interpretMessage()
 			self.messages.remove(message)
-			self.log("Handling done")
+		self.messages.clear()
+		self.log("Handling of all messages done")
 
 	def log(self, message):
 		print(message)

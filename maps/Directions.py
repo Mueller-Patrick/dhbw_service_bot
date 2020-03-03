@@ -27,7 +27,7 @@ class Direction(object):
     def __init__(self, arrival_date, initial_departure_place):
         self.arrival_time = arrival_date.timestamp()
 
-        self.directions_result = google_maps.directions("77815 Bühl Weitenung, Germany",
+        self.directions_result = google_maps.directions(initial_departure_place,
                                                         "Erzbergerstraße 121, 76133 Karlsruhe, Germany",
                                                         mode="transit",
                                                         arrival_time=self.arrival_time)

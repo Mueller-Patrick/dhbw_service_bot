@@ -64,7 +64,8 @@ class Command:
 								 "/start\n/help\n/stopbot\n/sendmessagetoeveryone\n\n/subscribemenu\n/unsubscribemenu\n/getmenu\n\n/subscribelectureplan\n/unsubscribelectureplan\n\n/privacy\n/whatdoyouknowaboutme")
 		else:
 			self.bot.sendMessage(self.message.user.chatID,
-								 ("Basic commands:\n/start\n/help\n\nMenu commands:\n/subscribemenu\n/unsubscribemenu\n/getmenu\n\n"
+								 (
+										 "Basic commands:\n/start\n/help\n\nMenu commands:\n/subscribemenu\n/unsubscribemenu\n/getmenu\n\n"
 										 + "Lecture plan commands:\n/subscribelectureplan\n/unsubscribelectureplan"
 										 + "\n\nFor privacy information, type\n/privacy\n"
 										 + "To get all information we have about you, type\n/whatdoyouknowaboutme"))
@@ -102,9 +103,21 @@ class Command:
 		self.bot.sendMessage(self.message.user.chatID, ("Your name is " + str(self.message.user.name)))
 
 		if self.message.user.wantsMenu:
-			self.bot.sendMessage(self.message.user.chatID, "You want to receive the daily canteen newsletter")
+			self.bot.sendMessage(self.message.user.chatID, "You want to receive the daily menu push")
 		else:
-			self.bot.sendMessage(self.message.user.chatID, "You don't want to receive the daily canteen newsletter")
+			self.bot.sendMessage(self.message.user.chatID, "You don't want to receive the daily menu push")
+
+		if self.message.user.wantsLecturePlan:
+			self.bot.sendMessage(self.message.user.chatID, "You want to receive the daily lecture plan push")
+		else:
+			self.bot.sendMessage(self.message.user.chatID, "You don't want to receive the daily lecture plan push")
+
+		if self.message.user.course:
+			self.bot.sendMessage(self.message.user.chatID, ("You are in the " + self.message.user.course + " course"))
+		else:
+			self.bot.sendMessage(self.message.user.chatID,
+								 "But I don't know which course you are in, so I can't send you"
+								 + "your lecture plan :(")
 
 	def command_getmenu(self):
 		now = datetime.now()
@@ -177,7 +190,8 @@ class Command:
 									 + " May the RaPla be with you!")
 				self.message.user.expectedMessageType = ''
 			else:
-				self.bot.sendMessage(self.message.user.chatID, "Invalid link. Please try again. Write stop to cancel setup.")
+				self.bot.sendMessage(self.message.user.chatID,
+									 "Invalid link. Please try again. Write stop to cancel setup.")
 				self.message.user.expectedMessageType = 'raplalink'
 
 	def message_broadcastmessage(self):

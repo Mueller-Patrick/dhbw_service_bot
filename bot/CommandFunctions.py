@@ -51,25 +51,27 @@ class CommandFunctions:
 							 "We are sorry to loose you as a subscriber and hope to see you here again.")
 
 	def command_whatdoyouknowaboutme(self):
-		self.bot.sendMessage(self.message.user.chatID, "I know the following things about you:")
-		self.bot.sendMessage(self.message.user.chatID, ("Your Telegram chat id is " + str(self.message.user.chatID)))
-		self.bot.sendMessage(self.message.user.chatID, ("Your name is " + str(self.message.user.name)))
+		self.bot.sendMessage(self.message.user.chatID, "🤔 I know the following things about you :")
+		self.bot.sendMessage(self.message.user.chatID, ("📥 Your Telegram chat id is " + str(self.message.user.chatID)))
+		self.bot.sendMessage(self.message.user.chatID, ("🗣 Your name is " + str(self.message.user.name)))
+		if self.message.user.address != '' and self.message.user.addess is not None:
+			self.bot.sendMessage(self.message.user.chatID, ('🚅 The address you entered is ' + self.message.user.address))
 
 		if self.message.user.wantsMenu:
-			self.bot.sendMessage(self.message.user.chatID, "You want to receive the daily menu push")
+			self.bot.sendMessage(self.message.user.chatID, "✅ You want to receive the daily menu push")
 		else:
-			self.bot.sendMessage(self.message.user.chatID, "You don't want to receive the daily menu push")
+			self.bot.sendMessage(self.message.user.chatID, "❌ You don't want to receive the daily menu push")
 
 		if self.message.user.wantsLecturePlan:
-			self.bot.sendMessage(self.message.user.chatID, "You want to receive the daily lecture plan push")
+			self.bot.sendMessage(self.message.user.chatID, "✅ You want to receive the daily lecture plan push")
 		else:
-			self.bot.sendMessage(self.message.user.chatID, "You don't want to receive the daily lecture plan push")
+			self.bot.sendMessage(self.message.user.chatID, "❌ You don't want to receive the daily lecture plan push")
 
 		if self.message.user.course:
-			self.bot.sendMessage(self.message.user.chatID, ("You are in the " + self.message.user.course + " course"))
+			self.bot.sendMessage(self.message.user.chatID, ("🏫 You are in the " + self.message.user.course + " course"))
 		else:
 			self.bot.sendMessage(self.message.user.chatID,
-								 "But I don't know which course you are in, so I can't send you"
+								 "❓ But I don't know which course you are in, so I can't send you"
 								 + "your lecture plan :(")
 
 	def command_getmenu(self):

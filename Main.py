@@ -66,6 +66,8 @@ class Main:
 				self.sendLectures()
 			# Reset the boolean to send the menu for today again
 			elif timeString == '00:01':
+				self.bot.log(("Messages handled yesterday: " + str(self.bot.messagesHandledToday)))
+				self.bot.messagesHandledToday = 0
 				self.sentMenuToday = False
 				self.sentLecturesToday = False
 
@@ -133,14 +135,14 @@ class Main:
 				self.bot.sendMessage(user.chatID, plan)
 
 				if user.address != None and user.address != '':
-					time = datetime(int(tomorrow.year), int(tomorrow.month), int(tomorrow.day), int(firstLectureTime[:2]), int(firstLectureTime[3:]))
+					time = datetime(int(tomorrow.year), int(tomorrow.month), int(tomorrow.day),
+									int(firstLectureTime[:2]), int(firstLectureTime[3:]))
 
 					direc = Directions.Direction(time, user.address)
 					trainPlan = direc.create_message()
 
 					self.bot.sendMessage(user.chatID, 'Here are the public transport directions:')
 					self.bot.sendMessage(user.chatID, trainPlan)
-
 
 	def getToken(self):
 		return telegram_secrets.token

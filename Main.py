@@ -115,9 +115,12 @@ class Main:
 				break
 		self.close()
 
+	# Writes statistics to bot/usageStats.json in the format "DATE": ["AMOUNT_RECEIVED","AMOUNT_SENT"]
 	def writeUsageStats(self, addLog):
 		if addLog:
-			self.bot.log(("We have " + str(len(self.bot.users)) + " users and yesterday I handled " + str(self.bot.messagesHandledToday) + " messages."))
+			self.bot.log(("We have " + str(len(self.bot.users)) + " users. Yesterday, I received "
+						  + str(self.bot.messagesReceivedToday) + " messages and sent "
+						  + str(self.bot.messagesSentToday) + " messages."))
 
 		try:
 			with open('bot/usageStats.json', 'r') as usageFile:
@@ -126,7 +129,8 @@ class Main:
 
 			usageList = json.loads(usageJson)
 
-			usageList[datetime.now().strftime('%Y-%m-%d')] += self.bot.messagesHandledToday
+			usageList[datetime.now().strftime('%Y-%m-%d')][0] += self.bot.messagesReceivedToday
+			usageList[datetime.now().strftime('%Y-%m-%d')][1] += self.bot.messagesSentToday
 
 			with open('bot/usageStats.json', 'w') as usageFile:
 				usageFile.write(json.dumps(usageList))
@@ -134,12 +138,13 @@ class Main:
 		except: # If file doesnt exist
 			with open('bot/usageStats.json', 'w') as usageFile:
 				usageList = {
-					datetime.now().strftime('%Y-%m-%d'): self.bot.messagesHandledToday
+					datetime.now().strftime('%Y-%m-%d'): [self.bot.messagesReceivedToday, self.bot.messagesSentToday]
 				}
 				usageFile.write(json.dumps(usageList))
 			usageFile.close()
 
-		self.bot.messagesHandledToday = 0
+		self.bot.messagesReceivedToday = 0
+		self.bot.messagesSentToday = 0
 
 	def sendMenu(self):
 		for user in self.bot.users:

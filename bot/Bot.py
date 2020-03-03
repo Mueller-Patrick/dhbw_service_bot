@@ -39,7 +39,8 @@ class Bot:
 
 		# To create statistics on how much messages have been handled
 		# If the bot restarted that day, this is the number of handled messages since the restart.
-		self.messagesHandledToday = 0
+		self.messagesReceivedToday = 0
+		self.messagesSentToday = 0
 
 	# External File handlers
 	def getOffset(self):
@@ -66,6 +67,7 @@ class Bot:
 					  'parse_mode': 'Markdown'}
 		reqUrl = (self.telegramUrl + self.telegram_token + self.sendMessageParam)
 		resp = requests.post(url=reqUrl, params=sendParams)
+		self.messagesSentToday += 1
 
 	# The options param has to be a [[String]], so an Array of rows with an array of buttons in JSON format.
 	def sendMessageWithOptions(self, chat, text, options):
@@ -77,6 +79,7 @@ class Bot:
 		}
 		reqUrl = (self.telegramUrl + self.telegram_token + self.sendMessageParam)
 		resp = requests.post(url=reqUrl, params=sendParams)
+		self.messagesSentToday += 1
 
 	def generateReplyMarkup(self, options):
 		reply = ('{"keyboard": [' + json.dumps(options) + '],'
@@ -144,7 +147,7 @@ class Bot:
 				cmd.Command(message, self).findCommand()
 			else:
 				cmd.Command(message, self).interpretMessage()
-			self.messagesHandledToday += 1
+			self.messagesReceivedToday += 1
 		self.messages.clear()
 
 	# self.log("Handled all current messages")

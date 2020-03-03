@@ -1,9 +1,9 @@
 import googlemaps
 import json
 from datetime import datetime
-from security import google
+import telegram_secrets
 
-google_maps = googlemaps.Client(key=google.google_API)
+google_maps = googlemaps.Client(key=telegram_secrets.google_API)
 
 '''
     arrival_date: has to be a datetime object
@@ -27,7 +27,7 @@ class Direction(object):
     def __init__(self, arrival_date, initial_departure_place):
         self.arrival_time = arrival_date.timestamp()
 
-        self.directions_result = google_maps.directions("77815 Bühl Weitenung, Germany",
+        self.directions_result = google_maps.directions(initial_departure_place,
                                                         "Erzbergerstraße 121, 76133 Karlsruhe, Germany",
                                                         mode="transit",
                                                         arrival_time=self.arrival_time)
@@ -98,19 +98,19 @@ class Direction(object):
 
     def create_message(self):
         trip_json = json.loads(self.get_as_json())
-        string = "🌱 Your ride starts at "
+        string = "🌱 *Your ride starts at "
         string += create_time_string(trip_json['departure_time'])
-        string += "\n"
+        string += "*\n"
         for leg in trip_json['legs']:
             try:
                 if leg['train']['type'] == "Tram":
-                    string += "🚋 "
+                    string += "🚋 _"
                 elif leg['train']['type'] == "Bus":
-                    string += "🚌 "
+                    string += "🚌 _"
                 else:
-                    string += "🚅 "
+                    string += "🚅 _"
             except:
-                string += "🚅 "
+                string += "🚅 _"
             string += leg['departure']['station']
             string += " ("
             string += create_time_string(leg['departure']['scheduled'])
@@ -120,7 +120,8 @@ class Direction(object):
             string += create_time_string(leg['arrival']['scheduled'])
             string += ") with "
             string += leg['train']['name']
-            string += "\n"
-        string += "🏫 You're at DHBW at "
+            string += "_\n"
+        string += "🏫 *You're at DHBW at "
         string += create_time_string(trip_json['arrival_time'])
+        string += "*"
         return string

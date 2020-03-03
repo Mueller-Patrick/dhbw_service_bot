@@ -10,6 +10,7 @@ from datetime import datetime
 from datetime import timedelta
 from menu import MenuSaver as menu
 from lecturePlan import LectureFetcher as lf
+from maps import Directions
 
 
 class Main:
@@ -90,7 +91,8 @@ class Main:
 						"expectedMsgType": user.expectedMessageType,
 						"wantsMenu": user.wantsMenu,
 						"course": user.course,
-						"wantsLecturePlan": user.wantsLecturePlan
+						"wantsLecturePlan": user.wantsLecturePlan,
+						"address": user.address
 					}
 					usersList.append(toAppend)
 				usersJson = json.dumps(usersList)
@@ -118,8 +120,7 @@ class Main:
 					self.bot.sendMessage(user.chatID, oneMenu)
 
 	def sendLectures(self):
-		now = datetime.now()
-		tomorrow = now + timedelta(days=1)
+		tomorrow = datetime.now() + timedelta(days=1)
 		dateString = tomorrow.strftime("%Y-%m-%d")  # to get the YYYY-MM-DD format that is required
 
 		for user in self.bot.users:
@@ -130,6 +131,16 @@ class Main:
 				self.bot.sendMessage(user.chatID, ('Good evening ' + user.name + '. Tomorrow your first lecture begins '
 												   + 'at ' + firstLectureTime + '. Here is the plan for tomorrow:'))
 				self.bot.sendMessage(user.chatID, plan)
+
+				if user.address != None and user.address != '':
+					time = datetime(int(tomorrow.year), int(tomorrow.month), int(tomorrow.day), int(firstLectureTime[:2]), int(firstLectureTime[3:]))
+
+					direc = Directions.Direction(time, user.address)
+					trainPlan = direc.create_message()
+
+					self.bot.sendMessage(user.chatID, 'Here are the public transport directions:')
+					self.bot.sendMessage(user.chatID, trainPlan)
+
 
 	def getToken(self):
 		return telegram_secrets.token
@@ -156,6 +167,7 @@ class Main:
 			currentUser.wantsMenu = user.get('wantsMenu')
 			currentUser.course = user.get('course')
 			currentUser.wantsLecturePlan = user.get('wantsLecturePlan')
+			currentUser.address = user.get('address')
 
 			users.append(currentUser)
 
@@ -172,7 +184,8 @@ class Main:
 				"expectedMsgType": user.expectedMessageType,
 				"wantsMenu": user.wantsMenu,
 				"course": user.course,
-				"wantsLecturePlan": user.wantsLecturePlan
+				"wantsLecturePlan": user.wantsLecturePlan,
+				"address": user.address
 			}
 			usersList.append(toAppend)
 		usersJson = json.dumps(usersList)

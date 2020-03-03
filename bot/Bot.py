@@ -58,16 +58,19 @@ class Bot:
 	def sendMessage(self, chat, text):
 		sendParams = {'chat_id': chat,
 					  'text': text,
-					  'reply_markup': '{"remove_keyboard": true}'}
+					  'reply_markup': '{"remove_keyboard": true}',
+					  'parse_mode': 'Markdown'}
 		reqUrl = (self.telegramUrl + self.telegram_token + self.sendMessageParam)
 		resp = requests.post(url=reqUrl, params=sendParams)
+		print(resp.json())
 
 	# The options param has to be a [[String]], so an Array of rows with an array of buttons in JSON format.
 	def sendMessageWithOptions(self, chat, text, options):
 		sendParams = {
 			'chat_id': chat,
 			'text': text,
-			'reply_markup': options
+			'reply_markup': options,
+			'parse_mode': 'Markdown'
 		}
 		reqUrl = (self.telegramUrl + self.telegram_token + self.sendMessageParam)
 		resp = requests.post(url=reqUrl, params=sendParams)
@@ -75,8 +78,8 @@ class Bot:
 
 	def generateReplyMarkup(self, options):
 		reply = ('{"keyboard": [' + json.dumps(options) + '],'
-		+ '"one_time_keyboard": true,'
-		+ '"resize_keyboard": true}')
+				 + '"one_time_keyboard": true,'
+				 + '"resize_keyboard": true}')
 		return reply
 
 	async def getUpdates(self):

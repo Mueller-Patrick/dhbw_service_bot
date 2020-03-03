@@ -62,7 +62,6 @@ class Bot:
 					  'parse_mode': 'Markdown'}
 		reqUrl = (self.telegramUrl + self.telegram_token + self.sendMessageParam)
 		resp = requests.post(url=reqUrl, params=sendParams)
-		print(resp.json())
 
 	# The options param has to be a [[String]], so an Array of rows with an array of buttons in JSON format.
 	def sendMessageWithOptions(self, chat, text, options):

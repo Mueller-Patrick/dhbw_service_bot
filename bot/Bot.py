@@ -8,7 +8,7 @@ import asyncio
 
 
 class Bot:
-	def __init__(self, telegram_token, users):
+	def __init__(self, telegram_token, users, lectureFetcher):
 		# Given parameters
 		self.telegram_token = telegram_token
 
@@ -35,11 +35,19 @@ class Bot:
 		self.closeNow = False
 		self.tellMainToClose = False
 
+		# The LectureFetcher instance
+		self.lectureFetcher = lectureFetcher
+
 	# External File handlers
 	def getOffset(self):
-		with open('bot/offsetFile.txt', 'r') as offsetFile:
-			self.offsetParam['offset'] = int(offsetFile.read())
-		offsetFile.close()
+		try:
+			with open('bot/offsetFile.txt', 'r') as offsetFile:
+				self.offsetParam['offset'] = int(offsetFile.read())
+			offsetFile.close()
+		except:
+			with open('bot/offsetFile.txt', 'w') as offsetFile:
+				offsetFile.close()
+			self.offsetParam['offset'] = 0
 
 	def setOffset(self, newOffset):
 		if newOffset != '':
@@ -85,24 +93,26 @@ class Bot:
 					chat = res.get('message').get('chat').get('id')
 					text = res.get('message').get('text')
 
-				if not text:
-					self.sendMessage(chat, "Unknown input format. Don't mess with me, fella!")
-				else:
-					currentUser = usr.User('0') # Creates an empty user object to be populated later
-					for user in self.users:
-						if user.chatID == chat:
-							currentUser = user
+					self.log("Received message")
 
-					if not currentUser.chatID == '0':
-						# If it is an existing user, get record for this user and create a new message entity
-						# with the user as parameter.
-						self.messages.append(msg.Message(currentUser, text))
+					if not text:
+						self.sendMessage(chat, "Unknown input format. Don't mess with me, fella!")
 					else:
-						# If unknown user, create a new user and write it to users list. Also create a new message
-						# entity with the user as parameter.
-						newUser = usr.User(chat)
-						self.users.append(newUser)
-						self.messages.append(msg.Message(newUser, text))
+						currentUser = usr.User('0')  # Creates an empty user object to be populated later
+						for user in self.users:
+							if user.chatID == chat:
+								currentUser = user
+
+						if not currentUser.chatID == '0':
+							# If it is an existing user, get record for this user and create a new message entity
+							# with the user as parameter.
+							self.messages.append(msg.Message(currentUser, text))
+						else:
+							# If unknown user, create a new user and write it to users list. Also create a new message
+							# entity with the user as parameter.
+							newUser = usr.User(chat)
+							self.users.append(newUser)
+							self.messages.append(msg.Message(newUser, text))
 
 			else:
 				self.log(update.json.get('error_code'))
@@ -111,16 +121,19 @@ class Bot:
 	# Used to handle all new commands and messages
 	def handleMessages(self):
 		for message in self.messages:
+			self.log(("Handling message by " + message.user.name))
 			if message.isCommand:
 				cmd.Command(message, self).findCommand()
 			else:
 				cmd.Command(message, self).interpretMessage()
-			self.messages.remove(message)
+		self.messages.clear()
+		self.log("Handled all current messages")
 
 	def log(self, message):
 		print(message)
 		self.sendMessage(telegram_secrets.patrick_telegram_id, message)
-		#self.sendMessage(patrickID.david_telegram_id, message)
+
+	# self.sendMessage(patrickID.david_telegram_id, message)
 
 	# Used to tell the bot to accept no more commands because it is about to be closed
 	def close(self):

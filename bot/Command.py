@@ -59,7 +59,8 @@ class Command:
 			'changecoursename': self.mfunctions.message_changecoursename,
 			'raplalinkwithoutpush': self.mfunctions.message_raplalinkwithoutpush,
 			'useraddress': self.mfunctions.message_useraddress,
-			'lectureplanday': self.mfunctions.message_lectureplanday
+			'lectureplanday': self.mfunctions.message_lectureplanday,
+			'menuday': self.mfunctions.message_menuday
 		}
 
 		messageFunc = callMessageFunctions.get(type)

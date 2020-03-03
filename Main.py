@@ -66,8 +66,7 @@ class Main:
 				self.sendLectures()
 			# Reset the boolean to send the menu for today again
 			elif timeString == '00:01':
-				self.bot.log(("Messages handled yesterday: " + str(self.bot.messagesHandledToday)))
-				self.bot.messagesHandledToday = 0
+				self.writeUsageStats(True)
 				self.sentMenuToday = False
 				self.sentLecturesToday = False
 
@@ -106,12 +105,41 @@ class Main:
 				# save rapla links
 				self.lfetcher.writeLinksToJson()
 
+				# save usage stats
+				self.writeUsageStats(False)
+
 				self.bot.log(("Saved all preferences at " + now.strftime("%H:%M:%S")))
 
 			# Check if it should stop
 			if self.bot.tellMainToClose:
 				break
 		self.close()
+
+	def writeUsageStats(self, addLog):
+		if addLog:
+			self.bot.log(("We have " + str(len(self.bot.users)) + " users and yesterday I handled " + str(self.bot.messagesHandledToday) + " messages."))
+
+		try:
+			with open('bot/usageStats.json', 'r') as usageFile:
+				usageJson = usageFile.read()
+			usageFile.close()
+
+			usageList = json.loads(usageJson)
+
+			usageList[datetime.now().strftime('%Y-%m-%d')] += self.bot.messagesHandledToday
+
+			with open('bot/usageStats.json', 'w') as usageFile:
+				usageFile.write(json.dumps(usageList))
+			usageFile.close()
+		except: # If file doesnt exist
+			with open('bot/usageStats.json', 'w') as usageFile:
+				usageList = {
+					datetime.now().strftime('%Y-%m-%d'): self.bot.messagesHandledToday
+				}
+				usageFile.write(json.dumps(usageList))
+			usageFile.close()
+
+		self.bot.messagesHandledToday = 0
 
 	def sendMenu(self):
 		for user in self.bot.users:
@@ -198,6 +226,9 @@ class Main:
 
 		# Save rapla links
 		self.lfetcher.writeLinksToJson()
+
+		# Save usage stats
+		self.writeUsageStats(False)
 
 		# tell the bot to terminate
 		self.bot.close()

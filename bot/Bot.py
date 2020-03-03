@@ -38,6 +38,7 @@ class Bot:
 		self.lectureFetcher = lectureFetcher
 
 		# To create statistics on how much messages have been handled
+		# If the bot restarted that day, this is the number of handled messages since the restart.
 		self.messagesHandledToday = 0
 
 	# External File handlers

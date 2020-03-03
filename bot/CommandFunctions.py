@@ -71,15 +71,10 @@ class CommandFunctions:
 								 + "your lecture plan :(")
 
 	def command_getmenu(self):
-		now = datetime.now()
-		weekday = now.weekday()
-		if weekday < 5:  # Because monday is 0...
-			fetchedMenu = menu.Reader(1).get_menu_as_arr()
-			self.bot.sendMessage(self.message.user.chatID, "Here you go: ")
-			for oneMenu in fetchedMenu:
-				self.bot.sendMessage(self.message.user.chatID, oneMenu)
-		else:
-			self.bot.sendMessage(self.message.user.chatID, "The canteen is closed today. Hence no menu for you.")
+		self.bot.sendMessageWithOptions(self.message.user.chatID, 'For which day do you want the plan?',
+										self.bot.generateReplyMarkup(['Today', 'Tomorrow']))
+
+		self.message.user.expectedMessageType = 'menuday'
 
 	def command_subscribelectureplan(self):
 		if self.message.user.course == '' or self.message.user.course == None:

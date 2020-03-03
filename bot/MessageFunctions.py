@@ -140,3 +140,21 @@ class MessageFunctions:
 					self.bot.sendMessage(self.message.user.chatID, trainPlan)
 
 		self.message.user.expectedMessageType = ''
+
+	def message_menuday(self):
+		if self.message.text == 'Today':
+			day = 0
+		elif self.message.text == 'Tomorrow':
+			day = 1
+		else:
+			day = 0
+
+		forDay = datetime.now() + timedelta(days=day)
+		weekday = forDay.weekday()
+		if weekday < 5:  # Because monday is 0...
+			fetchedMenu = menu.Reader(day+1).get_menu_as_arr() # day+1 because 1 is today, 2 is tomorrow...
+			self.bot.sendMessage(self.message.user.chatID, "Here you go: ")
+			for oneMenu in fetchedMenu:
+				self.bot.sendMessage(self.message.user.chatID, oneMenu)
+		else:
+			self.bot.sendMessage(self.message.user.chatID, "The canteen is closed there. Hence no menu for you.")

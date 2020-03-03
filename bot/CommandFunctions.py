@@ -12,13 +12,15 @@ class CommandFunctions:
 		# Provide help list for patrick with full command list and for other users with commands they can use.
 		if str(self.message.user.chatID) == str(telegram_secrets.patrick_telegram_id):
 			self.bot.sendMessage(self.message.user.chatID,
-								 "/start\n/help\n/stopbot\n/sendmessagetoeveryone\n\n/subscribemenu\n/unsubscribemenu\n/getmenu\n\n/subscribelectureplan\n/unsubscribelectureplan\n/getlectures\n\n/privacy\n/whatdoyouknowaboutme")
+								 "/start\n/help\n/stopbot\n/sendmessagetoeveryone\n\n/subscribemenu\n/unsubscribemenu\n/getmenu\n\n/subscribelectureplan\n/unsubscribelectureplan\n/getlectures\n/subscribepublictransport\n\n/privacy\n/whatdoyouknowaboutme")
 		else:
 			self.bot.sendMessage(self.message.user.chatID,
 								 (
-										 "Basic commands:\n/start\n/help\n\nMenu commands:\n/subscribemenu\n/unsubscribemenu\n/getmenu\n\n"
-										 + "Lecture plan commands:\n/subscribelectureplan\n/unsubscribelectureplan\n/getlectures"
-										 + "\n\nFor privacy information, type\n/privacy\n"
+										 "Basic commands:\n/start\n/help\n\n"
+										 + "Menu commands:\n/subscribemenu\n/unsubscribemenu\n/getmenu\n\n"
+										 + "Lecture plan commands:\n/subscribelectureplan\n/unsubscribelectureplan\n/getlectures\n\n"
+								 		 + "Public transport:\n/subscribetraininfo\n\n"
+										 + "For privacy information, type\n/privacy\n"
 										 + "To get all information we have about you, type\n/whatdoyouknowaboutme"))
 
 	def command_start(self):

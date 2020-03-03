@@ -13,7 +13,6 @@ class Menu(object):
     def __init__(self, day):
         self.valid = True
         if not self.check_if_valid(day):
-            print("Datum außerhalb des möglichen Bereiches! (max. die aktuelle Woche)")
             self.valid = False
 
         if self.valid:
@@ -60,7 +59,16 @@ class Menu(object):
 
         x = 0
         for i in range(1, 4):  # Wahlessen 1 - 3
+            return_string += "__"
             return_string += string[string.find("Wahlessen " + str(i)):string.find("Wahlessen " + (str(i + 1)))] + "\n"
+            return_string = return_string.replace("Wahlessen " + str(i), "Wahlessen " + str(i) + "__")
             return_string += "%i%"
-        return_string = return_string[:-3]
-        return re.sub("\n\n+", "\n\n", return_string)
+        return_string = return_string[:-5]
+        return_string = re.sub("\n", "**\n", return_string)
+        return_string = return_string.replace("**\n**\n**\n", "\n\n")
+        return_string = return_string.replace("**\n**\n", "\n\n")
+        return re.sub("\n\n+", "\n\n**", return_string).replace("**%i%", "%i%")
+
+
+today = 1
+print(Menu(today).create_string())

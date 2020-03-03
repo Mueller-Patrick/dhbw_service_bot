@@ -154,9 +154,9 @@ class Command:
 
 	# Message types
 	def message_unknown(self):
-		self.bot.sendMessage(self.message.user.chatID,
-							 ('I don\'t know what to do with your input :( I\'m just gonna send it back to you:\n' +
-							  self.message.text))
+		self.bot.sendMessageWithOptions(self.message.user.chatID,
+										'I don\'t know what to do with your input :( Use this to get help:',
+										self.bot.generateReplyMarkup(['/help']))
 
 	def message_name(self):
 		self.message.user.name = self.message.text

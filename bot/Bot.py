@@ -5,6 +5,7 @@ import requests
 import telegram_secrets
 from bot import Command as cmd, Message as msg, User as usr
 import asyncio
+import json
 
 
 class Bot:
@@ -17,10 +18,8 @@ class Bot:
 		self.sendMessageParam = 'sendMessage'
 		self.receiveUpdatesParam = 'getUpdates'
 
-		# Params for the http request
+		# Param for the http request
 		self.offsetParam = {'offset': 0}
-		self.sendParams = {'chat_id': '',
-						   'text': ''}
 
 		# Get update offset
 		self.getOffset()
@@ -55,16 +54,30 @@ class Bot:
 				offsetFile.write(str(newOffset))
 			offsetFile.close()
 
-	# Api Handlers
+	# Sends a param to the user so that current custom keyboards get removed.
 	def sendMessage(self, chat, text):
-		self.sendParams['chat_id'] = chat
-		self.sendParams['text'] = text
+		sendParams = {'chat_id': chat,
+					  'text': text,
+					  'reply_markup': '{"remove_keyboard": true}'}
 		reqUrl = (self.telegramUrl + self.telegram_token + self.sendMessageParam)
-		resp = requests.post(url=reqUrl, params=self.sendParams)
+		resp = requests.post(url=reqUrl, params=sendParams)
 
-		# Reset send params after request
-		self.sendParams = {'chat_id': '',
-						   'text': ''}
+	# The options param has to be a [[String]], so an Array of rows with an array of buttons in JSON format.
+	def sendMessageWithOptions(self, chat, text, options):
+		sendParams = {
+			'chat_id': chat,
+			'text': text,
+			'reply_markup': options
+		}
+		reqUrl = (self.telegramUrl + self.telegram_token + self.sendMessageParam)
+		resp = requests.post(url=reqUrl, params=sendParams)
+		print(resp.json())
+
+	def generateReplyMarkup(self, options):
+		reply = ('{"keyboard": [' + json.dumps(options) + '],'
+		+ '"one_time_keyboard": true,'
+		+ '"resize_keyboard": true}')
+		return reply
 
 	async def getUpdates(self):
 		# If the bot is not about to be closed
@@ -93,7 +106,7 @@ class Bot:
 					chat = res.get('message').get('chat').get('id')
 					text = res.get('message').get('text')
 
-					self.log("Received message")
+					# self.log("Received message")
 
 					if not text:
 						self.sendMessage(chat, "Unknown input format. Don't mess with me, fella!")
@@ -121,13 +134,14 @@ class Bot:
 	# Used to handle all new commands and messages
 	def handleMessages(self):
 		for message in self.messages:
-			self.log(("Handling message by " + message.user.name))
+			# self.log(("Handling message by " + message.user.name))
 			if message.isCommand:
 				cmd.Command(message, self).findCommand()
 			else:
 				cmd.Command(message, self).interpretMessage()
 		self.messages.clear()
-		self.log("Handled all current messages")
+
+	# self.log("Handled all current messages")
 
 	def log(self, message):
 		print(message)

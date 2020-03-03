@@ -54,9 +54,8 @@ class CommandFunctions:
 		self.bot.sendMessage(self.message.user.chatID, "🤔 I know the following things about you :")
 		self.bot.sendMessage(self.message.user.chatID, ("📥 Your Telegram chat id is " + str(self.message.user.chatID)))
 		self.bot.sendMessage(self.message.user.chatID, ("🗣 Your name is " + str(self.message.user.name)))
-		if self.message.user.address != '' and self.message.user.addess is not None:
+		if self.message.user.address != '' and self.message.user.address is not None:
 			self.bot.sendMessage(self.message.user.chatID, ('🚅 The address you entered is ' + self.message.user.address))
-
 		if self.message.user.wantsMenu:
 			self.bot.sendMessage(self.message.user.chatID, "✅ You want to receive the daily menu push")
 		else:

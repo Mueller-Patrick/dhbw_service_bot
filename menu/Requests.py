@@ -68,7 +68,3 @@ class Menu(object):
         return_string = return_string.replace("**\n**\n**\n", "\n\n")
         return_string = return_string.replace("**\n**\n", "\n\n")
         return re.sub("\n\n+", "\n\n**", return_string).replace("**%i%", "%i%")
-
-
-today = 1
-print(Menu(today).create_string())

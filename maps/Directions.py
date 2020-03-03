@@ -125,5 +125,3 @@ class Direction(object):
         string += create_time_string(trip_json['arrival_time'])
         string += "**"
         return string
-
-print(Direction(datetime.today(), "Bühl").create_message())

@@ -59,12 +59,12 @@ class Menu(object):
 
         x = 0
         for i in range(1, 4):  # Wahlessen 1 - 3
-            return_string += "__"
+            return_string += "_"
             return_string += string[string.find("Wahlessen " + str(i)):string.find("Wahlessen " + (str(i + 1)))] + "\n"
-            return_string = return_string.replace("Wahlessen " + str(i), "Wahlessen " + str(i) + "__")
+            return_string = return_string.replace("Wahlessen " + str(i), "Wahlessen " + str(i) + "_")
             return_string += "%i%"
         return_string = return_string[:-5]
-        return_string = re.sub("\n", "**\n", return_string)
-        return_string = return_string.replace("**\n**\n**\n", "\n\n")
-        return_string = return_string.replace("**\n**\n", "\n\n")
-        return re.sub("\n\n+", "\n\n**", return_string).replace("**%i%", "%i%")
+        return_string = re.sub("\n", "*\n", return_string)
+        return_string = return_string.replace("*\n*\n*\n", "\n\n")
+        return_string = return_string.replace("*\n*\n", "\n\n")
+        return re.sub("\n\n+", "\n\n*", return_string).replace("*%i%", "%i%")

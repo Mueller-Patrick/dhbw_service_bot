@@ -14,7 +14,7 @@ class Command:
 		# Defined commands
 		self.commands = ['/start', '/help', '/stopbot', '/privacy', '/whatdoyouknowaboutme', '/subscribemenu',
 						 '/unsubscribemenu', '/getmenu', '/subscribelectureplan', '/unsubscribelectureplan',
-						 '/sendmessagetoeveryone', '/getlectures', '/gettraininfo']
+						 '/sendmessagetoeveryone', '/getlectures', '/subscribetraininfo']
 
 	# Used to find the requested command
 	def findCommand(self):
@@ -38,7 +38,7 @@ class Command:
 			'/unsubscribelectureplan': self.command_unsubscribelectureplan,
 			'/sendmessagetoeveryone': self.command_sendmessagetoeveryone,
 			'/getlectures': self.command_getlectures,
-			'/gettraininfo': self.command_gettraininfo
+			'/subscribetraininfo': self.command_subscribetraininfo
 		}
 
 		commandFunc = callCommandFunctions.get(command)
@@ -143,7 +143,7 @@ class Command:
 			self.message.user.wantsLecturePlan = True
 			self.bot.sendMessage(self.message.user.chatID, "You successfully subscribed to the daily lecture plan push."
 								 + " May the RaPla be with you! If you also want to receive public transport "
-								 + "Information, send /gettraininfo")
+								 + "Information, send /subscribetraininfo")
 
 	def command_unsubscribelectureplan(self):
 		self.bot.sendMessage(self.message.user.chatID, "What did I do wrong? :(((( I'm so sad now :(((( But since "
@@ -172,7 +172,7 @@ class Command:
 				self.message.user.name) + " tried to broadcast a message"))
 			self.bot.sendMessage(self.message.user.chatID, "You are not allowed to do this.")
 
-	def command_gettraininfo(self):
+	def command_subscribetraininfo(self):
 		self.bot.sendMessage(self.message.user.chatID, 'Please provide me your home address or the station where you '
 							 + 'would like to depart in a format like you would search for it with Google Maps')
 		self.message.user.expectedMessageType = 'useraddress'
@@ -204,7 +204,7 @@ class Command:
 			self.message.user.wantsLecturePlan = True
 			self.bot.sendMessage(self.message.user.chatID, "You successfully subscribed to the daily lecture plan push."
 								 + " May the RaPla be with you! If you also want to receive public transport "
-								 + "Information, send /gettraininfo")
+								 + "Information, send /subscribetraininfo")
 			self.message.user.expectedMessageType = ''
 		else:
 			self.bot.sendMessage(self.message.user.chatID, "Unknown course. Please send me the link to your courses"
@@ -238,7 +238,7 @@ class Command:
 				self.bot.sendMessage(self.message.user.chatID,
 									 "You successfully subscribed to the daily lecture plan push."
 									 + " May the RaPla be with you! If you also want to receive public transport "
-									 + "Information, send /gettraininfo")
+									 + "Information, send /subscribetraininfo")
 				self.message.user.expectedMessageType = ''
 			else:
 				self.bot.sendMessage(self.message.user.chatID,

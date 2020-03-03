@@ -11,3 +11,4 @@ class User:
 		self.wantsMenu = False
 		self.course = ''
 		self.wantsLecturePlan = False
+		self.address = ''

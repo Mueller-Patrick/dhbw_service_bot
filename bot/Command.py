@@ -14,7 +14,7 @@ class Command:
 		# Defined commands
 		self.commands = ['/start', '/help', '/stopbot', '/privacy', '/whatdoyouknowaboutme', '/subscribemenu',
 						 '/unsubscribemenu', '/getmenu', '/subscribelectureplan', '/unsubscribelectureplan',
-						 '/sendmessagetoeveryone', '/getlectures']
+						 '/sendmessagetoeveryone', '/getlectures', '/gettraininfo']
 
 	# Used to find the requested command
 	def findCommand(self):
@@ -37,7 +37,8 @@ class Command:
 			'/subscribelectureplan': self.command_subscribelectureplan,
 			'/unsubscribelectureplan': self.command_unsubscribelectureplan,
 			'/sendmessagetoeveryone': self.command_sendmessagetoeveryone,
-			'/getlectures': self.command_getlectures
+			'/getlectures': self.command_getlectures,
+			'/gettraininfo': self.command_gettraininfo
 		}
 
 		commandFunc = callCommandFunctions.get(command)
@@ -53,7 +54,8 @@ class Command:
 			'raplalink': self.message_raplalink,
 			'broadcastmessage': self.message_broadcastmessage,
 			'changecoursename': self.message_changecoursename,
-			'raplalinkwithoutpush': self.message_raplalinkwithoutpush
+			'raplalinkwithoutpush': self.message_raplalinkwithoutpush,
+			'useraddress': self.message_useraddress
 		}
 
 		messageFunc = callMessageFunctions.get(type)
@@ -140,7 +142,8 @@ class Command:
 		else:
 			self.message.user.wantsLecturePlan = True
 			self.bot.sendMessage(self.message.user.chatID, "You successfully subscribed to the daily lecture plan push."
-								 + " May the RaPla be with you!")
+								 + " May the RaPla be with you! If you also want to receive public transport "
+								 + "Information, send /gettraininfo")
 
 	def command_unsubscribelectureplan(self):
 		self.bot.sendMessage(self.message.user.chatID, "What did I do wrong? :(((( I'm so sad now :(((( But since "
@@ -148,7 +151,8 @@ class Command:
 
 	def command_getlectures(self):
 		if self.message.user.course == None or self.message.user.course == '':
-			self.bot.sendMessage(self.message.user.chatID, 'I don\'t know which course you are in. Please provide me this Information:')
+			self.bot.sendMessage(self.message.user.chatID,
+								 'I don\'t know which course you are in. Please provide me this Information:')
 			self.message.user.expectedMessageType = 'changecoursename'
 		else:
 			self.bot.sendMessage(self.message.user.chatID, 'Here ya go:')
@@ -168,6 +172,11 @@ class Command:
 				self.message.user.name) + " tried to broadcast a message"))
 			self.bot.sendMessage(self.message.user.chatID, "You are not allowed to do this.")
 
+	def command_gettraininfo(self):
+		self.bot.sendMessage(self.message.user.chatID, 'Please provide me your home address or the station where you '
+							 + 'would like to depart in a format like you would search for it with Google Maps')
+		self.message.user.expectedMessageType = 'useraddress'
+
 	# Message types
 	def message_unknown(self):
 		self.bot.sendMessageWithOptions(self.message.user.chatID,
@@ -177,14 +186,14 @@ class Command:
 	def message_name(self):
 		self.message.user.name = self.message.text
 		welcomeMsg = ('Hello, ' + self.message.text + '! Pleased to meet you! To get you started, I\'ll now explain to '
-					+ 'you the stuff I\'m able to do and what commands may use. You already figured out the first command, /start. '
-					+ 'Great work there! To continue, you might want to subscribe to the daily menu push service via /subscribemenu '
-					+ 'and the daily lecture plan push via /subscribelectureplan. Pretty easy to remember, right? If you want to '
-					+ 'unsubscribe from these services, you just need to type /unsubscribemenu or /unsubscribelectureplan (You '
-					+ 'probably already guessed these). To get the daily menu at any time, send /getmenu. If you forgot '
-					+ 'what lectures you had today, type /getlectures to get the plan again. And because I '
-					+ 'respect your privacy, type /privacy and /whatdoyouknowaboutme to get Info about what we save '
-					+ 'about you. Last but not least, type /help to get a short description of every command.')
+					  + 'you the stuff I\'m able to do and what commands may use. You already figured out the first command, /start. '
+					  + 'Great work there! To continue, you might want to subscribe to the daily menu push service via /subscribemenu '
+					  + 'and the daily lecture plan push via /subscribelectureplan. Pretty easy to remember, right? If you want to '
+					  + 'unsubscribe from these services, you just need to type /unsubscribemenu or /unsubscribelectureplan (You '
+					  + 'probably already guessed these). To get the daily menu at any time, send /getmenu. If you forgot '
+					  + 'what lectures you had today, type /getlectures to get the plan again. And because I '
+					  + 'respect your privacy, type /privacy and /whatdoyouknowaboutme to get Info about what we save '
+					  + 'about you. Last but not least, type /help to get a short description of every command.')
 		self.bot.sendMessage(self.message.user.chatID, welcomeMsg)
 		self.message.user.expectedMessageType = ''
 
@@ -194,7 +203,8 @@ class Command:
 		if self.bot.lectureFetcher.checkForCourse(self.message.user.course):
 			self.message.user.wantsLecturePlan = True
 			self.bot.sendMessage(self.message.user.chatID, "You successfully subscribed to the daily lecture plan push."
-								 + " May the RaPla be with you!")
+								 + " May the RaPla be with you! If you also want to receive public transport "
+								 + "Information, send /gettraininfo")
 			self.message.user.expectedMessageType = ''
 		else:
 			self.bot.sendMessage(self.message.user.chatID, "Unknown course. Please send me the link to your courses"
@@ -205,7 +215,8 @@ class Command:
 		self.message.user.course = self.message.text
 
 		if self.bot.lectureFetcher.checkForCourse(self.message.user.course):
-			self.bot.sendMessage(self.message.user.chatID, 'Successfully added/changed course. Here is the plan for today:')
+			self.bot.sendMessage(self.message.user.chatID,
+								 'Successfully added/changed course. Here is the plan for today:')
 			now = datetime.now()
 			dateString = now.strftime("%Y-%m-%d")
 			plan = self.bot.lectureFetcher.getFormattedLectures(self.message.user.course, dateString)
@@ -226,7 +237,8 @@ class Command:
 				self.message.user.wantsLecturePlan = True
 				self.bot.sendMessage(self.message.user.chatID,
 									 "You successfully subscribed to the daily lecture plan push."
-									 + " May the RaPla be with you!")
+									 + " May the RaPla be with you! If you also want to receive public transport "
+									 + "Information, send /gettraininfo")
 				self.message.user.expectedMessageType = ''
 			else:
 				self.bot.sendMessage(self.message.user.chatID,
@@ -257,3 +269,7 @@ class Command:
 			self.bot.sendMessage(user.chatID, self.message.text)
 
 		self.message.user.expectedMessageType = ''
+
+	def message_useraddress(self):
+		self.message.user.address = self.message.text
+		self.bot.sendMessage(self.message.user.chatID, 'Successfully added address. Big Brother is now watching you. 😈')

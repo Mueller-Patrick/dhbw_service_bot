@@ -17,12 +17,14 @@ class MessageFunctions:
 	def message_name(self):
 		self.message.user.name = self.message.text
 		welcomeMsg = ('Hello, ' + self.message.text + '! Pleased to meet you! To get you started, I\'ll now explain to '
-					  + 'you the stuff I\'m able to do and what commands may use. You already figured out the first command, /start. '
+					  + 'you the stuff I\'m able to do and what commands you may use. You already figured out the first command, /start. '
 					  + 'Great work there! To continue, you might want to subscribe to the daily menu push service via /subscribemenu '
 					  + 'and the daily lecture plan push via /subscribelectureplan. Pretty easy to remember, right? If you want to '
 					  + 'unsubscribe from these services, you just need to type /unsubscribemenu or /unsubscribelectureplan (You '
 					  + 'probably already guessed these). To get the daily menu at any time, send /getmenu. If you forgot '
-					  + 'what lectures you had today, type /getlectures to get the plan again. And because I '
+					  + 'what lectures you have today, type /getlectures to get the plan again. '
+					  +	'Also, if you don\'t want to check the crappy DB app every day, type /subscribetraininfo and send the '
+					  + 'required Information to get public transport directions alongside the lecture push. And because I '
 					  + 'respect your privacy, type /privacy and /whatdoyouknowaboutme to get Info about what we save '
 					  + 'about you. Last but not least, type /help to get a short description of every command.')
 		self.bot.sendMessage(self.message.user.chatID, welcomeMsg)

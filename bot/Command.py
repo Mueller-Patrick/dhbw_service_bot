@@ -160,7 +160,14 @@ class Command:
 
 	def message_name(self):
 		self.message.user.name = self.message.text
-		welcomeMsg = 'Hello, ' + self.message.text + '! Pleased to meet you!'
+		welcomeMsg = ('Hello, ' + self.message.text + '! Pleased to meet you! To get you started, I\'ll now explain to '
+					+ 'you the stuff I\'m able to do and what commands may use. You already figured out the first command, /start. '
+					+ 'Great work there! To continue, you might want to subscribe to the daily menu push service via /subscribemenu '
+					+ 'and the daily lecture plan push via /subscribelectureplan. Pretty easy to remember, right? If you want to '
+					+ 'unsubscribe from these services, you just need to type /unsubscribemenu or /unsubscribelectureplan (You '
+					+ 'probably already guessed these). To get the daily menu at any time, send /getmenu. And because I '
+					+ 'respect your privacy, type /privacy and /whatdoyouknowaboutme to get Info about what we save '
+					+ 'about you. Last but not least, type /help to get a short description of every command.')
 		self.bot.sendMessage(self.message.user.chatID, welcomeMsg)
 		self.message.user.expectedMessageType = ''
 

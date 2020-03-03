@@ -273,3 +273,5 @@ class Command:
 	def message_useraddress(self):
 		self.message.user.address = self.message.text
 		self.bot.sendMessage(self.message.user.chatID, 'Successfully added address. Big Brother is now watching you. 😈')
+
+		self.message.user.expectedMessageType = ''

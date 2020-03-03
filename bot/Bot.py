@@ -37,6 +37,9 @@ class Bot:
 		# The LectureFetcher instance
 		self.lectureFetcher = lectureFetcher
 
+		# To create statistics on how much messages have been handled
+		self.messagesHandledToday = 0
+
 	# External File handlers
 	def getOffset(self):
 		try:
@@ -73,7 +76,6 @@ class Bot:
 		}
 		reqUrl = (self.telegramUrl + self.telegram_token + self.sendMessageParam)
 		resp = requests.post(url=reqUrl, params=sendParams)
-		print(resp.json())
 
 	def generateReplyMarkup(self, options):
 		reply = ('{"keyboard": [' + json.dumps(options) + '],'
@@ -141,6 +143,7 @@ class Bot:
 				cmd.Command(message, self).findCommand()
 			else:
 				cmd.Command(message, self).interpretMessage()
+			self.messagesHandledToday += 1
 		self.messages.clear()
 
 	# self.log("Handled all current messages")

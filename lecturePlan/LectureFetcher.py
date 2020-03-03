@@ -54,14 +54,17 @@ class LectureFetcher:
 	# Get all events for this link
 	# The dayString needs to have the format YYYY-MM-DD (The only decent date format if you asked me)
 	def getLecturesByLink(self, link, dayString):
-		lectures = events(link)
-		lectures.sort()
-		returnList = []
-		for lec in lectures:
-			if dayString in str(lec):
-				returnList.append(str(lec))
-
-		return returnList
+		try:
+			lectures = events(link)
+			lectures.sort()
+			returnList = []
+			for lec in lectures:
+				if dayString in str(lec):
+					returnList.append(str(lec))
+			return returnList
+		except:
+			print('LectureFetcher.getLecturesByLink: Invalid link or dayString given.')
+			return ''
 
 	# Get all events for this course
 	# The dayString needs to have the format YYYY-MM-DD (The only decent date format if you asked me)
@@ -74,10 +77,12 @@ class LectureFetcher:
 	# The dayString needs to have the format YYYY-MM-DD (The only decent date format if you asked me)
 	def getFirstLectureTime(self, courseName, dayString):
 		lectures = self.getLecturesByCourseName(courseName, dayString)
-
-		beginTime = lectures[0][11:16]  # Get the substring from index 11 to index 16 of the first lecture (this
-		# substring is the HH:MM format of the begin time)
-		return beginTime
+		if lectures:
+			beginTime = lectures[0][11:16]  # Get the substring from index 11 to index 16 of the first lecture (this
+			# substring is the HH:MM format of the begin time)
+			return beginTime
+		else:
+			return ''
 
 	def getFormattedLectures(self, courseName, dayString):
 		lectures = self.getLecturesByCourseName(courseName, dayString)

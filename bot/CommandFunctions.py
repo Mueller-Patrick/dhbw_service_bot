@@ -12,14 +12,15 @@ class CommandFunctions:
 		# Provide help list for patrick with full command list and for other users with commands they can use.
 		if str(self.message.user.chatID) == str(telegram_secrets.patrick_telegram_id):
 			self.bot.sendMessage(self.message.user.chatID,
-								 "/start\n/help\n/stopbot\n/sendmessagetoeveryone\n\n/subscribemenu\n/unsubscribemenu\n/getmenu\n\n/subscribelectureplan\n/unsubscribelectureplan\n/getlectures\n/subscribepublictransport\n\n/privacy\n/whatdoyouknowaboutme")
+								 "/start\n/help\n/stopbot\n/sendmessagetoeveryone\n\n/subscribemenu\n/unsubscribemenu\n/getmenu\n\n/subscribelectureplan\n/unsubscribelectureplan\n/getlectures\n/subscribepublictransport\n\n/getmeme\n\n/privacy\n/whatdoyouknowaboutme")
 		else:
 			self.bot.sendMessage(self.message.user.chatID,
 								 (
 										 "Basic commands:\n/start\n/help\n\n"
 										 + "Menu commands:\n/subscribemenu\n/unsubscribemenu\n/getmenu\n\n"
 										 + "Lecture plan commands:\n/subscribelectureplan\n/unsubscribelectureplan\n/getlectures\n\n"
-								 		 + "Public transport:\n/subscribetraininfo\n\n"
+										 + "Public transport:\n/subscribetraininfo\n\n"
+								 		 + "Get your favorite memes: /getmeme\n\n"
 										 + "For privacy information, type\n/privacy\n"
 										 + "To get all information we have about you, type\n/whatdoyouknowaboutme"))
 
@@ -55,7 +56,8 @@ class CommandFunctions:
 		self.bot.sendMessage(self.message.user.chatID, ("📥 Your Telegram chat id is " + str(self.message.user.chatID)))
 		self.bot.sendMessage(self.message.user.chatID, ("🗣 Your name is " + str(self.message.user.name)))
 		if self.message.user.address != '' and self.message.user.address is not None:
-			self.bot.sendMessage(self.message.user.chatID, ('🚅 The address you entered is ' + self.message.user.address))
+			self.bot.sendMessage(self.message.user.chatID,
+								 ('🚅 The address you entered is ' + self.message.user.address))
 		if self.message.user.wantsMenu:
 			self.bot.sendMessage(self.message.user.chatID, "✅ You want to receive the daily menu push")
 		else:
@@ -67,7 +69,8 @@ class CommandFunctions:
 			self.bot.sendMessage(self.message.user.chatID, "❌ You don't want to receive the daily lecture plan push")
 
 		if self.message.user.course:
-			self.bot.sendMessage(self.message.user.chatID, ("🏫 You are in the " + self.message.user.course + " course"))
+			self.bot.sendMessage(self.message.user.chatID,
+								 ("🏫 You are in the " + self.message.user.course + " course"))
 		else:
 			self.bot.sendMessage(self.message.user.chatID,
 								 "❓ But I don't know which course you are in, so I can't send you"
@@ -117,3 +120,10 @@ class CommandFunctions:
 		self.bot.sendMessage(self.message.user.chatID, 'Please provide me your home address or the station where you '
 							 + 'would like to depart in a format like you would search for it with Google Maps')
 		self.message.user.expectedMessageType = 'useraddress'
+
+	def command_getmeme(self):
+		# Memes.getMeme returns a list in this format: ['MEME_FILE_OR_ID', FETCH_ID, TYPEINDEX, MEMEINDEX]
+		# If the meme has not been uploaded to telegram yet, the file itself is sent with the boolean FETCH_ID
+		# set to true so the file_id provided by telegram gets saved.
+		self.bot.sendMessageWithOptions(self.message.user.chatID, "Please select the type of meme:", self.bot.generateReplyMarkup(self.bot.memes.getMemeTypes()))
+		self.message.user.expectedMessageType = 'memetype'

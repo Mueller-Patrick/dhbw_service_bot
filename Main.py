@@ -11,13 +11,15 @@ from datetime import timedelta
 from menu import MenuSaver as menu
 from lecturePlan import LectureFetcher as lf
 from maps import Directions
+from memes import Memes
 
 
 class Main:
 	def __init__(self):
 		self.token = self.getToken()
 		self.lfetcher = lf.LectureFetcher()
-		self.bot = bt.Bot(telegram_token=self.token, users=self.getUsers(), lectureFetcher=self.lfetcher)
+		self.memes = Memes.Memes()
+		self.bot = bt.Bot(telegram_token=self.token, users=self.getUsers(), lectureFetcher=self.lfetcher, memes=self.memes)
 		self.sentMenuToday = False
 		self.sentLecturesToday = False
 
@@ -90,6 +92,7 @@ class Main:
 						"chatID": user.chatID,
 						"name": user.name,
 						"expectedMsgType": user.expectedMessageType,
+						"tempParams": user.tempParams,
 						"wantsMenu": user.wantsMenu,
 						"course": user.course,
 						"wantsLecturePlan": user.wantsLecturePlan,
@@ -108,7 +111,7 @@ class Main:
 				# save usage stats
 				self.writeUsageStats(False)
 
-				self.bot.log(("Saved all preferences at " + now.strftime("%H:%M:%S")))
+				print(("Saved all preferences at " + now.strftime("%H:%M:%S")))
 
 			# Check if it should stop
 			if self.bot.tellMainToClose:
@@ -204,6 +207,8 @@ class Main:
 
 			currentUser.name = name = user.get('name')
 			currentUser.expectedMessageType = user.get('expectedMsgType')
+			if user.get('tempParams') != None:
+				currentUser.tempParams = user.get('tempParams')
 			currentUser.wantsMenu = user.get('wantsMenu')
 			currentUser.course = user.get('course')
 			currentUser.wantsLecturePlan = user.get('wantsLecturePlan')
@@ -222,6 +227,7 @@ class Main:
 				"chatID": user.chatID,
 				"name": user.name,
 				"expectedMsgType": user.expectedMessageType,
+				"tempParams": user.tempParams,
 				"wantsMenu": user.wantsMenu,
 				"course": user.course,
 				"wantsLecturePlan": user.wantsLecturePlan,
@@ -238,7 +244,7 @@ class Main:
 		self.lfetcher.writeLinksToJson()
 
 		# Save usage stats
-		self.writeUsageStats(True)
+		self.writeUsageStats(False)
 
 		# tell the bot to terminate
 		self.bot.close()

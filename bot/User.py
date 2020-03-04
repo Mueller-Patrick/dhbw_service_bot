@@ -8,6 +8,7 @@ class User:
 		self.chatID = chatID
 		self.name = ''
 		self.expectedMessageType = ''
+		self.tempParams = {}
 		self.wantsMenu = False
 		self.course = ''
 		self.wantsLecturePlan = False

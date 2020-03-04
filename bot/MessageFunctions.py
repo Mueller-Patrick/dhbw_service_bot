@@ -16,16 +16,17 @@ class MessageFunctions:
 
 	def message_name(self):
 		self.message.user.name = self.message.text
-		welcomeMsg = ('Hello, ' + self.message.text + '! Pleased to meet you! To get you started, I\'ll now explain to '
-					  + 'you the stuff I\'m able to do and what commands you may use. You already figured out the first command, /start. '
-					  + 'Great work there! To continue, you might want to subscribe to the daily menu push service via /subscribemenu '
-					  + 'and the daily lecture plan push via /subscribelectureplan. Pretty easy to remember, right? If you want to '
+		welcomeMsg = ('Hello, *' + self.message.text + '*! Pleased to meet you! To get you started, I\'ll now explain to '
+					  + 'you the stuff I\'m able to do and what commands you may use\n\n. You already figured out the first command, /start. '
+					  + 'Great work there!\n\nTo continue, you might want to *subscribe to the daily menu push service* via /subscribemenu '
+					  + 'and the *daily lecture plan push* via /subscribelectureplan. Pretty easy to remember, right? If you want to '
 					  + 'unsubscribe from these services, you just need to type /unsubscribemenu or /unsubscribelectureplan (You '
-					  + 'probably already guessed these). To get the daily menu at any time, send /getmenu. If you forgot '
-					  + 'what lectures you have today, type /getlectures to get the plan again. '
-					  +	'Also, if you don\'t want to check the crappy DB app every day, type /subscribetraininfo and send the '
-					  + 'required Information to get public transport directions alongside the lecture push. And because I '
-					  + 'respect your privacy, type /privacy and /whatdoyouknowaboutme to get Info about what we save '
+					  + 'probably already guessed these).\n\nTo *get the daily menu at any time*, send /getmenu. If you forgot '
+					  + '*what lectures you have today*, type /getlectures to get the plan again.\n\n'
+					  + 'Also, if you don\'t want to check the crappy DB app every day, type /subscribetraininfo and send the '
+					  + 'required Information to *get public transport directions* alongside the lecture push.\n\n'
+					  +	'We all love *memes*. Type /getmeme to access all of your favorite ones.\n\nAnd because I '
+					  + 'respect your *privacy*, type /privacy and /whatdoyouknowaboutme to get Info about what we save '
 					  + 'about you. Last but not least, type /help to get a short description of every command.')
 		self.bot.sendMessage(self.message.user.chatID, welcomeMsg)
 		self.message.user.expectedMessageType = ''
@@ -154,9 +155,29 @@ class MessageFunctions:
 		forDay = datetime.now() + timedelta(days=day)
 		weekday = forDay.weekday()
 		if weekday < 5:  # Because monday is 0...
-			fetchedMenu = menu.Reader(day+1).get_menu_as_arr() # day+1 because 1 is today, 2 is tomorrow...
+			fetchedMenu = menu.Reader(day + 1).get_menu_as_arr()  # day+1 because 1 is today, 2 is tomorrow...
 			self.bot.sendMessage(self.message.user.chatID, "Here you go: ")
 			for oneMenu in fetchedMenu:
 				self.bot.sendMessage(self.message.user.chatID, oneMenu)
 		else:
 			self.bot.sendMessage(self.message.user.chatID, "The canteen is closed there. Hence no menu for you.")
+
+	def message_memetype(self):
+		self.bot.sendMessageWithOptions(self.message.user.chatID, "Please select the meme:",
+										self.bot.generateReplyMarkup(self.bot.memes.getMemeId(self.message.text)))
+		self.message.user.tempParams['requestedMemeType'] = self.message.text
+		self.message.user.expectedMessageType = 'memeid'
+
+	def message_memeid(self):
+		self.bot.sendMessage(self.message.user.chatID, "Here is the requested meme:")
+
+		meme = self.bot.memes.getMeme(self.message.user.tempParams['requestedMemeType'], self.message.text)
+		# If the id is needed, clearly this getting sent here is the photo itself
+		if meme[1]:
+			meme_id = self.bot.sendPhoto(self.message.user.chatID, meme[0], False)
+			self.bot.memes.addMemeId(meme[2], meme[3], meme_id)
+		else:
+			self.bot.sendPhoto(self.message.user.chatID, meme[0], True)
+
+		self.message.user.expectedMessageType = ''
+		self.message.user.tempParams['requestedMemeType'] = ''

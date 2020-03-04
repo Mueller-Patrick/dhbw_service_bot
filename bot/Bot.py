@@ -9,7 +9,7 @@ import json
 
 
 class Bot:
-	def __init__(self, telegram_token, users, lectureFetcher):
+	def __init__(self, telegram_token, users, lectureFetcher, memes):
 		# Given parameters
 		self.telegram_token = telegram_token
 
@@ -17,6 +17,7 @@ class Bot:
 		self.telegramUrl = 'https://api.telegram.org/bot'
 		self.sendMessageParam = 'sendMessage'
 		self.receiveUpdatesParam = 'getUpdates'
+		self.sendPhotoParam = 'sendPhoto'
 
 		# Param for the http request
 		self.offsetParam = {'offset': 0}
@@ -36,6 +37,9 @@ class Bot:
 
 		# The LectureFetcher instance
 		self.lectureFetcher = lectureFetcher
+
+		# The Memes instance
+		self.memes = memes
 
 		# To create statistics on how much messages have been handled
 		# If the bot restarted that day, this is the number of handled messages since the restart.
@@ -81,8 +85,34 @@ class Bot:
 		resp = requests.post(url=reqUrl, params=sendParams)
 		self.messagesSentToday += 1
 
+	def sendPhoto(self, chat, photo, isFileId):
+		if isFileId:
+			sendParams = {
+				'chat_id': chat,
+				'reply_markup': '{"remove_keyboard": true}',
+				'photo': photo
+			}
+			files = {}
+		else:
+			sendParams = {
+				'chat_id': chat,
+				'reply_markup': '{"remove_keyboard": true}'
+			}
+			files = {
+				'photo': photo
+			}
+		reqUrl = (self.telegramUrl + self.telegram_token + self.sendPhotoParam)
+		resp = requests.post(url=reqUrl, params=sendParams, files=files)
+		self.messagesSentToday += 1
+
+		# Returns the file id so we don't have to send this picture again in the future
+		return resp.json().get('result').get('photo')[0].get('file_id')
+
 	def generateReplyMarkup(self, options):
-		reply = ('{"keyboard": [' + json.dumps(options) + '],'
+		optionsConverted = []
+		for option in options:
+			optionsConverted.append([option])
+		reply = ('{"keyboard": ' + json.dumps(optionsConverted) + ','
 				 + '"one_time_keyboard": true,'
 				 + '"resize_keyboard": true}')
 		return reply

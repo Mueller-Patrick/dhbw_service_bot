@@ -17,7 +17,7 @@ class Command:
 		# Defined commands
 		self.commands = ['/start', '/help', '/stopbot', '/privacy', '/whatdoyouknowaboutme', '/subscribemenu',
 						 '/unsubscribemenu', '/getmenu', '/subscribelectureplan', '/unsubscribelectureplan',
-						 '/sendmessagetoeveryone', '/getlectures', '/subscribetraininfo']
+						 '/sendmessagetoeveryone', '/getlectures', '/subscribetraininfo', '/getmeme']
 
 	# Used to find the requested command
 	def findCommand(self):
@@ -41,7 +41,8 @@ class Command:
 			'/unsubscribelectureplan': self.cfunctions.command_unsubscribelectureplan,
 			'/sendmessagetoeveryone': self.cfunctions.command_sendmessagetoeveryone,
 			'/getlectures': self.cfunctions.command_getlectures,
-			'/subscribetraininfo': self.cfunctions.command_subscribetraininfo
+			'/subscribetraininfo': self.cfunctions.command_subscribetraininfo,
+			'/getmeme': self.cfunctions.command_getmeme
 		}
 
 		commandFunc = callCommandFunctions.get(command)
@@ -60,7 +61,9 @@ class Command:
 			'raplalinkwithoutpush': self.mfunctions.message_raplalinkwithoutpush,
 			'useraddress': self.mfunctions.message_useraddress,
 			'lectureplanday': self.mfunctions.message_lectureplanday,
-			'menuday': self.mfunctions.message_menuday
+			'menuday': self.mfunctions.message_menuday,
+			'memetype': self.mfunctions.message_memetype,
+			'memeid': self.mfunctions.message_memeid
 		}
 
 		messageFunc = callMessageFunctions.get(type)

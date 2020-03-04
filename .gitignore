@@ -7,3 +7,5 @@
 /lecturePlan/.cache
 /lecturePlan/raplaLinks.json
 /bot/usageStats.json
+/memes/*
+!/memes/Memes.py

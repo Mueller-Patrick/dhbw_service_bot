@@ -65,7 +65,7 @@ class Main:
 				self.sentLecturesToday = True
 				self.sendLectures()
 			# Reset the boolean to send the menu for today again
-			elif timeString == '00:01':
+			elif timeString == '23:59':
 				self.writeUsageStats(True)
 				self.sentMenuToday = False
 				self.sentLecturesToday = False
@@ -117,11 +117,6 @@ class Main:
 
 	# Writes statistics to bot/usageStats.json in the format "DATE": ["AMOUNT_RECEIVED","AMOUNT_SENT"]
 	def writeUsageStats(self, addLog):
-		if addLog:
-			self.bot.log(("We have " + str(len(self.bot.users)) + " users. Yesterday, I received "
-						  + str(self.bot.messagesReceivedToday) + " messages and sent "
-						  + str(self.bot.messagesSentToday) + " messages."))
-
 		try:
 			with open('bot/usageStats.json', 'r') as usageFile:
 				usageJson = usageFile.read()
@@ -129,13 +124,23 @@ class Main:
 
 			usageList = json.loads(usageJson)
 
-			usageList[datetime.now().strftime('%Y-%m-%d')][0] += self.bot.messagesReceivedToday
-			usageList[datetime.now().strftime('%Y-%m-%d')][1] += self.bot.messagesSentToday
+			if (datetime.now().strftime('%Y-%m-%d')) in usageList:
+				usageList[datetime.now().strftime('%Y-%m-%d')][0] += self.bot.messagesReceivedToday
+				usageList[datetime.now().strftime('%Y-%m-%d')][1] += self.bot.messagesSentToday
+			else:
+				usageList[datetime.now().strftime('%Y-%m-%d')] = [0, 0]
+				usageList[datetime.now().strftime('%Y-%m-%d')][0] = self.bot.messagesReceivedToday
+				usageList[datetime.now().strftime('%Y-%m-%d')][1] = self.bot.messagesSentToday
+
+			if addLog:
+				self.bot.log(("We have " + str(len(self.bot.users)) + " users. Yesterday, I received "
+							  + str(usageList[datetime.now().strftime('%Y-%m-%d')][0]) + " messages and sent "
+							  + str(usageList[datetime.now().strftime('%Y-%m-%d')][1]) + " messages."))
 
 			with open('bot/usageStats.json', 'w') as usageFile:
 				usageFile.write(json.dumps(usageList))
 			usageFile.close()
-		except: # If file doesnt exist
+		except:  # If file doesnt exist
 			with open('bot/usageStats.json', 'w') as usageFile:
 				usageList = {
 					datetime.now().strftime('%Y-%m-%d'): [self.bot.messagesReceivedToday, self.bot.messagesSentToday]
@@ -233,7 +238,7 @@ class Main:
 		self.lfetcher.writeLinksToJson()
 
 		# Save usage stats
-		self.writeUsageStats(False)
+		self.writeUsageStats(True)
 
 		# tell the bot to terminate
 		self.bot.close()

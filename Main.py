@@ -108,8 +108,6 @@ class Main:
 				# save usage stats
 				self.writeUsageStats(False)
 
-				self.bot.log(("Saved all preferences at " + now.strftime("%H:%M:%S")))
-
 			# Check if it should stop
 			if self.bot.tellMainToClose:
 				break
@@ -238,7 +236,7 @@ class Main:
 		self.lfetcher.writeLinksToJson()
 
 		# Save usage stats
-		self.writeUsageStats(True)
+		self.writeUsageStats(False)
 
 		# tell the bot to terminate
 		self.bot.close()

@@ -106,8 +106,12 @@ class Bot:
 		print('Sent photo, got answer', resp.json().get('ok'))
 		self.messagesSentToday += 1
 
-		# Returns the file id so we don't have to send this picture again in the future
-		return resp.json().get('result').get('photo')[0].get('file_id')
+		# If the photo was successful sent, return the file_id. Else, return -1
+		if resp.json().get('ok'):
+			# Returns the file id so we don't have to send this picture again in the future
+			return resp.json().get('result').get('photo')[0].get('file_id')
+		else:
+			return '-1'
 
 	def generateReplyMarkup(self, options):
 		optionsConverted = []

@@ -69,7 +69,7 @@ class Memes:
 	def returnMeme(self, meme, typeIndex, memeIndex):
 		# If the file_id of the meme is already known, return the id. Otherwise return the file itself.
 		if meme[1] != '':
-			return [meme[1], False, '', '']
+			return [meme[1], False, typeIndex, memeIndex]
 		else:
 			# Return the meme file, the boolean that we need the id, the type and the meme so its easier to find the
 			# meme in the addMemeId method.

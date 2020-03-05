@@ -177,7 +177,17 @@ class MessageFunctions:
 			meme_id = self.bot.sendPhoto(self.message.user.chatID, meme[0], False)
 			self.bot.memes.addMemeId(meme[2], meme[3], meme_id)
 		else:
-			self.bot.sendPhoto(self.message.user.chatID, meme[0], True)
+			meme_id = self.bot.sendPhoto(self.message.user.chatID, meme[0], True)
+
+			# If telegram returned an error whilst sending the photo via id, the id is invalid and has to be refreshed
+			if meme_id == '-1':
+				# Resets the id
+				self.bot.memes.addMemeId(meme[2], meme[3], '')
+
+				# Fetches the meme again to get the file itself and send it to the user. Also note the new file_id.
+				meme = self.bot.memes.getMeme(self.message.user.tempParams['requestedMemeType'], self.message.text)
+				meme_id = self.bot.sendPhoto(self.message.user.chatID, meme[0], False)
+				self.bot.memes.addMemeId(meme[2], meme[3], meme_id)
 
 		self.message.user.expectedMessageType = ''
 		self.message.user.tempParams['requestedMemeType'] = ''

@@ -182,7 +182,7 @@ class Main:
 				elif 'Programmieren 1' in plan:
 					meme = self.memes.getMeme('Geiger-Memes', '-1')
 					self.sendMeme(user, meme)
-				elif 'Theoretische Informatik 1' in plan:
+				elif 'Theoretische Informatik I' in plan:
 					meme = self.memes.getMeme('Rotzinger-Memes', '-1')
 					self.sendMeme(user, meme)
 				elif 'Projekt-Management 1' in plan:

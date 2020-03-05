@@ -178,11 +178,15 @@ class Main:
 				# Send meme in Mathematik 1 is in the plan
 				if 'Mathematik 1' in plan:
 					meme = self.memes.getMeme('Felder-Memes', '-1')
-
 					self.sendMeme(user, meme)
 				elif 'Programmieren 1' in plan:
 					meme = self.memes.getMeme('Geiger-Memes', '-1')
-
+					self.sendMeme(user, meme)
+				elif 'Theoretische Informatik 1' in plan:
+					meme = self.memes.getMeme('Rotzinger-Memes', '-1')
+					self.sendMeme(user, meme)
+				elif 'Projekt-Management 1' in plan:
+					meme = self.memes.getMeme('Vetter-Memes', '-1')
 					self.sendMeme(user, meme)
 
 				if user.address != None and user.address != '':

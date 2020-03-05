@@ -78,7 +78,7 @@ class CommandFunctions:
 
 	def command_getmenu(self):
 		self.bot.sendMessageWithOptions(self.message.user.chatID, 'For which day do you want the plan?',
-										self.bot.generateReplyMarkup(['Today', 'Tomorrow']))
+										self.bot.generateReplyMarkup([['Today', 'Tomorrow']]))
 
 		self.message.user.expectedMessageType = 'menuday'
 
@@ -103,7 +103,7 @@ class CommandFunctions:
 			self.message.user.expectedMessageType = 'changecoursename'
 		else:
 			self.bot.sendMessageWithOptions(self.message.user.chatID, 'For which day do you want the plan?',
-											self.bot.generateReplyMarkup(['Today', 'Tomorrow']))
+											self.bot.generateReplyMarkup([['Today', 'Tomorrow']]))
 
 			self.message.user.expectedMessageType = 'lectureplanday'
 
@@ -122,8 +122,11 @@ class CommandFunctions:
 		self.message.user.expectedMessageType = 'useraddress'
 
 	def command_getmeme(self):
-		# Memes.getMeme returns a list in this format: ['MEME_FILE_OR_ID', FETCH_ID, TYPEINDEX, MEMEINDEX]
-		# If the meme has not been uploaded to telegram yet, the file itself is sent with the boolean FETCH_ID
-		# set to true so the file_id provided by telegram gets saved.
-		self.bot.sendMessageWithOptions(self.message.user.chatID, "Please select the type of meme:", self.bot.generateReplyMarkup(self.bot.memes.getMemeTypes()))
+		# Convert the memeTypes to a list of lists so they appear as a vertical keyboard instead of horizontal
+		memeTypes = self.bot.memes.getMemeTypes()
+		memeTypesConverted = []
+		for meme in memeTypes:
+			memeTypesConverted.append([meme])
+
+		self.bot.sendMessageWithOptions(self.message.user.chatID, "Please select the type of meme:", self.bot.generateReplyMarkup(memeTypesConverted))
 		self.message.user.expectedMessageType = 'memetype'

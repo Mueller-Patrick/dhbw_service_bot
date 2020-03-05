@@ -113,11 +113,9 @@ class Bot:
 		else:
 			return '-1'
 
+
 	def generateReplyMarkup(self, options):
-		optionsConverted = []
-		for option in options:
-			optionsConverted.append([option])
-		reply = ('{"keyboard": ' + json.dumps(optionsConverted) + ','
+		reply = ('{"keyboard": ' + json.dumps(options) + ','
 				 + '"one_time_keyboard": true,'
 				 + '"resize_keyboard": true}')
 		return reply

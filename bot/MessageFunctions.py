@@ -163,12 +163,22 @@ class MessageFunctions:
 			self.bot.sendMessage(self.message.user.chatID, "The canteen is closed there. Hence no menu for you.")
 
 	def message_memetype(self):
+		memeIds = self.bot.memes.getMemeId(self.message.text)
+		memeIdsConverted = []
+
+		for meme in memeIds:
+			memeIdsConverted.append([meme])
+
 		self.bot.sendMessageWithOptions(self.message.user.chatID, "Please select the meme:",
-										self.bot.generateReplyMarkup(self.bot.memes.getMemeId(self.message.text)))
+										self.bot.generateReplyMarkup(memeIdsConverted))
 		self.message.user.tempParams['requestedMemeType'] = self.message.text
 		self.message.user.expectedMessageType = 'memeid'
 
 	def message_memeid(self):
+		# Memes.getMeme returns a list in this format: ['MEME_FILE_OR_ID', FETCH_ID, TYPEINDEX, MEMEINDEX]
+		# If the meme has not been uploaded to telegram yet, the file itself is sent with the boolean FETCH_ID
+		# set to true so the file_id provided by telegram gets saved.
+
 		self.bot.sendMessage(self.message.user.chatID, "Here is the requested meme:")
 
 		meme = self.bot.memes.getMeme(self.message.user.tempParams['requestedMemeType'], self.message.text)

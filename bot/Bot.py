@@ -73,6 +73,9 @@ class Bot:
 		resp = requests.post(url=reqUrl, params=sendParams)
 		self.messagesSentToday += 1
 
+		if not resp.json().get('ok'):
+			print(resp.json())
+
 	# The options param has to be a [[String]], so an Array of rows with an array of buttons in JSON format.
 	def sendMessageWithOptions(self, chat, text, options):
 		sendParams = {
@@ -84,6 +87,9 @@ class Bot:
 		reqUrl = (self.telegramUrl + self.telegram_token + self.sendMessageParam)
 		resp = requests.post(url=reqUrl, params=sendParams)
 		self.messagesSentToday += 1
+
+		if not resp.json().get('ok'):
+			print(resp.json())
 
 	def sendPhoto(self, chat, photo, isFileId):
 		if isFileId:
@@ -111,6 +117,7 @@ class Bot:
 			# Returns the file id so we don't have to send this picture again in the future
 			return resp.json().get('result').get('photo')[0].get('file_id')
 		else:
+			print(resp.json())
 			return '-1'
 
 
@@ -169,7 +176,7 @@ class Bot:
 							self.messages.append(msg.Message(newUser, text))
 
 			else:
-				self.log(update.json.get('error_code'))
+				print(update.json())
 				return update.json().get('error_code')
 
 	# Used to handle all new commands and messages

@@ -103,6 +103,7 @@ class Bot:
 			}
 		reqUrl = (self.telegramUrl + self.telegram_token + self.sendPhotoParam)
 		resp = requests.post(url=reqUrl, params=sendParams, files=files)
+		print('Sent photo, got answer', resp.json().get('ok'))
 		self.messagesSentToday += 1
 
 		# Returns the file id so we don't have to send this picture again in the future

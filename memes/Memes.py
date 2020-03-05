@@ -47,24 +47,24 @@ class Memes:
 				memeIndex = random.randrange(len(self.memeTypes[typeKeys[typeIndex]]))
 
 				# Fetch the meme
-				meme = self.getMemeObject(typeIndex, memeIndex)
+				memeSource = self.getMemeSourceList(typeIndex, memeIndex)
 
-				return self.returnMeme(meme, typeIndex, memeIndex)
+				return self.returnMeme(memeSource, typeIndex, memeIndex)
 		else:
 			if meme == '-1':
 				typeIndex = list(self.memeTypes).index(type)
 				memeIndex = random.randrange(len(self.memeTypes[type]))
 
-				meme = self.getMemeObject(typeIndex, memeIndex)
+				memeSource = self.getMemeSourceList(typeIndex, memeIndex)
 
-				return self.returnMeme(meme, typeIndex, memeIndex)
+				return self.returnMeme(memeSource, typeIndex, memeIndex)
 			else:
 				typeIndex = list(self.memeTypes).index(type)
 				memeIndex = list(self.memeTypes[type]).index(meme)
 
-				meme = self.getMemeObject(typeIndex, memeIndex)
+				memeSource = self.getMemeSourceList(typeIndex, memeIndex)
 
-				return self.returnMeme(meme, typeIndex, memeIndex)
+				return self.returnMeme(memeSource, typeIndex, memeIndex)
 
 	def returnMeme(self, meme, typeIndex, memeIndex):
 		# If the file_id of the meme is already known, return the id. Otherwise return the file itself.
@@ -87,7 +87,7 @@ class Memes:
 			return ['/help']
 
 	def addMemeId(self, typeIndex, memeIndex, file_id):
-		self.getMemeObject(typeIndex, memeIndex)[1] = file_id
+		self.getMemeSourceList(typeIndex, memeIndex)[1] = file_id
 
 		with open('memes/meme_meta.json', 'w')as memeFile:
 			memeFile.write(json.dumps(self.memeTypes))
@@ -105,7 +105,7 @@ class Memes:
 				memeFile.close()
 
 	# Returns the list with path and id of the meme
-	def getMemeObject(self, typeIndex, memeIndex):
+	def getMemeSourceList(self, typeIndex, memeIndex):
 		memeType = list(self.memeTypes)[typeIndex]
 		memesOfThisType = self.memeTypes[memeType]
 		meme = memesOfThisType[list(memesOfThisType)[memeIndex]]

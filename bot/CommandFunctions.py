@@ -127,6 +127,7 @@ class CommandFunctions:
 		memeTypesConverted = []
 		for meme in memeTypes:
 			memeTypesConverted.append([meme])
+		memeTypesConverted.append(['Random'])
 
 		self.bot.sendMessageWithOptions(self.message.user.chatID, "Please select the type of meme:", self.bot.generateReplyMarkup(memeTypesConverted))
 		self.message.user.expectedMessageType = 'memetype'

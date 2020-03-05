@@ -16,18 +16,19 @@ class MessageFunctions:
 
 	def message_name(self):
 		self.message.user.name = self.message.text
-		welcomeMsg = ('Hello, *' + self.message.text + '*! Pleased to meet you! To get you started, I\'ll now explain to '
-					  + 'you the stuff I\'m able to do and what commands you may use\n\n. You already figured out the first command, /start. '
-					  + 'Great work there!\n\nTo continue, you might want to *subscribe to the daily menu push service* via /subscribemenu '
-					  + 'and the *daily lecture plan push* via /subscribelectureplan. Pretty easy to remember, right? If you want to '
-					  + 'unsubscribe from these services, you just need to type /unsubscribemenu or /unsubscribelectureplan (You '
-					  + 'probably already guessed these).\n\nTo *get the daily menu at any time*, send /getmenu. If you forgot '
-					  + '*what lectures you have today*, type /getlectures to get the plan again.\n\n'
-					  + 'Also, if you don\'t want to check the crappy DB app every day, type /subscribetraininfo and send the '
-					  + 'required Information to *get public transport directions* alongside the lecture push.\n\n'
-					  +	'We all love *memes*. Type /getmeme to access all of your favorite ones.\n\nAnd because I '
-					  + 'respect your *privacy*, type /privacy and /whatdoyouknowaboutme to get Info about what we save '
-					  + 'about you. Last but not least, type /help to get a short description of every command.')
+		welcomeMsg = (
+					'Hello, *' + self.message.text + '*! Pleased to meet you! To get you started, I\'ll now explain to '
+					+ 'you the stuff I\'m able to do and what commands you may use\n\n. You already figured out the first command, /start. '
+					+ 'Great work there!\n\nTo continue, you might want to *subscribe to the daily menu push service* via /subscribemenu '
+					+ 'and the *daily lecture plan push* via /subscribelectureplan. Pretty easy to remember, right? If you want to '
+					+ 'unsubscribe from these services, you just need to type /unsubscribemenu or /unsubscribelectureplan (You '
+					+ 'probably already guessed these).\n\nTo *get the daily menu at any time*, send /getmenu. If you forgot '
+					+ '*what lectures you have today*, type /getlectures to get the plan again.\n\n'
+					+ 'Also, if you don\'t want to check the crappy DB app every day, type /subscribetraininfo and send the '
+					+ 'required Information to *get public transport directions* alongside the lecture push.\n\n'
+					+ 'We all love *memes*. Type /getmeme to access all of your favorite ones.\n\nAnd because I '
+					+ 'respect your *privacy*, type /privacy and /whatdoyouknowaboutme to get Info about what we save '
+					+ 'about you. Last but not least, type /help to get a short description of every command.')
 		self.bot.sendMessage(self.message.user.chatID, welcomeMsg)
 		self.message.user.expectedMessageType = ''
 
@@ -163,16 +164,22 @@ class MessageFunctions:
 			self.bot.sendMessage(self.message.user.chatID, "The canteen is closed there. Hence no menu for you.")
 
 	def message_memetype(self):
-		memeIds = self.bot.memes.getMemeId(self.message.text)
-		memeIdsConverted = []
+		if self.message.text == 'Random':
+			self.message.text = '-1'
+			self.message.user.tempParams['requestedMemeType'] = '-1'
+			self.message_memeid()
+		else:
+			memeIds = self.bot.memes.getMemeId(self.message.text)
+			memeIdsConverted = []
 
-		for meme in memeIds:
-			memeIdsConverted.append([meme])
+			for meme in memeIds:
+				memeIdsConverted.append([meme])
+			memeIdsConverted.append(['Random'])
 
-		self.bot.sendMessageWithOptions(self.message.user.chatID, "Please select the meme:",
-										self.bot.generateReplyMarkup(memeIdsConverted))
-		self.message.user.tempParams['requestedMemeType'] = self.message.text
-		self.message.user.expectedMessageType = 'memeid'
+			self.bot.sendMessageWithOptions(self.message.user.chatID, "Please select the meme:",
+											self.bot.generateReplyMarkup(memeIdsConverted))
+			self.message.user.tempParams['requestedMemeType'] = self.message.text
+			self.message.user.expectedMessageType = 'memeid'
 
 	def message_memeid(self):
 		# Memes.getMeme returns a list in this format: ['MEME_FILE_OR_ID', FETCH_ID, TYPEINDEX, MEMEINDEX]
@@ -180,6 +187,9 @@ class MessageFunctions:
 		# set to true so the file_id provided by telegram gets saved.
 
 		self.bot.sendMessage(self.message.user.chatID, "Here is the requested meme:")
+
+		if self.message.text == 'Random':
+			self.message.text = '-1'
 
 		meme = self.bot.memes.getMeme(self.message.user.tempParams['requestedMemeType'], self.message.text)
 		# If the id is needed, clearly this getting sent here is the photo itself

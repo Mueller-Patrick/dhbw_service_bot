@@ -175,6 +175,16 @@ class Main:
 												   + 'at ' + firstLectureTime + '. Here is the plan for tomorrow:'))
 				self.bot.sendMessage(user.chatID, plan)
 
+				# Send meme in Mathematik 1 is in the plan
+				if 'Mathematik 1' in plan:
+					meme = self.memes.getMeme('Felder-Memes', '-1')
+
+					self.sendMeme(user, meme)
+				elif 'Programmieren 1' in plan:
+					meme = self.memes.getMeme('Geiger-Memes', '-1')
+
+					self.sendMeme(user, meme)
+
 				if user.address != None and user.address != '':
 					time = datetime(int(tomorrow.year), int(tomorrow.month), int(tomorrow.day),
 									int(firstLectureTime[:2]), int(firstLectureTime[3:]))
@@ -184,6 +194,25 @@ class Main:
 
 					self.bot.sendMessage(user.chatID, 'Here are the public transport directions:')
 					self.bot.sendMessage(user.chatID, trainPlan)
+
+	# Send the given meme
+	def sendMeme(self, user, meme):
+		if meme[1]:
+			meme_id = self.bot.sendPhoto(user.chatID, meme[0], False)
+			self.bot.memes.addMemeId(meme[2], meme[3], meme_id)
+		else:
+			meme_id = self.bot.sendPhoto(user.chatID, meme[0], True)
+
+			# If telegram returned an error whilst sending the photo via id, the id is invalid and has to be refreshed
+			if meme_id == '-1':
+				# Resets the id
+				self.memes.addMemeId(meme[2], meme[3], '')
+
+				# Fetches the meme again to get the file itself and send it to the user. Also note the new file_id.
+				meme = self.memes.getMeme(list(self.memes.memeTypes)[meme[2]],
+										  list(list(self.memes.memeTypes)[meme[2]])[meme[3]])
+				meme_id = self.bot.sendPhoto(user.chatID, meme[0], False)
+				self.memes.addMemeId(meme[2], meme[3], meme_id)
 
 	def getToken(self):
 		return telegram_secrets.token

@@ -18,7 +18,7 @@ class MessageFunctions:
 		self.message.user.name = self.message.text
 		welcomeMsg = (
 					'Hello, *' + self.message.text + '*! Pleased to meet you! To get you started, I\'ll now explain to '
-					+ 'you the stuff I\'m able to do and what commands you may use\n\n. You already figured out the first command, /start. '
+					+ 'you the stuff I\'m able to do and what commands you may use.\n\n You already figured out the first command, /start. '
 					+ 'Great work there!\n\nTo continue, you might want to *subscribe to the daily menu push service* via /subscribemenu '
 					+ 'and the *daily lecture plan push* via /subscribelectureplan. Pretty easy to remember, right? If you want to '
 					+ 'unsubscribe from these services, you just need to type /unsubscribemenu or /unsubscribelectureplan (You '

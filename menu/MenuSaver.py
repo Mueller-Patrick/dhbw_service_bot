@@ -3,12 +3,8 @@ import os
 import datetime
 
 from menu import Requests
+from menu import Utility as Util
 from datetime import timedelta
-from difflib import SequenceMatcher
-
-
-def similar(a, b):
-    return SequenceMatcher(None, a, b).ratio()
 
 
 def foods_to_json(food_array):
@@ -27,7 +23,7 @@ def foods_to_json(food_array):
 def check_if_in_file(path, unsaved_json):
     if not check_if_path_exists(path):
         return False
-    data = load_data(path)
+    data = Util.load_data(path)
 
     for saved_json in data:
         if saved_json == unsaved_json:
@@ -39,10 +35,10 @@ def check_if_in_file(path, unsaved_json):
 def check_if_key_in_file(path, unsaved_json, json_key):
     if not check_if_path_exists(path):
         return False
-    data = load_data(path)
+    data = Util.load_data(path)
 
     for saved_json in data:
-        if similar(saved_json[json_key], unsaved_json[json_key]) >= 0.8:
+        if Util.similar(saved_json[json_key], unsaved_json[json_key]) >= 0.8:
             return True
 
     return False
@@ -52,19 +48,6 @@ def check_if_path_exists(path):
     if not os.path.exists(path) or os.stat(path).st_size == 0:
         return False
     return True
-
-
-def load_data(path):
-    with open(path) as infile:
-        data = json.loads(infile.read())
-    infile.close()
-    return data
-
-
-def save_data(path, data):
-    with open(path, 'w') as outfile:
-        outfile.write(json.dumps(data, indent=4))
-    outfile.close()
 
 
 def increment_array_in_json(food, path, compare_key, increment_key):
@@ -78,15 +61,15 @@ def increment_array_in_json(food, path, compare_key, increment_key):
     """
 
     dates = [food['was_available_on']]
-    data = load_data(path)
+    data = Util.load_data(path)
     for dataset in data:
-        if similar(dataset[compare_key], food[compare_key]) >= 0.8:
+        if Util.similar(dataset[compare_key], food[compare_key]) >= 0.8:
             if isinstance(dataset[increment_key], list):
                 for date in dataset[increment_key]:
                     if date not in dates:
                         dates.append(date)
             data[data.index(dataset)][increment_key] = dates
-            save_data(path, data)
+            Util.save_data(path, data)
 
 
 class Saver(object):
@@ -107,12 +90,12 @@ class Saver(object):
                     increment_array_in_json(food, food_path, 'name', 'was_available_on')
 
             if check_if_path_exists(food_path):
-                data = load_data(food_path)
+                data = Util.load_data(food_path)
 
                 for dataset in data:
                     self.foods.append(dataset)
 
-            save_data(food_path, self.foods)
+            Util.save_data(food_path, self.foods)
 
             # Save new menu
             self.unsaved_menu = {
@@ -125,27 +108,40 @@ class Saver(object):
             menu_path = "menu/savedMenus.json"
             if not check_if_in_file(menu_path, self.unsaved_menu):
                 if check_if_path_exists(menu_path):
-                    data = load_data(menu_path)
+                    data = Util.load_data(menu_path)
                     for dataset in data:
                         self.menus.append(dataset)
 
                 self.menus.append(self.unsaved_menu)
 
-                save_data(menu_path, self.menus)
+                Util.save_data(menu_path, self.menus)
+
+
+def get_foods_as_arr():
+    foods = Util.load_data("menu/savedFoods.json")
+    return foods
 
 
 class Reader(object):
     def __init__(self, day):
         Saver(day)
-        with open('menu/savedMenus.json', 'r') as testfile:
-            data = json.loads(testfile.read())
-        testfile.close()
+        data = Util.load_data("menu/savedMenus.json")
         self.day = datetime.datetime.today() + timedelta(days=day - 1)
-        self.day = self.day.date()
-        self.day = str(self.day.day) + "." + str(self.day.month) + "." + str(self.day.year)
+        self.day = self.day.strftime("%Y-%m-%d")
         for x in data:
             if self.day == x['day']:
                 self.menu = x['menu']
+
+    def get_food_with_ratings_as_string_array(self):
+        data = Util.load_data("menu/savedFoods.json")
+        date = self.day
+        array = []
+        for dataset in data:
+            if date in dataset["was_available_on"]:
+                string = str(dataset["name"]) + " [" + "%.2f" % dataset["rating"] + "⭐]"
+                array.append(string)
+
+        return array
 
     def get_menu_as_str(self):
         return self.menu
@@ -153,15 +149,7 @@ class Reader(object):
     def get_menu_as_arr(self):
         menu = str(self.menu)
         array = menu.split("%i%")
-
         return array
-
-    def get_foods_as_arr(self):
-        foods = load_data("menu/savedFoods.json")
-        return foods
 
     def get_day(self):
         return self.day
-
-
-# Saver(1)

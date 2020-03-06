@@ -32,7 +32,7 @@ class Menu(object):
         return (self.today.weekday() + self.day) <= 5
 
     def create_date_string(self):
-        return str(self.day.day) + "." + str(self.day.month) + "." + str(self.day.year)
+        return self.day.today().strftime("%Y-%m-%d")
 
     def create_string(self):
         string = ""
@@ -72,7 +72,9 @@ class Menu(object):
     def create_foods(self):
         menu_string = self.create_string()
         foods = []
-        while menu_string.find("*") != -1:
+        while menu_string.find("Wahlessen") != -1:
+            start = menu_string.find("Wahlessen")
+            menu_string = menu_string[start:]
             start = menu_string.find("*") + 1
             menu_string = menu_string[start:]
             end = menu_string.find("*")

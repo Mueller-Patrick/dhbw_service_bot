@@ -66,8 +66,9 @@ class Main:
 			elif str(timeString) == '18:00' and not self.sentLecturesToday and sendPlanToday:
 				self.sentLecturesToday = True
 				self.sendLectures()
-			# Reset the boolean to send the menu for today again
-			elif timeString == '23:59':
+			# Reset the boolean to send the menu for today again.
+			# Do this only if seconds < 30 because otherwise it would happen twice.
+			elif timeString == '23:59' and int(datetime.now().strftime('%S')) < 30:
 				self.writeUsageStats(True)
 				self.sentMenuToday = False
 				self.sentLecturesToday = False

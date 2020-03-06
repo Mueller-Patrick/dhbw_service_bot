@@ -6,6 +6,7 @@ import telegram_secrets
 from bot import Command as cmd, Message as msg, User as usr
 import asyncio
 import json
+from datetime import datetime
 
 
 class Bot:
@@ -154,7 +155,7 @@ class Bot:
 					chat = res.get('message').get('chat').get('id')
 					text = res.get('message').get('text')
 
-					# self.log("Received message")
+					print("Received message at", datetime.now().strftime('%H:%M:%S'))
 
 					if not text:
 						self.sendMessage(chat, "Unknown input format. Don't mess with me, fella!")

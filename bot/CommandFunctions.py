@@ -122,12 +122,16 @@ class CommandFunctions:
 		self.message.user.expectedMessageType = 'useraddress'
 
 	def command_getmeme(self):
-		# Convert the memeTypes to a list of lists so they appear as a vertical keyboard instead of horizontal
-		memeTypes = self.bot.memes.getMemeTypes()
-		memeTypesConverted = []
-		for meme in memeTypes:
-			memeTypesConverted.append([meme])
-		memeTypesConverted.append(['Random'])
+		if self.message.user.course != '':
+			# Convert the memeTypes to a list of lists so they appear as a vertical keyboard instead of horizontal
+			memeTypes = self.bot.memes.getMemeTypes(self.message.user.course)
+			memeTypesConverted = []
+			for meme in memeTypes:
+				memeTypesConverted.append([meme])
+			memeTypesConverted.append(['Random'])
 
-		self.bot.sendMessageWithOptions(self.message.user.chatID, "Please select the type of meme:", self.bot.generateReplyMarkup(memeTypesConverted))
-		self.message.user.expectedMessageType = 'memetype'
+			self.bot.sendMessageWithOptions(self.message.user.chatID, "Please select the type of meme:", self.bot.generateReplyMarkup(memeTypesConverted))
+			self.message.user.expectedMessageType = 'memetype'
+		else:
+			self.bot.sendMessage(self.message.user.chatID, "I can't send you memes because you are in no course. "
+														   + "Type /getlectures to enter a course.")

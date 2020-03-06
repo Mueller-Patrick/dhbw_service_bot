@@ -12,7 +12,7 @@ class MessageFunctions:
 	def message_unknown(self):
 		self.bot.sendMessageWithOptions(self.message.user.chatID,
 										'I don\'t know what to do with your input :( Use this to get help:',
-										self.bot.generateReplyMarkup(['/help']))
+										self.bot.generateReplyMarkup([['/help']]))
 
 	def message_name(self):
 		self.message.user.name = self.message.text
@@ -33,34 +33,62 @@ class MessageFunctions:
 		self.message.user.expectedMessageType = ''
 
 	def message_coursename(self):
-		self.message.user.course = self.message.text
+		self.message.user.tempParams['enteredCourse'] = self.message.text
 
-		if self.bot.lectureFetcher.checkForCourse(self.message.user.course):
-			self.message.user.wantsLecturePlan = True
-			self.bot.sendMessage(self.message.user.chatID, "You successfully subscribed to the daily lecture plan push."
-								 + " May the RaPla be with you! If you also want to receive public transport "
-								 + "Information, send /subscribetraininfo")
-			self.message.user.expectedMessageType = ''
+		self.bot.sendMessage(self.message.user.chatID, "Please send me the password for " + self.message.text)
+		self.message.user.expectedMessageType = 'coursepassword'
+
+	def message_coursepassword(self):
+		password = self.message.text
+		self.bot.deleteMessage(self.message.user.chatID, self.message.id)
+
+		if password == self.bot.memes.getPassword(self.message.user.tempParams['enteredCourse']):
+			self.message.user.course = self.message.user.tempParams['enteredCourse']
+			self.message.user.tempParams['enteredCourse'] = ''
+
+			if self.bot.lectureFetcher.checkForCourse(self.message.user.course):
+				self.message.user.wantsLecturePlan = True
+				self.bot.sendMessage(self.message.user.chatID, "You successfully subscribed to the daily lecture plan push."
+									 + " May the RaPla be with you! If you also want to receive public transport "
+									 + "Information, send /subscribetraininfo")
+				self.message.user.expectedMessageType = ''
+			else:
+				self.bot.sendMessage(self.message.user.chatID, "Unknown course. Please send me the link to your courses"
+									 + " iCal calendar:")
+				self.message.user.expectedMessageType = "raplalink"
 		else:
-			self.bot.sendMessage(self.message.user.chatID, "Unknown course. Please send me the link to your courses"
-								 + " iCal calendar:")
-			self.message.user.expectedMessageType = "raplalink"
+			self.bot.sendMessage(self.message.user.chatID, "Wrong password. Please start again using /subscribelectureplan")
 
 	def message_changecoursename(self):
-		self.message.user.course = self.message.text
+		self.message.user.tempParams['enteredCourse'] = self.message.text
 
-		if self.bot.lectureFetcher.checkForCourse(self.message.user.course):
-			self.bot.sendMessage(self.message.user.chatID,
-								 'Successfully added/changed course. Here is the plan for today:')
-			now = datetime.now()
-			dateString = now.strftime("%Y-%m-%d")
-			plan = self.bot.lectureFetcher.getFormattedLectures(self.message.user.course, dateString)
-			self.bot.sendMessage(self.message.user.chatID, plan)
-			self.message.user.expectedMessageType = ''
+		self.bot.sendMessage(self.message.user.chatID, "Please send me the password for " + self.message.text)
+		self.message.user.expectedMessageType = 'changedcoursepassword'
+
+
+	def message_changedcoursepassword(self):
+		password = self.message.text
+		self.bot.deleteMessage(self.message.user.chatID, self.message.id)
+
+		if password == self.bot.memes.getPassword(self.message.user.tempParams['enteredCourse']):
+			self.message.user.course = self.message.user.tempParams['enteredCourse']
+			self.message.user.tempParams['enteredCourse'] = ''
+
+			if self.bot.lectureFetcher.checkForCourse(self.message.user.course):
+				self.bot.sendMessage(self.message.user.chatID,
+									 'Successfully added/changed course. Here is the plan for today:')
+				now = datetime.now()
+				dateString = now.strftime("%Y-%m-%d")
+				plan = self.bot.lectureFetcher.getFormattedLectures(self.message.user.course, dateString)
+				self.bot.sendMessage(self.message.user.chatID, plan)
+				self.message.user.expectedMessageType = ''
+			else:
+				self.bot.sendMessage(self.message.user.chatID, "Unknown course. Please send me the link to your courses"
+									 + " iCal calendar:")
+				self.message.user.expectedMessageType = "raplalinkwithoutpush"
 		else:
-			self.bot.sendMessage(self.message.user.chatID, "Unknown course. Please send me the link to your courses"
-								 + " iCal calendar:")
-			self.message.user.expectedMessageType = "raplalinkwithoutpush"
+			self.bot.sendMessage(self.message.user.chatID,
+								 "Wrong password. Please start again using /getlectures")
 
 	def message_raplalink(self):
 		if self.message.text == 'stop':
@@ -169,7 +197,7 @@ class MessageFunctions:
 			self.message.user.tempParams['requestedMemeType'] = '-1'
 			self.message_memeid()
 		else:
-			memeIds = self.bot.memes.getMemeId(self.message.text)
+			memeIds = self.bot.memes.getMemeId(self.message.user.course, self.message.text)
 			memeIdsConverted = []
 
 			for meme in memeIds:
@@ -191,23 +219,23 @@ class MessageFunctions:
 		if self.message.text == 'Random':
 			self.message.text = '-1'
 
-		meme = self.bot.memes.getMeme(self.message.user.tempParams['requestedMemeType'], self.message.text)
+		meme = self.bot.memes.getMeme(self.message.user.course, self.message.user.tempParams['requestedMemeType'], self.message.text)
 		# If the id is needed, clearly this getting sent here is the photo itself
 		if meme[1]:
 			meme_id = self.bot.sendPhoto(self.message.user.chatID, meme[0], False)
-			self.bot.memes.addMemeId(meme[2], meme[3], meme_id)
+			self.bot.memes.addMemeId(self.message.user.course, meme[2], meme[3], meme_id)
 		else:
 			meme_id = self.bot.sendPhoto(self.message.user.chatID, meme[0], True)
 
 			# If telegram returned an error whilst sending the photo via id, the id is invalid and has to be refreshed
 			if meme_id == '-1':
 				# Resets the id
-				self.bot.memes.addMemeId(meme[2], meme[3], '')
+				self.bot.memes.addMemeId(self.message.user.course, meme[2], meme[3], '')
 
 				# Fetches the meme again to get the file itself and send it to the user. Also note the new file_id.
-				meme = self.bot.memes.getMeme(self.message.user.tempParams['requestedMemeType'], self.message.text)
+				meme = self.bot.memes.getMeme(self.message.user.course, self.message.user.tempParams['requestedMemeType'], self.message.text)
 				meme_id = self.bot.sendPhoto(self.message.user.chatID, meme[0], False)
-				self.bot.memes.addMemeId(meme[2], meme[3], meme_id)
+				self.bot.memes.addMemeId(self.message.user.course, meme[2], meme[3], meme_id)
 
 		self.message.user.expectedMessageType = ''
 		self.message.user.tempParams['requestedMemeType'] = ''

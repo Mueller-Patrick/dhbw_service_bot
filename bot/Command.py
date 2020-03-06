@@ -63,7 +63,9 @@ class Command:
 			'lectureplanday': self.mfunctions.message_lectureplanday,
 			'menuday': self.mfunctions.message_menuday,
 			'memetype': self.mfunctions.message_memetype,
-			'memeid': self.mfunctions.message_memeid
+			'memeid': self.mfunctions.message_memeid,
+			'coursepassword': self.mfunctions.message_coursepassword,
+			'changedcoursepassword': self.mfunctions.message_changedcoursepassword
 		}
 
 		messageFunc = callMessageFunctions.get(type)

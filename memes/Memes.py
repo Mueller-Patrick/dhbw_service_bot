@@ -6,22 +6,24 @@
  It has this file structure:
 
  {
-  "TYPE1": {
-    "MEME1": [
-      "PATH",
-      "FILE_ID"
-    ],
-    "MEME2": [
-      "PATH",
-      ""
-    ]
-  },
-  "TYPE2": {
-    "MEME1": [
-      "PATH",
-      ""
-    ]
-  }
+	"COURSE1": {
+		"TYPE1": {
+			"MEME1": [
+				"PATH",
+				"FILE_ID"
+			],
+			"MEME2": [
+				"PATH",
+				""
+			]
+	  	},
+	  	"TYPE2": {
+			"MEME1": [
+				"PATH",
+				""
+			]
+	  	}
+  	}
 }
 """
 import random
@@ -38,31 +40,31 @@ class Memes:
 	# If type and meme are left blank, a random meme is returned.
 	# If only meme is blank, a random meme of this type is returned.
 	# list(DICTNAME)[INDEX] returns the key at this index
-	def getMeme(self, type, meme):
+	def getMeme(self, course, type, meme):
 		if type == '-1':
 			if meme == '-1':
 				# Generate random type and meme indices
-				typeIndex = random.randrange(len(self.memeTypes))
-				typeKeys = list(self.memeTypes)
-				memeIndex = random.randrange(len(self.memeTypes[typeKeys[typeIndex]]))
+				typeIndex = random.randrange(len(self.memeTypes[course]))
+				typeKeys = list(self.memeTypes[course])
+				memeIndex = random.randrange(len(self.memeTypes[course][typeKeys[typeIndex]]))
 
 				# Fetch the meme
-				memeSource = self.getMemeSourceList(typeIndex, memeIndex)
+				memeSource = self.getMemeSourceList(course, typeIndex, memeIndex)
 
 				return self.returnMeme(memeSource, typeIndex, memeIndex)
 		else:
 			if meme == '-1':
-				typeIndex = list(self.memeTypes).index(type)
-				memeIndex = random.randrange(len(self.memeTypes[type]))
+				typeIndex = list(self.memeTypes[course]).index(type)
+				memeIndex = random.randrange(len(self.memeTypes[course][type]))
 
-				memeSource = self.getMemeSourceList(typeIndex, memeIndex)
+				memeSource = self.getMemeSourceList(course, typeIndex, memeIndex)
 
 				return self.returnMeme(memeSource, typeIndex, memeIndex)
 			else:
-				typeIndex = list(self.memeTypes).index(type)
-				memeIndex = list(self.memeTypes[type]).index(meme)
+				typeIndex = list(self.memeTypes[course]).index(type)
+				memeIndex = list(self.memeTypes[course][type]).index(meme)
 
-				memeSource = self.getMemeSourceList(typeIndex, memeIndex)
+				memeSource = self.getMemeSourceList(course, typeIndex, memeIndex)
 
 				return self.returnMeme(memeSource, typeIndex, memeIndex)
 
@@ -76,21 +78,21 @@ class Memes:
 			return [open(meme[0], 'rb'), True, typeIndex, memeIndex]
 
 	# Returns a list with all available meme types
-	def getMemeTypes(self):
-		return list(self.memeTypes)
+	def getMemeTypes(self, course):
+		return list(self.memeTypes[course])
 
 	# Returns a list with all available memes for a given type
-	def getMemeId(self, type):
-		if type in self.memeTypes:
-			return list(self.memeTypes[type])
+	def getMemeId(self, course, type):
+		if type in self.memeTypes[course]:
+			return list(self.memeTypes[course][type])
 		else:
 			return ['/help']
 
-	def addMemeId(self, typeIndex, memeIndex, file_id):
+	def addMemeId(self, course, typeIndex, memeIndex, file_id):
 		self.getMemeSourceList(typeIndex, memeIndex)[1] = file_id
 
 		with open('memes/meme_meta.json', 'w')as memeFile:
-			memeFile.write(json.dumps(self.memeTypes))
+			memeFile.write(json.dumps(self.memeTypes[course]))
 
 	def readMemeTypes(self):
 		try:
@@ -105,9 +107,13 @@ class Memes:
 				memeFile.close()
 
 	# Returns the list with path and id of the meme
-	def getMemeSourceList(self, typeIndex, memeIndex):
-		memeType = list(self.memeTypes)[typeIndex]
-		memesOfThisType = self.memeTypes[memeType]
+	def getMemeSourceList(self, course, typeIndex, memeIndex):
+		memeType = list(self.memeTypes[course])[typeIndex]
+		memesOfThisType = self.memeTypes[course][memeType]
 		meme = memesOfThisType[list(memesOfThisType)[memeIndex]]
 
 		return meme
+
+	# Returns the access password for a given course
+	def getPassword(self, course):
+		return self.memeTypes['PASSWORDS'][course]

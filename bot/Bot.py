@@ -19,6 +19,7 @@ class Bot:
 		self.sendMessageParam = 'sendMessage'
 		self.receiveUpdatesParam = 'getUpdates'
 		self.sendPhotoParam = 'sendPhoto'
+		self.deleteMessageParam = 'deleteMessage'
 
 		# Param for the http request
 		self.offsetParam = {'offset': 0}
@@ -75,7 +76,7 @@ class Bot:
 		self.messagesSentToday += 1
 
 		if not resp.json().get('ok'):
-			print(resp.json())
+			print('Error on sending text: ' + resp.json())
 
 	# The options param has to be a [[String]], so an Array of rows with an array of buttons in JSON format.
 	def sendMessageWithOptions(self, chat, text, options):
@@ -90,7 +91,7 @@ class Bot:
 		self.messagesSentToday += 1
 
 		if not resp.json().get('ok'):
-			print(resp.json())
+			print('Error on sending text with options: ' + resp.json())
 
 	def sendPhoto(self, chat, photo, isFileId):
 		if isFileId:
@@ -110,7 +111,7 @@ class Bot:
 			}
 		reqUrl = (self.telegramUrl + self.telegram_token + self.sendPhotoParam)
 		resp = requests.post(url=reqUrl, params=sendParams, files=files)
-		print('Sent photo, got answer', resp.json().get('ok'))
+		print('Sent photo, got answer ' + resp.json().get('ok'))
 		self.messagesSentToday += 1
 
 		# If the photo was successful sent, return the file_id. Else, return -1
@@ -118,15 +119,25 @@ class Bot:
 			# Returns the file id so we don't have to send this picture again in the future
 			return resp.json().get('result').get('photo')[0].get('file_id')
 		else:
-			print(resp.json())
+			print('Error on sending picture: ' + resp.json())
 			return '-1'
-
 
 	def generateReplyMarkup(self, options):
 		reply = ('{"keyboard": ' + json.dumps(options) + ','
 				 + '"one_time_keyboard": true,'
 				 + '"resize_keyboard": true}')
 		return reply
+
+	def deleteMessage(self, chatID, messageID):
+		sendParams = {
+			'chat_id': chatID,
+			'message_id': messageID
+		}
+		reqUrl = (self.telegramUrl + self.telegram_token + self.deleteMessageParam)
+		resp = requests.post(url=reqUrl, params=sendParams)
+
+		if not resp.json().get('ok'):
+			print('Error on deleting message: ' + resp.json())
 
 	async def getUpdates(self):
 		# If the bot is not about to be closed
@@ -154,8 +165,9 @@ class Bot:
 				for res in update.json().get('result'):
 					chat = res.get('message').get('chat').get('id')
 					text = res.get('message').get('text')
+					messageID = str(res.get('message').get('message_id'))
 
-					print("Received message at", datetime.now().strftime('%H:%M:%S'))
+					print("Received message at " + datetime.now().strftime('%H:%M:%S'))
 
 					if not text:
 						self.sendMessage(chat, "Unknown input format. Don't mess with me, fella!")
@@ -168,16 +180,16 @@ class Bot:
 						if not currentUser.chatID == '0':
 							# If it is an existing user, get record for this user and create a new message entity
 							# with the user as parameter.
-							self.messages.append(msg.Message(currentUser, text))
+							self.messages.append(msg.Message(currentUser, text, messageID))
 						else:
 							# If unknown user, create a new user and write it to users list. Also create a new message
 							# entity with the user as parameter.
 							newUser = usr.User(chat)
 							self.users.append(newUser)
-							self.messages.append(msg.Message(newUser, text))
+							self.messages.append(msg.Message(newUser, text, messageID))
 
 			else:
-				print(update.json())
+				print('Error on update: ' + update.json())
 				return update.json().get('error_code')
 
 	# Used to handle all new commands and messages

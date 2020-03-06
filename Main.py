@@ -178,16 +178,16 @@ class Main:
 
 				# Send meme in Mathematik 1 is in the plan
 				if 'Mathematik 1' in plan:
-					meme = self.memes.getMeme('Felder-Memes', '-1')
+					meme = self.memes.getMeme(user.course, 'Felder-Memes', '-1')
 					self.sendMeme(user, meme)
 				elif 'Programmieren 1' in plan:
-					meme = self.memes.getMeme('Geiger-Memes', '-1')
+					meme = self.memes.getMeme(user.course, 'Geiger-Memes', '-1')
 					self.sendMeme(user, meme)
 				elif 'Theoretische Informatik I' in plan:
-					meme = self.memes.getMeme('Rotzinger-Memes', '-1')
+					meme = self.memes.getMeme(user.course, 'Rotzinger-Memes', '-1')
 					self.sendMeme(user, meme)
 				elif 'Projekt-Management 1' in plan:
-					meme = self.memes.getMeme('Vetter-Memes', '-1')
+					meme = self.memes.getMeme(user.course, 'Vetter-Memes', '-1')
 					self.sendMeme(user, meme)
 
 				if user.address != None and user.address != '':
@@ -204,20 +204,20 @@ class Main:
 	def sendMeme(self, user, meme):
 		if meme[1]:
 			meme_id = self.bot.sendPhoto(user.chatID, meme[0], False)
-			self.bot.memes.addMemeId(meme[2], meme[3], meme_id)
+			self.bot.memes.addMemeId(user.course, meme[2], meme[3], meme_id)
 		else:
 			meme_id = self.bot.sendPhoto(user.chatID, meme[0], True)
 
 			# If telegram returned an error whilst sending the photo via id, the id is invalid and has to be refreshed
 			if meme_id == '-1':
 				# Resets the id
-				self.memes.addMemeId(meme[2], meme[3], '')
+				self.memes.addMemeId(user.course, meme[2], meme[3], '')
 
 				# Fetches the meme again to get the file itself and send it to the user. Also note the new file_id.
-				meme = self.memes.getMeme(list(self.memes.memeTypes)[meme[2]],
+				meme = self.memes.getMeme(user.course, list(self.memes.memeTypes)[meme[2]],
 										  list(list(self.memes.memeTypes)[meme[2]])[meme[3]])
 				meme_id = self.bot.sendPhoto(user.chatID, meme[0], False)
-				self.memes.addMemeId(meme[2], meme[3], meme_id)
+				self.memes.addMemeId(user.course, meme[2], meme[3], meme_id)
 
 	def getToken(self):
 		return telegram_secrets.token

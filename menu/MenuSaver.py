@@ -58,8 +58,10 @@ def increment_array_in_json(food, path, compare_key, increment_key):
     @param increment_key: key to array to increment
 
     This method automatically saves data with incremented array
+    The name will be updated
     """
 
+    name = food['name']
     dates = [food['was_available_on']]
     data = Util.load_data(path)
     for dataset in data:
@@ -69,6 +71,7 @@ def increment_array_in_json(food, path, compare_key, increment_key):
                     if date not in dates:
                         dates.append(date)
             data[data.index(dataset)][increment_key] = dates
+            data[data.index(dataset)]['name'] = name
             Util.save_data(path, data)
 
 

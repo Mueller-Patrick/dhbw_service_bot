@@ -19,9 +19,11 @@ class Main:
 		self.token = self.getToken()
 		self.lfetcher = lf.LectureFetcher()
 		self.memes = Memes.Memes()
-		self.bot = bt.Bot(telegram_token=self.token, users=self.getUsers(), lectureFetcher=self.lfetcher, memes=self.memes)
+		self.bot = bt.Bot(telegram_token=self.token, users=self.getUsers(), lectureFetcher=self.lfetcher,
+						  memes=self.memes)
 		self.sentMenuToday = False
 		self.sentLecturesToday = False
+		self.askedForRatingToday = False
 
 		# Runs both loops independent from each other
 		loop = asyncio.get_event_loop()
@@ -66,6 +68,9 @@ class Main:
 			elif str(timeString) == '18:00' and not self.sentLecturesToday and sendPlanToday:
 				self.sentLecturesToday = True
 				self.sendLectures()
+			elif str(timeString) == '14:30' and not self.askedForRatingToday and canteenOpen:
+				self.askedForRatingToday = True
+				self.sendMenuRating()
 			# Reset the boolean to send the menu for today again.
 			# Do this only if seconds < 30 because otherwise it would happen twice.
 			elif timeString == '23:59' and int(datetime.now().strftime('%S')) < 30:
@@ -178,16 +183,16 @@ class Main:
 
 				# Send meme in Mathematik 1 is in the plan
 				if 'Mathematik 1' in plan:
-					meme = self.memes.getMeme('Felder-Memes', '-1')
+					meme = self.memes.getMeme(user.course, 'Felder-Memes', '-1')
 					self.sendMeme(user, meme)
 				elif 'Programmieren 1' in plan:
-					meme = self.memes.getMeme('Geiger-Memes', '-1')
+					meme = self.memes.getMeme(user.course, 'Geiger-Memes', '-1')
 					self.sendMeme(user, meme)
 				elif 'Theoretische Informatik I' in plan:
-					meme = self.memes.getMeme('Rotzinger-Memes', '-1')
+					meme = self.memes.getMeme(user.course, 'Rotzinger-Memes', '-1')
 					self.sendMeme(user, meme)
 				elif 'Projekt-Management 1' in plan:
-					meme = self.memes.getMeme('Vetter-Memes', '-1')
+					meme = self.memes.getMeme(user.course, 'Vetter-Memes', '-1')
 					self.sendMeme(user, meme)
 
 				if user.address != None and user.address != '':
@@ -204,20 +209,31 @@ class Main:
 	def sendMeme(self, user, meme):
 		if meme[1]:
 			meme_id = self.bot.sendPhoto(user.chatID, meme[0], False)
-			self.bot.memes.addMemeId(meme[2], meme[3], meme_id)
+			self.bot.memes.addMemeId(user.course, meme[2], meme[3], meme_id)
 		else:
 			meme_id = self.bot.sendPhoto(user.chatID, meme[0], True)
 
 			# If telegram returned an error whilst sending the photo via id, the id is invalid and has to be refreshed
 			if meme_id == '-1':
 				# Resets the id
-				self.memes.addMemeId(meme[2], meme[3], '')
+				self.memes.addMemeId(user.course, meme[2], meme[3], '')
 
 				# Fetches the meme again to get the file itself and send it to the user. Also note the new file_id.
-				meme = self.memes.getMeme(list(self.memes.memeTypes)[meme[2]],
+				meme = self.memes.getMeme(user.course, list(self.memes.memeTypes)[meme[2]],
 										  list(list(self.memes.memeTypes)[meme[2]])[meme[3]])
 				meme_id = self.bot.sendPhoto(user.chatID, meme[0], False)
-				self.memes.addMemeId(meme[2], meme[3], meme_id)
+				self.memes.addMemeId(user.course, meme[2], meme[3], meme_id)
+
+	def sendMenuRating(self):
+		mealArr = menu.Reader(1).get_food_with_ratings_as_string_array()
+
+		mealString = ("Meal 1:\n" + mealArr[0] + "\nMeal 2:\n" + mealArr[1] + "\nMeal 3:\n" + mealArr[2])
+		for user in self.bot.users:
+			if user.wantsMenu:
+				self.bot.sendMessageWithOptions(user.chatID, ("Please rate your meal today. The available meals were:\n\n" + mealString),
+												self.bot.generateReplyMarkup([['Meal 1', 'Meal 2', 'Meal 3'], ['Don\'t rate']]))
+				user.tempParams['ratingMealset'] = mealArr
+				user.expectedMessageType = 'mealtoberated'
 
 	def getToken(self):
 		return telegram_secrets.token

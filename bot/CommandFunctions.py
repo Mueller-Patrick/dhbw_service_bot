@@ -12,7 +12,7 @@ class CommandFunctions:
 		# Provide help list for patrick with full command list and for other users with commands they can use.
 		if str(self.message.user.chatID) == str(telegram_secrets.patrick_telegram_id):
 			self.bot.sendMessage(self.message.user.chatID,
-								 "/start\n/help\n/stopbot\n/sendmessagetoeveryone\n\n/subscribemenu\n/unsubscribemenu\n/getmenu\n\n/subscribelectureplan\n/unsubscribelectureplan\n/getlectures\n/subscribepublictransport\n\n/getmeme\n\n/privacy\n/whatdoyouknowaboutme")
+								 "/start\n/help\n/stopbot\n/sendmessagetoeveryone\n\n/subscribemenu\n/unsubscribemenu\n/getmenu\n\n/subscribelectureplan\n/unsubscribelectureplan\n/getlectures\n/subscribepublictransport\n\n/getmeme\n\n/reportbug\n\n/privacy\n/whatdoyouknowaboutme")
 		else:
 			self.bot.sendMessage(self.message.user.chatID,
 								 (
@@ -21,6 +21,7 @@ class CommandFunctions:
 										 + "Lecture plan commands:\n/subscribelectureplan\n/unsubscribelectureplan\n/getlectures\n\n"
 										 + "Public transport:\n/subscribetraininfo\n\n"
 								 		 + "Get your favorite memes: /getmeme\n\n"
+								 		 + "To report a bug: /reportbug\n\n"
 										 + "For privacy information, type\n/privacy\n"
 										 + "To get all information we have about you, type\n/whatdoyouknowaboutme"))
 
@@ -122,12 +123,20 @@ class CommandFunctions:
 		self.message.user.expectedMessageType = 'useraddress'
 
 	def command_getmeme(self):
-		# Convert the memeTypes to a list of lists so they appear as a vertical keyboard instead of horizontal
-		memeTypes = self.bot.memes.getMemeTypes()
-		memeTypesConverted = []
-		for meme in memeTypes:
-			memeTypesConverted.append([meme])
-		memeTypesConverted.append(['Random'])
+		if self.message.user.course != '':
+			# Convert the memeTypes to a list of lists so they appear as a vertical keyboard instead of horizontal
+			memeTypes = self.bot.memes.getMemeTypes(self.message.user.course)
+			memeTypesConverted = []
+			for meme in memeTypes:
+				memeTypesConverted.append([meme])
+			memeTypesConverted.append(['Random'])
 
-		self.bot.sendMessageWithOptions(self.message.user.chatID, "Please select the type of meme:", self.bot.generateReplyMarkup(memeTypesConverted))
-		self.message.user.expectedMessageType = 'memetype'
+			self.bot.sendMessageWithOptions(self.message.user.chatID, "Please select the type of meme:", self.bot.generateReplyMarkup(memeTypesConverted))
+			self.message.user.expectedMessageType = 'memetype'
+		else:
+			self.bot.sendMessage(self.message.user.chatID, "I can't send you memes because you are in no course. "
+														   + "Type /getlectures to enter a course.")
+
+	def command_reportbug(self):
+		self.bot.sendMessage(self.message.user.chatID, "Please describe the bug:")
+		self.message.user.expectedMessageType = 'bugdescription'

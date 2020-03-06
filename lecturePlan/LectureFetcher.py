@@ -35,7 +35,7 @@ class LectureFetcher:
 			return False
 
 	def addRaplaLink(self, courseName, link):
-		self.linkDict[courseName] = link
+		self.linkDict[courseName.upper()][0] = link
 
 	def writeLinksToJson(self):
 		linkJson = json.dumps(self.linkDict)
@@ -47,7 +47,10 @@ class LectureFetcher:
 	# Check if the course is already known. If not, returns false so we can go on and ask the user for the link.
 	def checkForCourse(self, course):
 		if course.upper() in self.linkDict:
-			return True
+			if self.linkDict[course.upper()][0] != '':
+				return True
+			else:
+				return False
 		else:
 			return False
 
@@ -69,7 +72,7 @@ class LectureFetcher:
 	# Get all events for this course
 	# The dayString needs to have the format YYYY-MM-DD (The only decent date format if you asked me)
 	def getLecturesByCourseName(self, courseName, dayString):
-		link = self.linkDict.get(courseName.upper())  # courseName.upper() writes the name in all caps
+		link = self.linkDict.get(courseName.upper())[0]  # courseName.upper() writes the name in all caps
 		# just in case the user was to stupid to enter it right
 		return self.getLecturesByLink(link, dayString)
 
@@ -97,3 +100,18 @@ class LectureFetcher:
 				retString += (lecture[11:16] + ': ' + lecture[startIndexOfLecture:endIndexOfLecture])
 
 		return retString
+
+	# Returns  true if the course has no users yet
+	def firstUserInCourse(self, courseName):
+		try:
+			firstUser = not self.linkDict.get(courseName.upper())[1]
+
+			return firstUser
+		except:
+			return True
+
+	def setUserOfCourse(self, courseName):
+		if courseName.upper() not in self.linkDict:
+			self.linkDict[courseName.upper()] = ['', True]
+		else:
+			self.linkDict[courseName.upper()][1] = True

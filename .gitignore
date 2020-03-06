@@ -9,3 +9,4 @@
 /bot/usageStats.json
 /memes/*
 !/memes/Memes.py
+/menu/savedFoods.json

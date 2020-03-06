@@ -19,9 +19,11 @@ class Main:
 		self.token = self.getToken()
 		self.lfetcher = lf.LectureFetcher()
 		self.memes = Memes.Memes()
-		self.bot = bt.Bot(telegram_token=self.token, users=self.getUsers(), lectureFetcher=self.lfetcher, memes=self.memes)
+		self.bot = bt.Bot(telegram_token=self.token, users=self.getUsers(), lectureFetcher=self.lfetcher,
+						  memes=self.memes)
 		self.sentMenuToday = False
 		self.sentLecturesToday = False
+		self.askedForRatingToday = False
 
 		# Runs both loops independent from each other
 		loop = asyncio.get_event_loop()
@@ -66,6 +68,9 @@ class Main:
 			elif str(timeString) == '18:00' and not self.sentLecturesToday and sendPlanToday:
 				self.sentLecturesToday = True
 				self.sendLectures()
+			elif str(timeString) == '14:30' and not self.askedForRatingToday and canteenOpen:
+				self.askedForRatingToday = True
+				self.sendMenuRating()
 			# Reset the boolean to send the menu for today again.
 			# Do this only if seconds < 30 because otherwise it would happen twice.
 			elif timeString == '23:59' and int(datetime.now().strftime('%S')) < 30:
@@ -218,6 +223,17 @@ class Main:
 										  list(list(self.memes.memeTypes)[meme[2]])[meme[3]])
 				meme_id = self.bot.sendPhoto(user.chatID, meme[0], False)
 				self.memes.addMemeId(user.course, meme[2], meme[3], meme_id)
+
+	def sendMenuRating(self):
+		mealArr = menu.Reader(1).get_food_with_ratings_as_string_array()
+
+		mealString = ("Meal 1:\n" + mealArr[0] + "\nMeal 2:\n" + mealArr[1] + "\nMeal 3:\n" + mealArr[2])
+		for user in self.bot.users:
+			if user.wantsMenu:
+				self.bot.sendMessageWithOptions(user.chatID, ("Please rate your meal today. The available meals were:\n\n" + mealString),
+												self.bot.generateReplyMarkup([['Meal 1', 'Meal 2', 'Meal 3'], ['Don\'t rate']]))
+				user.tempParams['ratingMealset'] = mealArr
+				user.expectedMessageType = 'mealtoberated'
 
 	def getToken(self):
 		return telegram_secrets.token

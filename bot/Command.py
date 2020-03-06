@@ -17,7 +17,8 @@ class Command:
 		# Defined commands
 		self.commands = ['/start', '/help', '/stopbot', '/privacy', '/whatdoyouknowaboutme', '/subscribemenu',
 						 '/unsubscribemenu', '/getmenu', '/subscribelectureplan', '/unsubscribelectureplan',
-						 '/sendmessagetoeveryone', '/getlectures', '/subscribetraininfo', '/getmeme']
+						 '/sendmessagetoeveryone', '/getlectures', '/subscribetraininfo', '/getmeme',
+						 '/reportbug']
 
 	# Used to find the requested command
 	def findCommand(self):
@@ -42,7 +43,8 @@ class Command:
 			'/sendmessagetoeveryone': self.cfunctions.command_sendmessagetoeveryone,
 			'/getlectures': self.cfunctions.command_getlectures,
 			'/subscribetraininfo': self.cfunctions.command_subscribetraininfo,
-			'/getmeme': self.cfunctions.command_getmeme
+			'/getmeme': self.cfunctions.command_getmeme,
+			'/reportbug': self.cfunctions.command_reportbug
 		}
 
 		commandFunc = callCommandFunctions.get(command)
@@ -65,7 +67,12 @@ class Command:
 			'memetype': self.mfunctions.message_memetype,
 			'memeid': self.mfunctions.message_memeid,
 			'coursepassword': self.mfunctions.message_coursepassword,
-			'changedcoursepassword': self.mfunctions.message_changedcoursepassword
+			'changedcoursepassword': self.mfunctions.message_changedcoursepassword,
+			'mealtoberated': self.mfunctions.message_mealtoberated,
+			'mealrating': self.mfunctions.message_mealrating,
+			'newcoursepassword': self.mfunctions.message_newcoursepassword,
+			'changedcoursenewcoursepassword': self.mfunctions.message_changedcoursenewcoursepassword,
+			'bugdescription': self.mfunctions.message_bugdescription
 		}
 
 		messageFunc = callMessageFunctions.get(type)

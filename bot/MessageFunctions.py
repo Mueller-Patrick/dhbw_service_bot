@@ -2,6 +2,7 @@ import telegram_secrets
 from menu import MenuSaver as menu
 from datetime import datetime, timedelta
 from maps import Directions
+from menu import Rater
 
 
 class MessageFunctions:
@@ -17,27 +18,39 @@ class MessageFunctions:
 	def message_name(self):
 		self.message.user.name = self.message.text
 		welcomeMsg = (
-					'Hello, *' + self.message.text + '*! Pleased to meet you! To get you started, I\'ll now explain to '
-					+ 'you the stuff I\'m able to do and what commands you may use.\n\n You already figured out the first command, /start. '
-					+ 'Great work there!\n\nTo continue, you might want to *subscribe to the daily menu push service* via /subscribemenu '
-					+ 'and the *daily lecture plan push* via /subscribelectureplan. Pretty easy to remember, right? If you want to '
-					+ 'unsubscribe from these services, you just need to type /unsubscribemenu or /unsubscribelectureplan (You '
-					+ 'probably already guessed these).\n\nTo *get the daily menu at any time*, send /getmenu. If you forgot '
-					+ '*what lectures you have today*, type /getlectures to get the plan again.\n\n'
-					+ 'Also, if you don\'t want to check the crappy DB app every day, type /subscribetraininfo and send the '
-					+ 'required Information to *get public transport directions* alongside the lecture push.\n\n'
-					+ 'We all love *memes*. Type /getmeme to access all of your favorite ones.\n\nAnd because I '
-					+ 'respect your *privacy*, type /privacy and /whatdoyouknowaboutme to get Info about what we save '
-					+ 'about you. Last but not least, type /help to get a short description of every command.')
+				'Hello, *' + self.message.text + '*! Pleased to meet you! To get you started, I\'ll now explain to '
+				+ 'you the stuff I\'m able to do and what commands you may use.\n\n You already figured out the first command, /start. '
+				+ 'Great work there!\n\nTo continue, you might want to *subscribe to the daily menu push service* via /subscribemenu '
+				+ 'and the *daily lecture plan push* via /subscribelectureplan. Pretty easy to remember, right? If you want to '
+				+ 'unsubscribe from these services, you just need to type /unsubscribemenu or /unsubscribelectureplan (You '
+				+ 'probably already guessed these).\n\nTo *get the daily menu at any time*, send /getmenu. If you forgot '
+				+ '*what lectures you have today*, type /getlectures to get the plan again.\n\n'
+				+ 'Also, if you don\'t want to check the crappy DB app every day, type /subscribetraininfo and send the '
+				+ 'required Information to *get public transport directions* alongside the lecture push.\n\n'
+				+ 'We all love *memes*. Type /getmeme to access all of your favorite ones.\n\n'
+				+ 'If you find a *bug*, report it via /reportbug.\n\nAnd because I '
+				+ 'respect your *privacy*, type /privacy and /whatdoyouknowaboutme to get Info about what we save '
+				+ 'about you. Last but not least, type /help to get a short description of every command.')
 		self.bot.sendMessage(self.message.user.chatID, welcomeMsg)
 		self.message.user.expectedMessageType = ''
 
+	# From /subscribelectureplan
 	def message_coursename(self):
-		self.message.user.tempParams['enteredCourse'] = self.message.text
+		if self.bot.lectureFetcher.firstUserInCourse(self.message.text):
+			self.message.user.course = self.message.text
+			self.bot.sendMessage(self.message.user.chatID,
+								 "You are the first user in this course. Please send me "
+								 + "a password that future users have to enter in order to "
+								 + "join this course. Write it down somewhere save because "
+								 + "I will delete your message after I received it:")
+			self.message.user.expectedMessageType = 'newcoursepassword'
+			self.bot.lectureFetcher.setUserOfCourse(self.message.user.course)
+		else:
+			self.message.user.tempParams['enteredCourse'] = self.message.text
+			self.bot.sendMessage(self.message.user.chatID, "Please send me the password for " + self.message.text)
+			self.message.user.expectedMessageType = 'coursepassword'
 
-		self.bot.sendMessage(self.message.user.chatID, "Please send me the password for " + self.message.text)
-		self.message.user.expectedMessageType = 'coursepassword'
-
+	# From /subscribelectureplan -> coursename
 	def message_coursepassword(self):
 		password = self.message.text
 		self.bot.deleteMessage(self.message.user.chatID, self.message.id)
@@ -48,7 +61,8 @@ class MessageFunctions:
 
 			if self.bot.lectureFetcher.checkForCourse(self.message.user.course):
 				self.message.user.wantsLecturePlan = True
-				self.bot.sendMessage(self.message.user.chatID, "You successfully subscribed to the daily lecture plan push."
+				self.bot.sendMessage(self.message.user.chatID,
+									 "You successfully subscribed to the daily lecture plan push."
 									 + " May the RaPla be with you! If you also want to receive public transport "
 									 + "Information, send /subscribetraininfo")
 				self.message.user.expectedMessageType = ''
@@ -57,15 +71,46 @@ class MessageFunctions:
 									 + " iCal calendar:")
 				self.message.user.expectedMessageType = "raplalink"
 		else:
-			self.bot.sendMessage(self.message.user.chatID, "Wrong password. Please start again using /subscribelectureplan")
+			self.bot.sendMessage(self.message.user.chatID,
+								 "Wrong password. Please start again using /subscribelectureplan")
+			self.message.user.expectedMessageType = ''
 
+	# From /subscribelectureplan -> coursename
+	def message_newcoursepassword(self):
+		password = self.message.text
+		self.bot.deleteMessage(self.message.user.chatID, self.message.id)
+
+		self.bot.memes.setPassword(self.message.user.course, password)
+
+		if self.bot.lectureFetcher.checkForCourse(self.message.user.course):
+			self.message.user.wantsLecturePlan = True
+			self.bot.sendMessage(self.message.user.chatID,
+								 "You successfully subscribed to the daily lecture plan push."
+								 + " May the RaPla be with you! If you also want to receive public transport "
+								 + "Information, send /subscribetraininfo")
+			self.message.user.expectedMessageType = ''
+		else:
+			self.bot.sendMessage(self.message.user.chatID, "Unknown course. Please send me the link to your courses"
+								 + " iCal calendar:")
+			self.message.user.expectedMessageType = "raplalink"
+
+	# From /getlectures
 	def message_changecoursename(self):
-		self.message.user.tempParams['enteredCourse'] = self.message.text
+		if self.bot.lectureFetcher.firstUserInCourse(self.message.text):
+			self.message.user.course = self.message.text
+			self.bot.sendMessage(self.message.user.chatID,
+								 "You are the first user in this course. Please send me "
+								 + "a password that future users have to enter in order to "
+								 + "join this course. Write it down somewhere save because "
+								 + "I will delete your message after I received it:")
+			self.message.user.expectedMessageType = 'changedcoursenewcoursepassword'
+			self.bot.lectureFetcher.setUserOfCourse(self.message.user.course)
+		else:
+			self.message.user.tempParams['enteredCourse'] = self.message.text
+			self.bot.sendMessage(self.message.user.chatID, "Please send me the password for " + self.message.text)
+			self.message.user.expectedMessageType = 'changedcoursepassword'
 
-		self.bot.sendMessage(self.message.user.chatID, "Please send me the password for " + self.message.text)
-		self.message.user.expectedMessageType = 'changedcoursepassword'
-
-
+	# From /getlectures -> changecoursename
 	def message_changedcoursepassword(self):
 		password = self.message.text
 		self.bot.deleteMessage(self.message.user.chatID, self.message.id)
@@ -77,10 +122,8 @@ class MessageFunctions:
 			if self.bot.lectureFetcher.checkForCourse(self.message.user.course):
 				self.bot.sendMessage(self.message.user.chatID,
 									 'Successfully added/changed course. Here is the plan for today:')
-				now = datetime.now()
-				dateString = now.strftime("%Y-%m-%d")
-				plan = self.bot.lectureFetcher.getFormattedLectures(self.message.user.course, dateString)
-				self.bot.sendMessage(self.message.user.chatID, plan)
+				self.message.text = 'Today'
+				self.message_lectureplanday()
 				self.message.user.expectedMessageType = ''
 			else:
 				self.bot.sendMessage(self.message.user.chatID, "Unknown course. Please send me the link to your courses"
@@ -89,7 +132,27 @@ class MessageFunctions:
 		else:
 			self.bot.sendMessage(self.message.user.chatID,
 								 "Wrong password. Please start again using /getlectures")
+			self.message.user.expectedMessageType = ''
 
+	# From /getlectures -> changecoursename
+	def message_changedcoursenewcoursepassword(self):
+		password = self.message.text
+		self.bot.deleteMessage(self.message.user.chatID, self.message.id)
+
+		self.bot.memes.setPassword(self.message.user.course, password)
+
+		if self.bot.lectureFetcher.checkForCourse(self.message.user.course):
+			self.bot.sendMessage(self.message.user.chatID,
+								 'Successfully added/changed course. Here is the plan for today:')
+			self.message.text = 'Today'
+			self.message_lectureplanday()
+			self.message.user.expectedMessageType = ''
+		else:
+			self.bot.sendMessage(self.message.user.chatID, "Unknown course. Please send me the link to your courses"
+								 + " iCal calendar:")
+			self.message.user.expectedMessageType = "raplalinkwithoutpush"
+
+	# From /subscribelectureplan -> coursepassword / newcoursepassword
 	def message_raplalink(self):
 		if self.message.text == 'stop':
 			self.message.user.expectedMessageType = ''
@@ -108,6 +171,7 @@ class MessageFunctions:
 									 "Invalid link. Please try again. Write stop to cancel setup.")
 				self.message.user.expectedMessageType = 'raplalink'
 
+	# From /getlectures -> changedcoursepassword / changedcoursenewcoursepassword
 	def message_raplalinkwithoutpush(self):
 		if self.message.text == 'stop':
 			self.message.user.expectedMessageType = ''
@@ -117,10 +181,8 @@ class MessageFunctions:
 				self.bot.lectureFetcher.addRaplaLink(self.message.user.course, self.message.text)
 				self.bot.sendMessage(self.message.user.chatID,
 									 "Successfully added RaPla link for your course. Here is the plan for today:")
-				now = datetime.now()
-				dateString = now.strftime("%Y-%m-%d")
-				plan = self.bot.lectureFetcher.getFormattedLectures(self.message.user.course, dateString)
-				self.bot.sendMessage(self.message.user.chatID, plan)
+				self.message.text = 'Today'
+				self.message_lectureplanday()
 				self.message.user.expectedMessageType = ''
 			else:
 				self.bot.sendMessage(self.message.user.chatID,
@@ -219,7 +281,8 @@ class MessageFunctions:
 		if self.message.text == 'Random':
 			self.message.text = '-1'
 
-		meme = self.bot.memes.getMeme(self.message.user.course, self.message.user.tempParams['requestedMemeType'], self.message.text)
+		meme = self.bot.memes.getMeme(self.message.user.course, self.message.user.tempParams['requestedMemeType'],
+									  self.message.text)
 		# If the id is needed, clearly this getting sent here is the photo itself
 		if meme[1]:
 			meme_id = self.bot.sendPhoto(self.message.user.chatID, meme[0], False)
@@ -233,9 +296,50 @@ class MessageFunctions:
 				self.bot.memes.addMemeId(self.message.user.course, meme[2], meme[3], '')
 
 				# Fetches the meme again to get the file itself and send it to the user. Also note the new file_id.
-				meme = self.bot.memes.getMeme(self.message.user.course, self.message.user.tempParams['requestedMemeType'], self.message.text)
+				meme = self.bot.memes.getMeme(self.message.user.course,
+											  self.message.user.tempParams['requestedMemeType'], self.message.text)
 				meme_id = self.bot.sendPhoto(self.message.user.chatID, meme[0], False)
 				self.bot.memes.addMemeId(self.message.user.course, meme[2], meme[3], meme_id)
 
 		self.message.user.expectedMessageType = ''
 		self.message.user.tempParams['requestedMemeType'] = ''
+
+	def message_mealtoberated(self):
+		mealToBeRated = self.message.text
+
+		if mealToBeRated == 'Don\'t rate':
+			self.bot.sendMessage(self.message.user.chatID, "Ok, no rating. This is fine.")
+			self.message.user.expectedMessageType = ''
+		else:
+			if mealToBeRated in ('Meal 1', 'Meal 2', 'Meal 3'):
+				self.message.user.tempParams['ratedMeal'] = mealToBeRated
+				self.bot.sendMessageWithOptions(self.message.user.chatID, "How many stars do you give?",
+												self.bot.generateReplyMarkup(
+													[['0 ⭐', '1 ⭐', '2 ⭐', '3 ⭐', '4 ⭐', '5 ⭐']]))
+				self.message.user.expectedMessageType = 'mealrating'
+			else:
+				self.bot.sendMessageWithOptions(self.message.user.chatID, "Wrong input. Try again",
+												self.bot.generateReplyMarkup(
+													[['Meal 1', 'Meal 2', 'Meal 3'], ['Don\'t rate']]))
+
+	def message_mealrating(self):
+		rating = self.message.text
+		mealArr = self.message.user.tempParams['ratingMealset']
+
+		rating = int(rating[:1])
+
+		if rating in (0, 5):
+			ratedMeal = mealArr[int(self.message.user.tempParams['ratedMeal'][5]) - 1]
+			Rater.Rater(ratedMeal, rating)
+			self.bot.sendMessage(self.message.user.chatID, "Thank you for rating! 😁")
+			self.message.user.tempParams['ratingMealset'] = ''
+			self.message.user.tempParams['ratedMeal'] = ''
+			self.message.user.expectedMessageType = ''
+		else:
+			self.bot.sendMessageWithOptions(self.message.user.chatID, "Wrong input. Try again.",
+											self.bot.generateReplyMarkup([['0 ⭐', '1 ⭐', '2 ⭐', '3 ⭐', '4 ⭐', '5 ⭐']]))
+
+	def message_bugdescription(self):
+		self.bot.log(('Got a bug report:\n\n' + self.message.text))
+		self.bot.sendMessage(self.message.user.chatID, "Thanks for reporting this bug. We will fix it ASAP.")
+		self.message.user.expectedMessageType = ''

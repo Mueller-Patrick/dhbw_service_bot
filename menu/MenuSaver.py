@@ -147,7 +147,9 @@ class Reader(object):
         return array
 
     def get_menu_as_str(self):
-
+        """
+        @return: string of menu with ratings
+        """
         string = self.menu
         temp_string = string
         temp = 0

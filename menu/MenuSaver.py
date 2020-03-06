@@ -58,8 +58,10 @@ def increment_array_in_json(food, path, compare_key, increment_key):
     @param increment_key: key to array to increment
 
     This method automatically saves data with incremented array
+    The name will be updated
     """
 
+    name = food['name']
     dates = [food['was_available_on']]
     data = Util.load_data(path)
     for dataset in data:
@@ -69,6 +71,7 @@ def increment_array_in_json(food, path, compare_key, increment_key):
                     if date not in dates:
                         dates.append(date)
             data[data.index(dataset)][increment_key] = dates
+            data[data.index(dataset)]['name'] = name
             Util.save_data(path, data)
 
 
@@ -144,10 +147,32 @@ class Reader(object):
         return array
 
     def get_menu_as_str(self):
-        return self.menu
+
+        string = self.menu
+        temp_string = string
+        temp = 0
+        while temp_string.find("Wahlessen") != -1:
+            temp += temp_string.find("Wahlessen")
+            temp_string = temp_string[temp_string.find("Wahlessen"):]
+            temp += temp_string.replace("*", "#", 1).find("*") + 1
+
+            # find food in json
+            food = temp_string[temp_string.find("*"):temp_string.replace("*", "#", 1).find("*") + 1]
+            food = food.replace("*", "")
+
+            data = Util.load_data("menu/savedFoods.json")
+            for dataset in data:
+                if Util.similar(dataset['name'], food) >= 0.8:
+                    rating = " [" + "%.2f" % dataset["rating"] + "⭐]"
+
+            temp_string = temp_string[temp_string.replace("*", "#", 1).find("*"):]
+            string = string[:temp] + rating + string[temp:]
+            temp += len(rating) - 1
+
+        return string
 
     def get_menu_as_arr(self):
-        menu = str(self.menu)
+        menu = str(self.get_menu_as_str())
         array = menu.split("%i%")
         return array
 

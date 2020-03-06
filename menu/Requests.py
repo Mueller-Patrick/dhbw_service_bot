@@ -68,3 +68,14 @@ class Menu(object):
         return_string = return_string.replace("*\n*\n*\n", "\n\n")
         return_string = return_string.replace("*\n*\n", "\n\n")
         return re.sub("\n\n+", "\n\n*", return_string).replace("*%i%", "%i%")
+
+    def create_foods(self):
+        menu_string = self.create_string()
+        foods = []
+        while menu_string.find("*") != -1:
+            start = menu_string.find("*") + 1
+            menu_string = menu_string[start:]
+            end = menu_string.find("*")
+            foods.append(menu_string[:end])
+            menu_string = menu_string[end + 1:]
+        return foods

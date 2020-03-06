@@ -6,9 +6,10 @@
 
 
 class Message:
-	def __init__(self, user, text):
+	def __init__(self, user, text, id):
 		self.user = user
 		self.text = text
+		self.id = id
 		self.isCommand = False
 		self.checkCommand()
 

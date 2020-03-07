@@ -24,7 +24,7 @@ class CommandFunctions:
 								 		 + "To report a bug: /reportbug\n\n"
 										 + "For privacy information, type\n/privacy\n"
 										 + "To get all information we have about you, type\n/whatdoyouknowaboutme\n\n"
-										 + "If you have any questions, contact @PaddyOffical on Telegram."))
+										 + "If you have any questions, contact @PaddyOfficial on Telegram."))
 
 	def command_start(self):
 		self.bot.sendMessage(self.message.user.chatID, "Please send me your name so we get to know each other")

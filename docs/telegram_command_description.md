@@ -10,4 +10,6 @@ getmenu - Get todays menu<br>
 subscribelectureplan - Subscribe to the lecture plan push service<br>
 unsubscribelectureplan - Unsubscribe from the lecture plan push service<br>
 getlectures - Get todays lectures<br>
-subscribetraininfo - Get public transport directions along with the lecture plan
+subscribetraininfo - Get public transport directions along with the lecture plan<br>
+getmeme - Get some premium memes<br>
+reportbug - Report a bug

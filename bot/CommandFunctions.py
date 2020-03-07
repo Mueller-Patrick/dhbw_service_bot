@@ -12,14 +12,15 @@ class CommandFunctions:
 		# Provide help list for patrick with full command list and for other users with commands they can use.
 		if str(self.message.user.chatID) == str(telegram_secrets.patrick_telegram_id):
 			self.bot.sendMessageWithOptions(self.message.user.chatID,
-											"/help\n/stopbot\n/sendmessagetoeveryone\n\n/subscribemenu\n/unsubscribemenu\n/getmenu\n\n/subscribelectureplan\n/unsubscribelectureplan\n/getlectures\n/subscribepublictransport\n\n/getmeme\n\n/reportbug\n\n/privacy\n/whatdoyouknowaboutme",
+											"/help\n/stopbot\n/sendmessagetoeveryone\n\n/getmenu\n\n/getlectures\n\n/getmeme\n\n/reportbug\n\n/privacy\n/whatdoyouknowaboutme",
 											self.bot.generateReplyMarkup(
-												[['/stopbot'],['/sendmessagetoeveryone'], ['/help'], ['/getmenu'], ['/getlectures'], ['/getmeme'],
+												[['/stopbot'],['/sendmessagetoeveryone'], ['/help'], ['/settings'], ['/getmenu'], ['/getlectures'], ['/getmeme'],
 												 ['/reportbug'], ['/privacy'], ['/whatdoyouknowaboutme']]))
 		else:
 			self.bot.sendMessageWithOptions(self.message.user.chatID,
 											(
 													"*Help*: /help\n\n"
+													+ "*Settings: /settings"
 													+ "*Menu*: /getmenu\n\n"
 													+ "*Lecture plan*: /getlectures\n\n"
 													+ "Get your favorite *memes*: /getmeme\n\n"
@@ -28,7 +29,7 @@ class CommandFunctions:
 													+ "To get *all information* we have about you: /whatdoyouknowaboutme\n\n"
 													+ "If you have any questions, contact @PaddyOfficial on Telegram."),
 											self.bot.generateReplyMarkup(
-												[['/help'], ['/getmenu'], ['/getlectures'], ['/getmeme'],
+												[['/help'], ['/settings'], ['/getmenu'], ['/getlectures'], ['/getmeme'],
 												 ['/reportbug'], ['/privacy'], ['/whatdoyouknowaboutme']]))
 
 	def command_start(self):

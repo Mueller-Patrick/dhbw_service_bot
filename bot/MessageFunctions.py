@@ -30,7 +30,8 @@ class MessageFunctions:
 				+ 'We all love *memes*. Type /getmeme to access all of your favorite ones.\n\n'
 				+ 'If you find a *bug*, report it via /reportbug.\n\nAnd because I '
 				+ 'respect your *privacy*, type /privacy and /whatdoyouknowaboutme to get Info about what we save '
-				+ 'about you. Last but not least, type /help to get a short description of every command.')
+				+ 'about you. Last but not least, type /help to get a short description of every command.\n\n'
+				+ 'If you have any questions, contact @PaddyOffical on Telegram.')
 		self.bot.sendMessage(self.message.user.chatID, welcomeMsg)
 		self.message.user.expectedMessageType = ''
 

@@ -111,7 +111,7 @@ class Bot:
 			}
 		reqUrl = (self.telegramUrl + self.telegram_token + self.sendPhotoParam)
 		resp = requests.post(url=reqUrl, params=sendParams, files=files)
-		print('Sent photo, got answer ' + resp.json().get('ok'))
+		print('Sent photo, got answer ' + str(resp.json().get('ok')))
 		self.messagesSentToday += 1
 
 		# If the photo was successful sent, return the file_id. Else, return -1
@@ -167,7 +167,11 @@ class Bot:
 					text = res.get('message').get('text')
 					messageID = str(res.get('message').get('message_id'))
 
-					print("Received message at " + datetime.now().strftime('%H:%M:%S'))
+					# Print the first 10 characters of each message for debugging.
+					if len(text) < 11:
+						print("Received message at " + datetime.now().strftime('%H:%M:%S') + ', Text: ' + text)
+					else:
+						print("Received message at " + datetime.now().strftime('%H:%M:%S') + ', Text: ' + text[:10] + '...')
 
 					if not text:
 						self.sendMessage(chat, "Unknown input format. Don't mess with me, fella!")

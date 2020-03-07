@@ -3,6 +3,7 @@ from menu import MenuSaver as menu
 from datetime import datetime, timedelta
 from maps import Directions
 from menu import Rater
+import logging
 
 
 class MessageFunctions:
@@ -10,199 +11,40 @@ class MessageFunctions:
 		self.message = message
 		self.bot = bot
 
+	# Called when user sends a normal message but we don't expect any input
 	def message_unknown(self):
 		self.bot.sendMessageWithOptions(self.message.user.chatID,
-										'I don\'t know what to do with your input :( Use this to get help:',
+										'I don\'t know what to do with your input :( Use /help to get help:',
 										self.bot.generateReplyMarkup([['/help']]))
 
-	def message_name(self):
+	# Called when user registers for the first time and sends his name
+	def message_startname(self):
 		self.message.user.name = self.message.text
 		welcomeMsg = (
 				'Hello, *' + self.message.text + '*! Pleased to meet you! To get you started, I\'ll now explain to '
-				+ 'you the stuff I\'m able to do and what commands you may use.\n\n You already figured out the first command, /start. '
-				+ 'Great work there!\n\nTo continue, you might want to *subscribe to the daily menu push service* via /subscribemenu '
-				+ 'and the *daily lecture plan push* via /subscribelectureplan. Pretty easy to remember, right? If you want to '
-				+ 'unsubscribe from these services, you just need to type /unsubscribemenu or /unsubscribelectureplan (You '
-				+ 'probably already guessed these).\n\nTo *get the daily menu at any time*, send /getmenu. If you forgot '
+				+ 'you the stuff I\'m able to do and what commands you may use.\n\n'
+				+ 'To *set everything up*, use the /settings command. Under \'Personal Information\' you can add or '
+				+ 'change the Information that I need about you to provide my services to you. Under \'Subscription-Settings\' '
+				+ 'you can set up which push-messages you want to get from me.\n\n'
+				+ 'My Push-Service includes lecture plan pushes, daily menu pushes and public transport information for '
+				+ 'each day.\n\nTo *get the daily menu at any time*, send /getmenu. If you forgot '
 				+ '*what lectures you have today*, type /getlectures to get the plan again.\n\n'
-				+ 'Also, if you don\'t want to check the crappy DB app every day, type /subscribetraininfo and send the '
-				+ 'required Information to *get public transport directions* alongside the lecture push.\n\n'
 				+ 'We all love *memes*. Type /getmeme to access all of your favorite ones.\n\n'
 				+ 'If you find a *bug*, report it via /reportbug.\n\nAnd because I '
 				+ 'respect your *privacy*, type /privacy and /whatdoyouknowaboutme to get Info about what we save '
-				+ 'about you. Last but not least, type /help to get a short description of every command.\n\n'
+				+ 'about you. Last but not least, type /help to get a list of available commands.\n\n'
 				+ 'If you have any questions, contact @PaddyOfficial on Telegram.')
 		self.bot.sendMessage(self.message.user.chatID, welcomeMsg)
 		self.message.user.expectedMessageType = ''
 
-	# From /subscribelectureplan
-	def message_coursename(self):
-		if self.bot.lectureFetcher.firstUserInCourse(self.message.text):
-			self.message.user.course = self.message.text
-			self.bot.sendMessage(self.message.user.chatID,
-								 "You are the first user in this course. Please send me "
-								 + "a password that future users have to enter in order to "
-								 + "join this course. Write it down somewhere save because "
-								 + "I will delete your message after I received it:")
-			self.message.user.expectedMessageType = 'newcoursepassword'
-			self.bot.lectureFetcher.setUserOfCourse(self.message.user.course)
-		else:
-			self.message.user.tempParams['enteredCourse'] = self.message.text
-			self.bot.sendMessage(self.message.user.chatID, "Please send me the password for " + self.message.text)
-			self.message.user.expectedMessageType = 'coursepassword'
-
-	# From /subscribelectureplan -> coursename
-	def message_coursepassword(self):
-		password = self.message.text
-		self.bot.deleteMessage(self.message.user.chatID, self.message.id)
-
-		if password == self.bot.memes.getPassword(self.message.user.tempParams['enteredCourse']):
-			self.message.user.course = self.message.user.tempParams['enteredCourse']
-			self.message.user.tempParams['enteredCourse'] = ''
-
-			if self.bot.lectureFetcher.checkForCourse(self.message.user.course):
-				self.message.user.wantsLecturePlan = True
-				self.bot.sendMessage(self.message.user.chatID,
-									 "You successfully subscribed to the daily lecture plan push."
-									 + " May the RaPla be with you! If you also want to receive public transport "
-									 + "Information, send /subscribetraininfo")
-				self.message.user.expectedMessageType = ''
-			else:
-				self.bot.sendMessage(self.message.user.chatID, "Unknown course. Please send me the link to your courses"
-									 + " iCal calendar:")
-				self.message.user.expectedMessageType = "raplalink"
-		else:
-			self.bot.sendMessage(self.message.user.chatID,
-								 "Wrong password. Please start again using /subscribelectureplan")
-			self.message.user.expectedMessageType = ''
-
-	# From /subscribelectureplan -> coursename
-	def message_newcoursepassword(self):
-		password = self.message.text
-		self.bot.deleteMessage(self.message.user.chatID, self.message.id)
-
-		self.bot.memes.setPassword(self.message.user.course, password)
-
-		if self.bot.lectureFetcher.checkForCourse(self.message.user.course):
-			self.message.user.wantsLecturePlan = True
-			self.bot.sendMessage(self.message.user.chatID,
-								 "You successfully subscribed to the daily lecture plan push."
-								 + " May the RaPla be with you! If you also want to receive public transport "
-								 + "Information, send /subscribetraininfo")
-			self.message.user.expectedMessageType = ''
-		else:
-			self.bot.sendMessage(self.message.user.chatID, "Unknown course. Please send me the link to your courses"
-								 + " iCal calendar:")
-			self.message.user.expectedMessageType = "raplalink"
-
-	# From /getlectures
-	def message_changecoursename(self):
-		if self.bot.lectureFetcher.firstUserInCourse(self.message.text):
-			self.message.user.course = self.message.text
-			self.bot.sendMessage(self.message.user.chatID,
-								 "You are the first user in this course. Please send me "
-								 + "a password that future users have to enter in order to "
-								 + "join this course. Write it down somewhere save because "
-								 + "I will delete your message after I received it:")
-			self.message.user.expectedMessageType = 'changedcoursenewcoursepassword'
-			self.bot.lectureFetcher.setUserOfCourse(self.message.user.course)
-		else:
-			self.message.user.tempParams['enteredCourse'] = self.message.text
-			self.bot.sendMessage(self.message.user.chatID, "Please send me the password for " + self.message.text)
-			self.message.user.expectedMessageType = 'changedcoursepassword'
-
-	# From /getlectures -> changecoursename
-	def message_changedcoursepassword(self):
-		password = self.message.text
-		self.bot.deleteMessage(self.message.user.chatID, self.message.id)
-
-		if password == self.bot.memes.getPassword(self.message.user.tempParams['enteredCourse']):
-			self.message.user.course = self.message.user.tempParams['enteredCourse']
-			self.message.user.tempParams['enteredCourse'] = ''
-
-			if self.bot.lectureFetcher.checkForCourse(self.message.user.course):
-				self.bot.sendMessage(self.message.user.chatID,
-									 'Successfully added/changed course. Here is the plan for today:')
-				self.message.text = 'Today'
-				self.message_lectureplanday()
-				self.message.user.expectedMessageType = ''
-			else:
-				self.bot.sendMessage(self.message.user.chatID, "Unknown course. Please send me the link to your courses"
-									 + " iCal calendar:")
-				self.message.user.expectedMessageType = "raplalinkwithoutpush"
-		else:
-			self.bot.sendMessage(self.message.user.chatID,
-								 "Wrong password. Please start again using /getlectures")
-			self.message.user.expectedMessageType = ''
-
-	# From /getlectures -> changecoursename
-	def message_changedcoursenewcoursepassword(self):
-		password = self.message.text
-		self.bot.deleteMessage(self.message.user.chatID, self.message.id)
-
-		self.bot.memes.setPassword(self.message.user.course, password)
-
-		if self.bot.lectureFetcher.checkForCourse(self.message.user.course):
-			self.bot.sendMessage(self.message.user.chatID,
-								 'Successfully added/changed course. Here is the plan for today:')
-			self.message.text = 'Today'
-			self.message_lectureplanday()
-			self.message.user.expectedMessageType = ''
-		else:
-			self.bot.sendMessage(self.message.user.chatID, "Unknown course. Please send me the link to your courses"
-								 + " iCal calendar:")
-			self.message.user.expectedMessageType = "raplalinkwithoutpush"
-
-	# From /subscribelectureplan -> coursepassword / newcoursepassword
-	def message_raplalink(self):
-		if self.message.text == 'stop':
-			self.message.user.expectedMessageType = ''
-			self.bot.sendMessage(self.message.user.chatID, 'Mission aborted, repeating: MISSION ABORTED.')
-		else:
-			if self.bot.lectureFetcher.validateLink(self.message.text):
-				self.bot.lectureFetcher.addRaplaLink(self.message.user.course, self.message.text)
-				self.message.user.wantsLecturePlan = True
-				self.bot.sendMessage(self.message.user.chatID,
-									 "You successfully subscribed to the daily lecture plan push."
-									 + " May the RaPla be with you! If you also want to receive public transport "
-									 + "Information, send /subscribetraininfo")
-				self.message.user.expectedMessageType = ''
-			else:
-				self.bot.sendMessage(self.message.user.chatID,
-									 "Invalid link. Please try again. Write stop to cancel setup.")
-				self.message.user.expectedMessageType = 'raplalink'
-
-	# From /getlectures -> changedcoursepassword / changedcoursenewcoursepassword
-	def message_raplalinkwithoutpush(self):
-		if self.message.text == 'stop':
-			self.message.user.expectedMessageType = ''
-			self.bot.sendMessage(self.message.user.chatID, 'Mission aborted, repeating: MISSION ABORTED.')
-		else:
-			if self.bot.lectureFetcher.validateLink(self.message.text):
-				self.bot.lectureFetcher.addRaplaLink(self.message.user.course, self.message.text)
-				self.bot.sendMessage(self.message.user.chatID,
-									 "Successfully added RaPla link for your course. Here is the plan for today:")
-				self.message.text = 'Today'
-				self.message_lectureplanday()
-				self.message.user.expectedMessageType = ''
-			else:
-				self.bot.sendMessage(self.message.user.chatID,
-									 "Invalid link. Please try again. Write stop to cancel setup.")
-				self.message.user.expectedMessageType = 'raplalinkwithoutpush'
-
+	# Called when Patrick wants to broadcast something
 	def message_broadcastmessage(self):
 		for user in self.bot.users:
 			self.bot.sendMessage(user.chatID, self.message.text)
 
 		self.message.user.expectedMessageType = ''
 
-	def message_useraddress(self):
-		self.message.user.address = self.message.text
-		self.bot.sendMessage(self.message.user.chatID,
-							 'Successfully added address. Big Brother is now watching you. 😈')
-
-		self.message.user.expectedMessageType = ''
-
+	# Called when user sends the day he wants the lecture plan for
 	def message_lectureplanday(self):
 		if self.message.text == 'Today':
 			day = 0
@@ -219,7 +61,7 @@ class MessageFunctions:
 		else:
 			self.bot.sendMessage(self.message.user.chatID, plan)
 
-			if self.message.user.address != None and self.message.user.address != '':
+			if self.message.user.wantsTransportInfo and self.message.user.address is not None and self.message.user.address != '':
 				time = datetime(int(forDay.year), int(forDay.month), int(forDay.day),
 								int(firstLectureTime[:2]), int(firstLectureTime[3:]))
 
@@ -236,6 +78,7 @@ class MessageFunctions:
 
 		self.message.user.expectedMessageType = ''
 
+	# Called when user sends the day he wants the menu for
 	def message_menuday(self):
 		if self.message.text == 'Today':
 			day = 0
@@ -254,6 +97,7 @@ class MessageFunctions:
 		else:
 			self.bot.sendMessage(self.message.user.chatID, "The canteen is closed there. Hence no menu for you.")
 
+	# Called when user sends the type of meme he wants to get
 	def message_memetype(self):
 		if self.message.text == 'Random':
 			self.message.text = '-1'
@@ -272,6 +116,7 @@ class MessageFunctions:
 			self.message.user.tempParams['requestedMemeType'] = self.message.text
 			self.message.user.expectedMessageType = 'memeid'
 
+	# Called when user sends the exact meme he wants to get
 	def message_memeid(self):
 		# Memes.getMeme returns a list in this format: ['MEME_FILE_OR_ID', FETCH_ID, TYPEINDEX, MEMEINDEX]
 		# If the meme has not been uploaded to telegram yet, the file itself is sent with the boolean FETCH_ID
@@ -305,6 +150,7 @@ class MessageFunctions:
 		self.message.user.expectedMessageType = ''
 		self.message.user.tempParams['requestedMemeType'] = ''
 
+	# Called when user sends the meal that he wants to rate
 	def message_mealtoberated(self):
 		mealToBeRated = self.message.text
 
@@ -323,6 +169,7 @@ class MessageFunctions:
 												self.bot.generateReplyMarkup(
 													[['Meal 1', 'Meal 2', 'Meal 3'], ['Don\'t rate']]))
 
+	# Called when user sends the rating for his meal
 	def message_mealrating(self):
 		rating = self.message.text
 		mealArr = self.message.user.tempParams['ratingMealset']
@@ -340,7 +187,237 @@ class MessageFunctions:
 			self.bot.sendMessageWithOptions(self.message.user.chatID, "Wrong input. Try again.",
 											self.bot.generateReplyMarkup([['0 ⭐', '1 ⭐', '2 ⭐', '3 ⭐', '4 ⭐', '5 ⭐']]))
 
+	# Called when user sends the description of a bug he encountered
 	def message_bugdescription(self):
 		self.bot.log(('Got a bug report:\n\n' + self.message.text))
 		self.bot.sendMessage(self.message.user.chatID, "Thanks for reporting this bug. We will fix it ASAP.")
 		self.message.user.expectedMessageType = ''
+
+	# Called when user sends the type of settings he wants to change
+	def message_settingstype(self):
+		if self.message.text == '️🧍 Personal Information':
+			self.bot.sendMessageWithOptions(self.message.user.chatID,
+											"Here are the Information about you that you can change:",
+											self.bot.generateReplyMarkup(
+												[['🗣 Name'], ['🚅 Address'], ['🏫 Course'], ['⏪ Back']]))
+			self.message.user.expectedMessageType = 'settingspersonalinfo'
+		elif self.message.text == '📲 Subscription-Settings':
+			# Fetch the user's subscriptions to show them the current status
+			options = []
+			if self.message.user.wantsMenu:
+				options.append(['❌ Unsubscribe the Menu Push'])
+			else:
+				options.append(['✅ Subscribe the Menu Push'])
+
+			if self.message.user.wantsLecturePlan:
+				options.append(['❌ Unsubscribe the Lecture Plan Push'])
+			else:
+				options.append(['✅ Subscribe the Lecture Plan Push'])
+
+			if self.message.user.wantsTransportInfo:
+				options.append(['❌ Unsubscribe the Public Transport Info'])
+			else:
+				options.append(['✅ Subscribe the Public Transport Info'])
+
+			options.append(['⏪ Back'])
+
+			self.bot.sendMessageWithOptions(self.message.user.chatID,
+											"Here are your Subscriptions:",
+											self.bot.generateReplyMarkup(options))
+			self.message.user.expectedMessageType = 'settingssubscriptions'
+		elif self.message.text == '🧨 Cancel':
+			self.bot.sendMessage(self.message.user.chatID, "ALLES BLEIBT HIER WIE ES IST.")
+			self.message.user.expectedMessageType = ''
+		else:
+			self.bot.sendMessageWithOptions(self.message.user.chatID, "Wrong input. Please try again:",
+											self.bot.generateReplyMarkup(
+												[['️🧍 Personal Information'], ['📲 Subscription-Settings'],
+												 ['🧨 Cancel']]))
+
+	# Called when user sends the information that he wants to change his personal info
+	def message_settingspersonalinfo(self):
+		if self.message.text == '🗣 Name':
+			self.bot.sendMessage(self.message.user.chatID,
+								 "So you changed your name, huh? Interesting. Alright, send me your new one then:")
+			self.message.user.expectedMessageType = 'changepersonalinfo'
+			self.message.user.tempParams['personalInfoToBeChanged'] = 'name'
+		elif self.message.text == '🚅 Address':
+			self.bot.sendMessage(self.message.user.chatID,
+								 "Ok, please provide me the new address where you would like to get on the train:")
+			self.message.user.expectedMessageType = 'changepersonalinfo'
+			self.message.user.tempParams['personalInfoToBeChanged'] = 'address'
+		elif self.message.text == '🏫 Course':
+			if self.message.user.course != '':
+				self.bot.sendMessage(self.message.user.chatID,
+									 ("What the hell? How can one change their course? But you must not question "
+									  + "the master, I guess... Go on then, what's your new course?"))
+			else:
+				self.bot.sendMessage(self.message.user.chatID, "Please send me your course name:")
+			self.message.user.expectedMessageType = 'changepersonalinfo'
+			self.message.user.tempParams['personalInfoToBeChanged'] = 'course'
+		elif self.message.text == '⏪ Back':
+			self.bot.sendMessageWithOptions(self.message.user.chatID, 'What do you want to change?',
+											self.bot.generateReplyMarkup(
+												[['️🧍 Personal Information'], ['📲 Subscription-Settings'],
+												 ['🧨 Cancel']]))
+			self.message.user.expectedMessageType = 'settingstype'
+		else:
+			self.bot.sendMessageWithOptions(self.message.user.chatID, "Wrong input. Please try again:",
+											self.bot.generateReplyMarkup(
+												[['🗣 Name'], ['🚅 Address'], ['🏫 Course'], ['⏪ Back']]))
+
+	# Called when user sends the information that he wants to change his subscription settings
+	def message_settingssubscriptions(self):
+		if self.message.text == '❌ Unsubscribe the Menu Push':
+			self.message.user.wantsMenu = False
+			self.bot.sendMessage(self.message.user.chatID, "💔 Unsubscribed you from the menu push")
+			self.message.user.expectedMessageType = ''
+		elif self.message.text == '✅ Subscribe the Menu Push':
+			self.message.user.wantsMenu = True
+			self.bot.sendMessage(self.message.user.chatID, "❤️ Subscribed you to the menu push")
+			self.message.user.expectedMessageType = ''
+		elif self.message.text == '❌ Unsubscribe the Lecture Plan Push':
+			self.message.user.wantsLecturePlan = False
+			self.bot.sendMessage(self.message.user.chatID, "💔 Unsubscribed you from the lecture plan push")
+			self.message.user.expectedMessageType = ''
+		elif self.message.text == '✅ Subscribe the Lecture Plan Push':
+			self.message.user.wantsLecturePlan = True
+			self.bot.sendMessage(self.message.user.chatID, "❤️ Subscribed you to the lecture plan push")
+			# Check if the user has already entered his course
+			if self.message.user.course == '' or self.message.user.course is None:
+				self.bot.sendMessageWithOptions(self.message.user.chatID,
+												("‼️ You have not entered your course yet. "
+												 + "Please do that via /settings -> Personal Information."),
+												self.bot.generateReplyMarkup([['/settings']]))
+			self.message.user.expectedMessageType = ''
+		elif self.message.text == '❌ Unsubscribe the Public Transport Info':
+			self.message.user.wantsTransportInfo = False
+			self.bot.sendMessage(self.message.user.chatID, "💔 Unsubscribed you from the public transport info")
+			self.message.user.expectedMessageType = ''
+		elif self.message.text == '✅ Subscribe the Public Transport Info':
+			self.message.user.wantsTransportInfo = True
+			self.bot.sendMessage(self.message.user.chatID, "❤️ Subscribed you to the public transport info")
+			# Check if the user has already entered his address
+			if self.message.user.address == '' or self.message.user.address is None:
+				self.bot.sendMessageWithOptions(self.message.user.chatID, ("‼️ You have not entered your address yet. "
+																		   + "Please do that via /settings -> Personal Information"),
+												self.bot.generateReplyMarkup([['/settings']]))
+			self.message.user.expectedMessageType = ''
+		elif self.message.text == '⏪ Back':
+			self.bot.sendMessageWithOptions(self.message.user.chatID, 'What do you want to change?',
+											self.bot.generateReplyMarkup([['️🧍 Personal Information'],
+																		  ['📲 Subscription-Settings'], ['🧨 Cancel']]))
+			self.message.user.expectedMessageType = 'settingstype'
+		else:
+			# Fetch the user's subscriptions to show them the current status
+			options = []
+			if self.message.user.wantsMenu:
+				options.append(['❌ Unsubscribe the Menu Push'])
+			else:
+				options.append(['✅ Subscribe the Menu Push'])
+
+			if self.message.user.wantsLecturePlan:
+				options.append(['❌ Unsubscribe the Lecture Plan Push'])
+			else:
+				options.append(['✅ Subscribe the Lecture Plan Push'])
+
+			if self.message.user.wantsTransportInfo:
+				options.append(['❌ Unsubscribe the Public Transport Info'])
+			else:
+				options.append(['✅ Subscribe the Public Transport Info'])
+
+			options.append(['⏪ Back'])
+
+			self.bot.sendMessageWithOptions(self.message.user.chatID,
+											"Wrong input. Please try again:",
+											self.bot.generateReplyMarkup(options))
+
+	# Called when the user sends the new info about him
+	def message_changepersonalinfo(self):
+		type = self.message.user.tempParams['personalInfoToBeChanged']
+
+		if type == 'name':
+			self.message.user.name = self.message.text
+			self.bot.sendMessage(self.message.user.chatID, ("Successfully changed your name to " + self.message.text))
+			self.message.user.expectedMessageType = ''
+			self.message.user.tempParams['personalInfoToBeChanged'] = ''
+		elif type == 'address':
+			self.message.user.address = self.message.text
+			self.bot.sendMessage(self.message.user.chatID,
+								 ("Successfully changed your address to " + self.message.text))
+			self.message.user.expectedMessageType = ''
+			self.message.user.tempParams['personalInfoToBeChanged'] = ''
+		elif type == 'course':
+			if self.bot.lectureFetcher.firstUserInCourse(self.message.text):
+				self.message.user.course = self.message.text
+				self.bot.sendMessage(self.message.user.chatID,
+									 "You are the first user in this course. Please send me "
+									 + "a password that future users have to enter in order to "
+									 + "join this course. Write it down somewhere save because "
+									 + "I will delete your message after I received it:")
+				self.message.user.expectedMessageType = 'newcoursepassword'
+				self.bot.lectureFetcher.setUserOfCourse(self.message.user.course)
+			else:
+				self.message.user.tempParams['enteredCourse'] = self.message.text
+				self.bot.sendMessage(self.message.user.chatID, "Please send me the password for " + self.message.text)
+				self.message.user.expectedMessageType = 'coursepassword'
+			self.message.user.tempParams['personalInfoToBeChanged'] = ''
+		else:
+			logging.warning(
+				'Wrong type for changing personal info given in MessageFunctions.message_changepersonalinfo. Given type: %s',
+				type)
+
+	# Called when the user sends the new password for a course
+	def message_newcoursepassword(self):
+		password = self.message.text
+		self.bot.deleteMessage(self.message.user.chatID, self.message.id)
+
+		self.bot.memes.setPassword(self.message.user.course, password)
+
+		if self.bot.lectureFetcher.checkForCourse(self.message.user.course):
+			self.bot.sendMessage(self.message.user.chatID, (
+					"You successfully joined the course " + self.message.user.course + " and set the passwort."))
+			self.message.user.expectedMessageType = ''
+		else:
+			self.bot.sendMessage(self.message.user.chatID,
+								 ("I don\'t know the RaPla link for this course yet. Would you "
+								  + "be so kind and send me the link?"))
+			self.message.user.expectedMessageType = "raplalink"
+
+	# Called when the users sends the password for a course
+	def message_coursepassword(self):
+		if self.message.text == 'cancel':
+			self.bot.sendMessage(self.message.user.chatID, 'Cancelled course setup.')
+			self.message.user.expectedMessageType = ''
+		else:
+			password = self.message.text
+			self.bot.deleteMessage(self.message.user.chatID, self.message.id)
+
+			if password == self.bot.memes.getPassword(self.message.user.tempParams['enteredCourse']):
+				self.message.user.course = self.message.user.tempParams['enteredCourse']
+				self.message.user.tempParams['enteredCourse'] = ''
+
+				self.bot.sendMessage(self.message.user.chatID,
+									 ("You successfully joined the course " + self.message.user.course))
+				self.message.user.expectedMessageType = ''
+			else:
+				self.bot.sendMessage(self.message.user.chatID,
+									 "Wrong password. Please try again. Write 'cancel' to cancel.")
+				self.message.user.expectedMessageType = 'coursepassword'
+
+	# Called when a user sends the RaPla link for a newly created course.
+	def message_raplalink(self):
+		if self.message.text == 'cancel':
+			self.message.user.expectedMessageType = ''
+			self.bot.sendMessage(self.message.user.chatID, 'Mission aborted, repeating: MISSION ABORTED.')
+			logging.warning('User %s, name %s created a new course but didn\'t supply a link!', self.message.user.chatID, self.message.user.name)
+		else:
+			if self.bot.lectureFetcher.validateLink(self.message.text):
+				self.bot.lectureFetcher.addRaplaLink(self.message.user.course, self.message.text)
+				self.bot.sendMessage(self.message.user.chatID,
+									 "Thank you for sending me the link! ❤️❤️❤️")
+				self.message.user.expectedMessageType = ''
+			else:
+				self.bot.sendMessage(self.message.user.chatID,
+									 "Invalid link. Please try again. Write 'cancel' to cancel setup.")
+				self.message.user.expectedMessageType = 'raplalink'

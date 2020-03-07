@@ -10,3 +10,4 @@
 /memes/*
 !/memes/Memes.py
 /menu/savedFoods.json
+/logs/*

@@ -6,6 +6,7 @@ import telegram_secrets
 from bot import Command as cmd, Message as msg, User as usr
 import asyncio
 import json
+import logging
 from datetime import datetime
 
 
@@ -76,7 +77,7 @@ class Bot:
 		self.messagesSentToday += 1
 
 		if not resp.json().get('ok'):
-			print('Error on sending text: ' + resp.json())
+			logging.error('Error on sending text: %s', resp.json())
 
 	# The options param has to be a [[String]], so an Array of rows with an array of buttons in JSON format.
 	def sendMessageWithOptions(self, chat, text, options):
@@ -91,7 +92,7 @@ class Bot:
 		self.messagesSentToday += 1
 
 		if not resp.json().get('ok'):
-			print('Error on sending text with options: ' + resp.json())
+			logging.error('Error on sending text with options: %s', resp.json())
 
 	def sendPhoto(self, chat, photo, isFileId):
 		if isFileId:
@@ -111,7 +112,7 @@ class Bot:
 			}
 		reqUrl = (self.telegramUrl + self.telegram_token + self.sendPhotoParam)
 		resp = requests.post(url=reqUrl, params=sendParams, files=files)
-		print('Sent photo, got answer ' + str(resp.json().get('ok')))
+		logging.debug('Sent photo, got answer %s', str(resp.json().get('ok')))
 		self.messagesSentToday += 1
 
 		# If the photo was successful sent, return the file_id. Else, return -1
@@ -119,7 +120,7 @@ class Bot:
 			# Returns the file id so we don't have to send this picture again in the future
 			return resp.json().get('result').get('photo')[0].get('file_id')
 		else:
-			print('Error on sending picture: ' + resp.json())
+			logging.error('Error on sending picture: %s', resp.json())
 			return '-1'
 
 	def generateReplyMarkup(self, options):
@@ -137,7 +138,7 @@ class Bot:
 		resp = requests.post(url=reqUrl, params=sendParams)
 
 		if not resp.json().get('ok'):
-			print('Error on deleting message: ' + resp.json())
+			logging.error('Error on deleting message: %s', resp.json())
 
 	async def getUpdates(self):
 		# If the bot is not about to be closed
@@ -169,9 +170,9 @@ class Bot:
 
 					# Print the first 10 characters of each message for debugging.
 					if len(text) < 11:
-						print("Received message at " + datetime.now().strftime('%H:%M:%S') + ', Text: ' + text)
+						logging.info('Received message: %s', text)
 					else:
-						print("Received message at " + datetime.now().strftime('%H:%M:%S') + ', Text: ' + text[:10] + '...')
+						logging.info('Received message: %s ...', text[:10])
 
 					if not text:
 						self.sendMessage(chat, "Unknown input format. Don't mess with me, fella!")
@@ -193,13 +194,13 @@ class Bot:
 							self.messages.append(msg.Message(newUser, text, messageID))
 
 			else:
-				print('Error on update: ' + update.json())
+				logging.error('Error on update: %s', update.json())
 				return update.json().get('error_code')
 
 	# Used to handle all new commands and messages
 	def handleMessages(self):
 		for message in self.messages:
-			# self.log(("Handling message by " + message.user.name))
+			# self.logs(("Handling message by " + message.user.name))
 			if message.isCommand:
 				cmd.Command(message, self).findCommand()
 			else:
@@ -207,10 +208,11 @@ class Bot:
 			self.messagesReceivedToday += 1
 		self.messages.clear()
 
-	# self.log("Handled all current messages")
+	# self.logs("Handled all current messages")
 
 	def log(self, message):
 		print(message)
+		logging.info(message)
 		self.sendMessage(telegram_secrets.patrick_telegram_id, message)
 
 	# self.sendMessage(patrickID.david_telegram_id, message)

@@ -27,7 +27,8 @@ class Main:
 		self.askedForRatingToday = False
 
 		# Configure logging
-		logging.basicConfig(filename='logs/main_application.logs', level=logging.INFO,
+		logfile = 'logs/main_application_' + datetime.now().strftime('%Y-%m-%d') + '.log'
+		logging.basicConfig(filename=logfile, level=logging.INFO,
 							format='%(asctime)s---%(levelname)s:%(message)s',
 							datefmt='%Y-%m-%d %H:%M:%S')
 
@@ -112,7 +113,8 @@ class Main:
 						"wantsMenu": user.wantsMenu,
 						"course": user.course,
 						"wantsLecturePlan": user.wantsLecturePlan,
-						"address": user.address
+						"address": user.address,
+						"wantsTransportInfo": user.wantsTransportInfo
 					}
 					usersList.append(toAppend)
 				usersJson = json.dumps(usersList)
@@ -205,7 +207,7 @@ class Main:
 					meme = self.memes.getMeme(user.course, 'Vetter-Memes', '-1')
 					self.sendMeme(user, meme)
 
-				if user.address != None and user.address != '':
+				if user.address != None and user.wantsTransportInfo and user.address != '':
 					time = datetime(int(tomorrow.year), int(tomorrow.month), int(tomorrow.day),
 									int(firstLectureTime[:2]), int(firstLectureTime[3:]))
 
@@ -275,6 +277,7 @@ class Main:
 			currentUser.course = user.get('course')
 			currentUser.wantsLecturePlan = user.get('wantsLecturePlan')
 			currentUser.address = user.get('address')
+			currentUser.wantsTransportInfo = user.get('wantsTransportInfo')
 
 			users.append(currentUser)
 
@@ -294,7 +297,8 @@ class Main:
 				"wantsMenu": user.wantsMenu,
 				"course": user.course,
 				"wantsLecturePlan": user.wantsLecturePlan,
-				"address": user.address
+				"address": user.address,
+				"wantsTransportInfo": user.wantsTransportInfo
 			}
 			usersList.append(toAppend)
 		usersJson = json.dumps(usersList)

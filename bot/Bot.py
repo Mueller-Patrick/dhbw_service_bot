@@ -123,6 +123,8 @@ class Bot:
 			logging.error('Error on sending picture: %s', resp.json())
 			return '-1'
 
+	# Provide an array of arrays where the inner array holds a horizontal line of options an the outer array holds
+	# all lines that are then displayed vertically.
 	def generateReplyMarkup(self, options):
 		reply = ('{"keyboard": ' + json.dumps(options) + ','
 				 + '"one_time_keyboard": true,'

@@ -13,3 +13,4 @@ class User:
 		self.course = ''
 		self.wantsLecturePlan = False
 		self.address = ''
+		self.wantsTransportInfo = False

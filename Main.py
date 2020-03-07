@@ -12,6 +12,7 @@ from menu import MenuSaver as menu
 from lecturePlan import LectureFetcher as lf
 from maps import Directions
 from memes import Memes
+import logging
 
 
 class Main:
@@ -24,6 +25,11 @@ class Main:
 		self.sentMenuToday = False
 		self.sentLecturesToday = False
 		self.askedForRatingToday = False
+
+		# Configure logging
+		logging.basicConfig(filename='logs/main_application.logs', level=logging.INFO,
+							format='%(asctime)s---%(levelname)s:%(message)s',
+							datefmt='%Y-%m-%d %H:%M:%S')
 
 		# Runs both loops independent from each other
 		loop = asyncio.get_event_loop()
@@ -64,16 +70,20 @@ class Main:
 			# run daily at 06:00 for all users that want the menu
 			if str(timeString) == '06:00' and not self.sentMenuToday and canteenOpen:
 				self.sentMenuToday = True
+				logging.info('Sending menu')
 				self.sendMenu()
 			elif str(timeString) == '18:00' and not self.sentLecturesToday and sendPlanToday:
 				self.sentLecturesToday = True
+				logging.info('Sending lecture plans')
 				self.sendLectures()
 			elif str(timeString) == '14:30' and not self.askedForRatingToday and canteenOpen:
 				self.askedForRatingToday = True
+				logging.info('Sending menu rating requests')
 				self.sendMenuRating()
 			# Reset the boolean to send the menu for today again.
 			# Do this only if seconds < 30 because otherwise it would happen twice.
 			elif timeString == '23:59' and int(datetime.now().strftime('%S')) < 30:
+				logging.info('Resetting variables and writing usage stats')
 				self.writeUsageStats(True)
 				self.sentMenuToday = False
 				self.sentLecturesToday = False
@@ -117,7 +127,7 @@ class Main:
 				# save usage stats
 				self.writeUsageStats(False)
 
-				print(("Saved all preferences at " + now.strftime("%H:%M:%S")))
+				logging.info('Saved all preferences')
 
 			# Check if it should stop
 			if self.bot.tellMainToClose:
@@ -230,8 +240,10 @@ class Main:
 		mealString = ("Meal 1:\n" + mealArr[0] + "\nMeal 2:\n" + mealArr[1] + "\nMeal 3:\n" + mealArr[2])
 		for user in self.bot.users:
 			if user.wantsMenu:
-				self.bot.sendMessageWithOptions(user.chatID, ("Please rate your meal today. The available meals were:\n\n" + mealString),
-												self.bot.generateReplyMarkup([['Meal 1', 'Meal 2', 'Meal 3'], ['Don\'t rate']]))
+				self.bot.sendMessageWithOptions(user.chatID, (
+							"Please rate your meal today. The available meals were:\n\n" + mealString),
+												self.bot.generateReplyMarkup(
+													[['Meal 1', 'Meal 2', 'Meal 3'], ['Don\'t rate']]))
 				user.tempParams['ratingMealset'] = mealArr
 				user.expectedMessageType = 'mealtoberated'
 
@@ -270,6 +282,7 @@ class Main:
 
 	# Used to save all users to a dict before closing.
 	def close(self):
+		logging.info('Closing bot now')
 		# save user data
 		usersList = []
 		for user in self.bot.users:
@@ -299,7 +312,7 @@ class Main:
 		# tell the bot to terminate
 		self.bot.close()
 		if len(self.bot.messages) > 0:
-			self.bot.log("Bot has to handle some more commands, please wait.")
+			logging.info('Bot has to handle more commands and will terminate once finished.')
 
 
 # Starting method

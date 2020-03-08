@@ -32,16 +32,22 @@ class Main:
 							format='%(asctime)s---%(levelname)s:%(message)s',
 							datefmt='%Y-%m-%d %H:%M:%S')
 
-		# Runs both loops independent from each other
+		# Runs the three coroutines independent from each other
 		loop = asyncio.get_event_loop()
 		cors = asyncio.wait([self.mainLoop(), self.pushLoop(), self.saveLoop()])
+		# Problem here: If one loop dies, the other two are still running and no error is thrown.
+		# If e.g. the mainLoop dies from an error, we see nothing on the console and the other two coroutines
+		# still work as expected.
 		loop.run_until_complete(cors)
 
 	async def mainLoop(self):
 		while True:
-			# Wait for commands by users
-			await self.bot.getUpdates()
-			self.bot.handleMessages()
+			try:
+				# Wait for commands by users
+				await self.bot.getUpdates()
+				self.bot.handleMessages()
+			except Exception as exc:
+				logging.error('Exception on mainLoop: %s', exc)
 
 			# Check if it should stop
 			if self.bot.tellMainToClose:

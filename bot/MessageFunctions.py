@@ -58,6 +58,8 @@ class MessageFunctions:
 
 		if not plan:
 			self.bot.sendMessage(self.message.user.chatID, 'No more lectures for that day.')
+		elif 'PaddyOfficial' in plan:
+			self.bot.sendMessage(self.message.user.chatID, plan)
 		else:
 			self.bot.sendMessage(self.message.user.chatID, plan)
 

@@ -138,6 +138,9 @@ class Reader(object):
             if self.day == x['day']:
                 self.menu = x['menu']
 
+        if not self.menu:
+            logging.error('In MenuSaver.Reader(): Could not read today\'s menu')
+
     def get_food_with_ratings_as_string_array(self):
         data = Util.load_data("menu/savedFoods.json")
         date = self.day

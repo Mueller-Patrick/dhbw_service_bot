@@ -87,15 +87,20 @@ class MessageFunctions:
 		else:
 			day = 0
 
-		forDay = datetime.now() + timedelta(days=day)
-		weekday = forDay.weekday()
-		if weekday < 5:  # Because monday is 0...
-			fetchedMenu = menu.Reader(day + 1).get_menu_as_arr()  # day+1 because 1 is today, 2 is tomorrow...
-			self.bot.sendMessage(self.message.user.chatID, "Here you go: ")
-			for oneMenu in fetchedMenu:
-				self.bot.sendMessage(self.message.user.chatID, oneMenu)
+		# If it's sunday and the user requests the menu for monday, inform him that the menu for next week can not be fetched yet.
+		if datetime.now().weekday() == 6 and day == 1:
+			self.bot.sendMessage(self.message.user.chatID,
+								 "The menu for next week is not yet available, check back tomorrow.")
 		else:
-			self.bot.sendMessage(self.message.user.chatID, "The canteen is closed there. Hence no menu for you.")
+			forDay = datetime.now() + timedelta(days=day)
+			weekday = forDay.weekday()
+			if weekday < 5:  # Because monday is 0...
+				fetchedMenu = menu.Reader(day + 1).get_menu_as_arr()  # day+1 because 1 is today, 2 is tomorrow...
+				self.bot.sendMessage(self.message.user.chatID, "Here you go: ")
+				for oneMenu in fetchedMenu:
+					self.bot.sendMessage(self.message.user.chatID, oneMenu)
+			else:
+				self.bot.sendMessage(self.message.user.chatID, "The canteen is closed there. Hence no menu for you.")
 
 	# Called when user sends the type of meme he wants to get
 	def message_memetype(self):
@@ -410,7 +415,8 @@ class MessageFunctions:
 		if self.message.text == 'cancel':
 			self.message.user.expectedMessageType = ''
 			self.bot.sendMessage(self.message.user.chatID, 'Mission aborted, repeating: MISSION ABORTED.')
-			logging.warning('User %s, name %s created a new course but didn\'t supply a link!', self.message.user.chatID, self.message.user.name)
+			logging.warning('User %s, name %s created a new course but didn\'t supply a link!',
+							self.message.user.chatID, self.message.user.name)
 		else:
 			if self.bot.lectureFetcher.validateLink(self.message.text):
 				self.bot.lectureFetcher.addRaplaLink(self.message.user.course, self.message.text)

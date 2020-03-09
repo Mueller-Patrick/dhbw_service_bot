@@ -92,7 +92,7 @@ class Memes:
 		self.getMemeSourceList(course, typeIndex, memeIndex)[1] = file_id
 
 		with open('memes/meme_meta.json', 'w')as memeFile:
-			memeFile.write(json.dumps(self.memeTypes))
+			memeFile.write(json.dumps(self.memeTypes, indent=4))
 
 	def readMemeTypes(self):
 		try:
@@ -122,4 +122,4 @@ class Memes:
 		self.memeTypes['PASSWORDS'][course] = password
 
 		with open('memes/meme_meta.json', 'w')as memeFile:
-			memeFile.write(json.dumps(self.memeTypes))
+			memeFile.write(json.dumps(self.memeTypes, indent=4))

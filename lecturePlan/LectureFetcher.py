@@ -39,7 +39,7 @@ class LectureFetcher:
 		self.linkDict[courseName.upper()][0] = link
 
 	def writeLinksToJson(self):
-		linkJson = json.dumps(self.linkDict)
+		linkJson = json.dumps(self.linkDict, indent=4)
 
 		with open("lecturePlan/raplaLinks.json", "w") as raplaFile:
 			raplaFile.write(linkJson)

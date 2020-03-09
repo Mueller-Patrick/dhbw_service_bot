@@ -123,7 +123,7 @@ class Main:
 						"wantsTransportInfo": user.wantsTransportInfo
 					}
 					usersList.append(toAppend)
-				usersJson = json.dumps(usersList)
+				usersJson = json.dumps(usersList, indent=4)
 
 				with open('bot/userDict.json', 'w') as userFile:
 					userFile.write(usersJson)
@@ -165,14 +165,14 @@ class Main:
 							  + str(usageList[datetime.now().strftime('%Y-%m-%d')][1]) + " messages."))
 
 			with open('bot/usageStats.json', 'w') as usageFile:
-				usageFile.write(json.dumps(usageList))
+				usageFile.write(json.dumps(usageList, indent=4))
 			usageFile.close()
 		except:  # If file doesnt exist
 			with open('bot/usageStats.json', 'w') as usageFile:
 				usageList = {
 					datetime.now().strftime('%Y-%m-%d'): [self.bot.messagesReceivedToday, self.bot.messagesSentToday]
 				}
-				usageFile.write(json.dumps(usageList))
+				usageFile.write(json.dumps(usageList, indent=4))
 			usageFile.close()
 
 		self.bot.messagesReceivedToday = 0
@@ -307,7 +307,7 @@ class Main:
 				"wantsTransportInfo": user.wantsTransportInfo
 			}
 			usersList.append(toAppend)
-		usersJson = json.dumps(usersList)
+		usersJson = json.dumps(usersList, indent=4)
 
 		with open('bot/userDict.json', 'w') as userFile:
 			userFile.write(usersJson)

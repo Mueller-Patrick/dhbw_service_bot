@@ -88,8 +88,7 @@ class CommandFunctions:
 	def command_getlectures(self):
 		if self.message.user.course == None or self.message.user.course == '':
 			self.bot.sendMessage(self.message.user.chatID,
-								 'I don\'t know which course you are in. Please provide me this Information:')
-			self.message.user.expectedMessageType = 'changecoursename'
+								 'I don\'t know which course you are in. Please provide me this information under /settings -> Personal Information')
 		else:
 			self.bot.sendMessageWithOptions(self.message.user.chatID, 'For which day do you want the plan?',
 											self.bot.generateReplyMarkup([['Today', 'Tomorrow']]))
@@ -119,7 +118,7 @@ class CommandFunctions:
 			self.message.user.expectedMessageType = 'memetype'
 		else:
 			self.bot.sendMessage(self.message.user.chatID, "I can't send you memes because you are in no course. "
-								 + "Type /getlectures to enter a course.")
+								 + "Enter your course under /settings -> Personal Information")
 
 	def command_reportbug(self):
 		self.bot.sendMessage(self.message.user.chatID, "Please describe the bug:")

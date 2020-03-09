@@ -14,20 +14,20 @@ class CommandFunctions:
 			self.bot.sendMessageWithOptions(self.message.user.chatID,
 											"/help\n/stopbot\n/sendmessagetoeveryone\n\n/getmenu\n\n/getlectures\n\n/getmeme\n\n/reportbug\n\n/privacy\n/whatdoyouknowaboutme",
 											self.bot.generateReplyMarkup(
-												[['/stopbot'],['/sendmessagetoeveryone'], ['/help'], ['/settings'], ['/getmenu'], ['/getlectures'], ['/getmeme'],
+												[['/stopbot'], ['/sendmessagetoeveryone'], ['/help'], ['/settings'],
+												 ['/getmenu'], ['/getlectures'], ['/getmeme'],
 												 ['/reportbug'], ['/privacy'], ['/whatdoyouknowaboutme']]))
 		else:
-			self.bot.sendMessageWithOptions(self.message.user.chatID,
-											(
-													"*Help*: /help\n\n"
-													+ "*Settings: /settings"
-													+ "*Menu*: /getmenu\n\n"
-													+ "*Lecture plan*: /getlectures\n\n"
-													+ "Get your favorite *memes*: /getmeme\n\n"
-													+ "To *report a bug*: /reportbug\n\n"
-													+ "*Privacy information*: /privacy\n"
-													+ "To get *all information* we have about you: /whatdoyouknowaboutme\n\n"
-													+ "If you have any questions, contact @PaddyOfficial on Telegram."),
+			replyString = ('*Help*: /help\n\n'
+				+ '*Settings*: /settings\n\n'
+				+ '*Menu*: /getmenu\n\n'
+				+ '*Lecture plan*: /getlectures\n\n'
+				+ 'Get your favorite *memes*: /getmeme\n\n'
+				+ 'To *report a bug*: /reportbug\n\n'
+				+ '*Privacy information*: /privacy\n'
+				+ 'To get *all information* we have about you: /whatdoyouknowaboutme\n\n'
+				+ 'If you have any questions, contact @PaddyOfficial on Telegram.')
+			self.bot.sendMessageWithOptions(self.message.user.chatID, replyString,
 											self.bot.generateReplyMarkup(
 												[['/help'], ['/settings'], ['/getmenu'], ['/getlectures'], ['/getmeme'],
 												 ['/reportbug'], ['/privacy'], ['/whatdoyouknowaboutme']]))
@@ -51,7 +51,8 @@ class CommandFunctions:
 
 	def command_whatdoyouknowaboutme(self):
 		self.bot.sendMessage(self.message.user.chatID, "🤔 I know the following things about you :")
-		self.bot.sendMessage(self.message.user.chatID, ("📥 Your Telegram chat id is " + str(self.message.user.chatID)))
+		self.bot.sendMessage(self.message.user.chatID,
+							 ("📥 Your Telegram chat id is " + str(self.message.user.chatID)))
 		self.bot.sendMessage(self.message.user.chatID, ("🗣 Your name is " + str(self.message.user.name)))
 		if self.message.user.address != '' and self.message.user.address is not None:
 			self.bot.sendMessage(self.message.user.chatID,
@@ -64,7 +65,8 @@ class CommandFunctions:
 		if self.message.user.wantsLecturePlan:
 			self.bot.sendMessage(self.message.user.chatID, "✅ You want to receive the daily lecture plan push")
 		else:
-			self.bot.sendMessage(self.message.user.chatID, "❌ You don't want to receive the daily lecture plan push")
+			self.bot.sendMessage(self.message.user.chatID,
+								 "❌ You don't want to receive the daily lecture plan push")
 
 		if self.message.user.wantsTransportInfo:
 			self.bot.sendMessage(self.message.user.chatID, "✅ You want to receive public transport info")

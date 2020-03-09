@@ -32,7 +32,7 @@ class Menu(object):
         return (self.today.weekday() + self.day) <= 5
 
     def create_date_string(self):
-        return self.day.today().strftime("%Y-%m-%d")
+        return self.day.strftime("%Y-%m-%d")
 
     def create_string(self):
         string = ""

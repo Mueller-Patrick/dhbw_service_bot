@@ -257,9 +257,11 @@ class MessageFunctions:
 			if self.message.user.course != '':
 				self.bot.sendMessage(self.message.user.chatID,
 									 ("What the hell? How can one change their course? But you must not question "
-									  + "the master, I guess... Go on then, what's your new course?"))
+									  + "the master, I guess... Go on then, what's your new course? (Please use the format "
+									  + "TINF19B4)"))
 			else:
-				self.bot.sendMessage(self.message.user.chatID, "Please send me your course name:")
+				self.bot.sendMessage(self.message.user.chatID,
+									 ("Please send me your course name (Please use the format TINF19B4):"))
 			self.message.user.expectedMessageType = 'changepersonalinfo'
 			self.message.user.tempParams['personalInfoToBeChanged'] = 'course'
 		elif self.message.text == '⏪ Back':
@@ -409,7 +411,8 @@ class MessageFunctions:
 				self.message.user.expectedMessageType = ''
 			else:
 				self.bot.sendMessage(self.message.user.chatID,
-									 "Wrong password. Please try again. Write 'cancel' to cancel.")
+									 "Wrong password. Please try again. Write 'cancel' to cancel and contact "
+									 + "@PaddyOfficial for help.")
 				self.message.user.expectedMessageType = 'coursepassword'
 
 	# Called when a user sends the RaPla link for a newly created course.

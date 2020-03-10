@@ -346,31 +346,46 @@ class MessageFunctions:
 		type = self.message.user.tempParams['personalInfoToBeChanged']
 
 		if type == 'name':
-			self.message.user.name = self.message.text
-			self.bot.sendMessage(self.message.user.chatID, ("Successfully changed your name to " + self.message.text))
-			self.message.user.expectedMessageType = ''
-			self.message.user.tempParams['personalInfoToBeChanged'] = ''
-		elif type == 'address':
-			self.message.user.address = self.message.text
-			self.bot.sendMessage(self.message.user.chatID,
-								 ("Successfully changed your address to " + self.message.text))
-			self.message.user.expectedMessageType = ''
-			self.message.user.tempParams['personalInfoToBeChanged'] = ''
-		elif type == 'course':
-			if self.bot.lectureFetcher.firstUserInCourse(self.message.text):
-				self.message.user.course = self.message.text
-				self.bot.sendMessage(self.message.user.chatID,
-									 "You are the first user in this course. Please send me "
-									 + "a password that future users have to enter in order to "
-									 + "join this course. Write it down somewhere save because "
-									 + "I will delete your message after I received it:")
-				self.message.user.expectedMessageType = 'newcoursepassword'
-				self.bot.lectureFetcher.setUserOfCourse(self.message.user.course)
+			if self.message.user.name == self.message.text:
+				self.bot.sendMessage(self.message.user.chatID, "That\'s the name I already know")
+				self.message.user.expectedMessageType = ''
+				self.message.user.tempParams['personalInfoToBeChanged'] = ''
 			else:
-				self.message.user.tempParams['enteredCourse'] = self.message.text
-				self.bot.sendMessage(self.message.user.chatID, "Please send me the password for " + self.message.text)
-				self.message.user.expectedMessageType = 'coursepassword'
-			self.message.user.tempParams['personalInfoToBeChanged'] = ''
+				self.message.user.name = self.message.text
+				self.bot.sendMessage(self.message.user.chatID, ("Successfully changed your name to " + self.message.text))
+				self.message.user.expectedMessageType = ''
+				self.message.user.tempParams['personalInfoToBeChanged'] = ''
+		elif type == 'address':
+			if self.message.user.address == self.message.text:
+				self.bot.sendMessage(self.message.user.chatID, "That\'s the address I already know")
+				self.message.user.expectedMessageType = ''
+				self.message.user.tempParams['personalInfoToBeChanged'] = ''
+			else:
+				self.message.user.address = self.message.text
+				self.bot.sendMessage(self.message.user.chatID,
+									 ("Successfully changed your address to " + self.message.text))
+				self.message.user.expectedMessageType = ''
+				self.message.user.tempParams['personalInfoToBeChanged'] = ''
+		elif type == 'course':
+			if self.message.user.course == self.message.text:
+				self.bot.sendMessage(self.message.user.chatID, "That\'s the course I already know")
+				self.message.user.expectedMessageType = ''
+				self.message.user.tempParams['personalInfoToBeChanged'] = ''
+			else:
+				if self.bot.lectureFetcher.firstUserInCourse(self.message.text):
+					self.message.user.course = self.message.text
+					self.bot.sendMessage(self.message.user.chatID,
+										 "You are the first user in this course. Please send me "
+										 + "a password that future users have to enter in order to "
+										 + "join this course. Write it down somewhere save because "
+										 + "I will delete your message after I received it:")
+					self.message.user.expectedMessageType = 'newcoursepassword'
+					self.bot.lectureFetcher.setUserOfCourse(self.message.user.course)
+				else:
+					self.message.user.tempParams['enteredCourse'] = self.message.text
+					self.bot.sendMessage(self.message.user.chatID, "Please send me the password for " + self.message.text)
+					self.message.user.expectedMessageType = 'coursepassword'
+				self.message.user.tempParams['personalInfoToBeChanged'] = ''
 		else:
 			logging.warning(
 				'Wrong type for changing personal info given in MessageFunctions.message_changepersonalinfo. Given type: %s',

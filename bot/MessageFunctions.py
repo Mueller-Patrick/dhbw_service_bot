@@ -72,11 +72,15 @@ class MessageFunctions:
 										 ('Your first lecture already began, so I suppose you '
 										  + 'are at the DHBW already and don\'t need the public transport Info.'))
 				else:
-					direc = Directions.Direction(time, self.message.user.address)
-					trainPlan = direc.create_message()
+					try:
+						direc = Directions.Direction(time, self.message.user.address)
+						trainPlan = direc.create_message()
 
-					self.bot.sendMessage(self.message.user.chatID, 'Here are the public transport directions:')
-					self.bot.sendMessage(self.message.user.chatID, trainPlan)
+						self.bot.sendMessage(self.message.user.chatID, 'Here are the public transport directions:')
+						self.bot.sendMessage(self.message.user.chatID, trainPlan)
+					except IndexError:
+						logging.error('In MessageFunctions(): Fetching directions for address %s not successful.',
+									  self.message.user.address)
 
 		self.message.user.expectedMessageType = ''
 
@@ -352,7 +356,8 @@ class MessageFunctions:
 				self.message.user.tempParams['personalInfoToBeChanged'] = ''
 			else:
 				self.message.user.name = self.message.text
-				self.bot.sendMessage(self.message.user.chatID, ("Successfully changed your name to " + self.message.text))
+				self.bot.sendMessage(self.message.user.chatID,
+									 ("Successfully changed your name to " + self.message.text))
 				self.message.user.expectedMessageType = ''
 				self.message.user.tempParams['personalInfoToBeChanged'] = ''
 		elif type == 'address':
@@ -383,7 +388,8 @@ class MessageFunctions:
 					self.bot.lectureFetcher.setUserOfCourse(self.message.user.course)
 				else:
 					self.message.user.tempParams['enteredCourse'] = self.message.text
-					self.bot.sendMessage(self.message.user.chatID, "Please send me the password for " + self.message.text)
+					self.bot.sendMessage(self.message.user.chatID,
+										 "Please send me the password for " + self.message.text)
 					self.message.user.expectedMessageType = 'coursepassword'
 				self.message.user.tempParams['personalInfoToBeChanged'] = ''
 		else:

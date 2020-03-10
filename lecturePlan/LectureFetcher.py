@@ -131,3 +131,6 @@ class LectureFetcher:
 			self.linkDict[courseName.upper()] = ['', True]
 		else:
 			self.linkDict[courseName.upper()][1] = True
+
+	def getAllKnownCourses(self):
+		return list(self.linkDict)

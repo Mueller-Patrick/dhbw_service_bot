@@ -108,11 +108,11 @@ class HelperFunctions:
 						self.main.bot.sendMessage(user.chatID, 'Here are the public transport directions:')
 						self.main.bot.sendMessage(user.chatID, trainPlan)
 					except:
-						self.bot.sendMessage(self.message.user.chatID, (
+						self.main.bot.sendMessage(user.chatID, (
 								'Could not fetch public transport directions for your address '
-								+ self.message.user.address))
+								+ user.address))
 						logging.warning('In HelperFunctions(): Fetching directions for address %s not successful.',
-									  self.message.user.address)
+									  user.address)
 
 	# Send the given meme
 	def sendMeme(self, user, meme):
@@ -141,7 +141,7 @@ class HelperFunctions:
 			if user.wantsMenu and user.wantsToRateMeals:
 				self.main.bot.sendMessageWithOptions(user.chatID, (
 						"Please rate your meal today. The available meals were:\n\n" + mealString),
-													 self.bot.generateReplyMarkup(
+													 self.main.bot.generateReplyMarkup(
 														 [['Meal 1', 'Meal 2', 'Meal 3'], ['Don\'t rate']]))
 				user.tempParams['ratingMealset'] = mealArr
 				user.expectedMessageType = 'mealtoberated'

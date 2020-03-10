@@ -93,7 +93,8 @@ class MessageFunctions:
 		if self.message.text == 'Today':
 			day = 0
 		elif self.message.text == 'Tomorrow':
-			day = 1
+			# TODO: Change back after David's bugfix of the savedFoods
+			day = 0
 		else:
 			day = 0
 

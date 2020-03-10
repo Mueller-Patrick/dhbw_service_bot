@@ -49,7 +49,7 @@ class AsnycLoops:
 				self.main.sentMenuToday = True
 				logging.info('Sending menu')
 				self.helpers.sendMenu()
-			elif str(timeString) == '11:24' and not self.main.sentLecturesToday and sendPlanToday:
+			elif str(timeString) == '18:00' and not self.main.sentLecturesToday and sendPlanToday:
 				self.main.sentLecturesToday = True
 				logging.info('Sending lecture plans')
 				self.helpers.sendLectures()

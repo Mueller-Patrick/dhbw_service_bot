@@ -90,7 +90,8 @@ class AsnycLoops:
 						"course": user.course,
 						"wantsLecturePlan": user.wantsLecturePlan,
 						"address": user.address,
-						"wantsTransportInfo": user.wantsTransportInfo
+						"wantsTransportInfo": user.wantsTransportInfo,
+						"wantsToRateMeals": user.wantsToRateMeals
 					}
 					usersList.append(toAppend)
 				usersJson = json.dumps(usersList, indent=4)

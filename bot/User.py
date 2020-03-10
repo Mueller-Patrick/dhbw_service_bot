@@ -14,3 +14,4 @@ class User:
 		self.wantsLecturePlan = False
 		self.address = ''
 		self.wantsTransportInfo = False
+		self.wantsToRateMeals = True

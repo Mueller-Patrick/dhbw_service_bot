@@ -130,7 +130,7 @@ class HelperFunctions:
 
 		mealString = ("Meal 1:\n" + mealArr[0] + "\nMeal 2:\n" + mealArr[1] + "\nMeal 3:\n" + mealArr[2])
 		for user in self.main.bot.users:
-			if user.wantsMenu:
+			if user.wantsMenu and user.wantsToRateMeals:
 				self.main.bot.sendMessageWithOptions(user.chatID, (
 						"Please rate your meal today. The available meals were:\n\n" + mealString),
 													 self.bot.generateReplyMarkup(
@@ -157,13 +157,18 @@ class HelperFunctions:
 
 			currentUser.name = user.get('name')
 			currentUser.expectedMessageType = user.get('expectedMsgType')
-			if user.get('tempParams') != None:
+			if user.get('tempParams') is not None:
 				currentUser.tempParams = user.get('tempParams')
-			currentUser.wantsMenu = user.get('wantsMenu')
+			if user.get('wantsMenu') is not None:
+				currentUser.wantsMenu = user.get('wantsMenu')
 			currentUser.course = user.get('course')
-			currentUser.wantsLecturePlan = user.get('wantsLecturePlan')
+			if user.get('wantsLecturePlan') is not None:
+				currentUser.wantsLecturePlan = user.get('wantsLecturePlan')
 			currentUser.address = user.get('address')
-			currentUser.wantsTransportInfo = user.get('wantsTransportInfo')
+			if user.get('wantsTransportInfo') is not None:
+				currentUser.wantsTransportInfo = user.get('wantsTransportInfo')
+			if user.get('wantsToRateMeals') is not None:
+				currentUser.wantsToRateMeals = user.get('wantsToRateMeals')
 
 			users.append(currentUser)
 

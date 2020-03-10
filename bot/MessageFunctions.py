@@ -27,7 +27,8 @@ class MessageFunctions:
 				+ 'change the Information that I need about you to provide my services to you. Under \'Subscription-Settings\' '
 				+ 'you can set up which push-messages you want to get from me.\n\n'
 				+ 'My Push-Service includes lecture plan pushes, daily menu pushes and public transport information for '
-				+ 'each day.\n\nTo *get the daily menu at any time*, send /getmenu. If you forgot '
+				+ 'each day. If you receive the menu push, I\'ll also ask you to *rate your meal*. If you don\'t '
+				+ 'want that, you can opt-out in the subscription settings.\n\nTo *get the daily menu at any time*, send /getmenu. If you forgot '
 				+ '*what lectures you have today*, type /getlectures to get the plan again.\n\n'
 				+ 'We all love *memes*. Type /getmeme to access all of your favorite ones.\n\n'
 				+ 'If you find a *bug*, report it via /reportbug.\n\nAnd because I '
@@ -230,6 +231,11 @@ class MessageFunctions:
 			else:
 				options.append(['✅ Subscribe the Public Transport Info'])
 
+			if self.message.user.wantsToRateMeals:
+				options.append(['❌ Opt-out of the Meal Rating'])
+			else:
+				options.append(['✅ Opt-in to the Meal Rating'])
+
 			options.append(['⏪ Back'])
 
 			self.bot.sendMessageWithOptions(self.message.user.chatID,
@@ -316,6 +322,14 @@ class MessageFunctions:
 																		   + "Please do that via /settings -> Personal Information"),
 												self.bot.generateReplyMarkup([['/settings']]))
 			self.message.user.expectedMessageType = ''
+		elif self.message.text == '❌ Opt-out of the Meal Rating':
+			self.message.user.wantsToRateMeals = False
+			self.bot.sendMessage(self.message.user.chatID, "💔 Opted you out of the meal rating system")
+			self.message.user.expectedMessageType = ''
+		elif self.message.text == '✅ Opt-in to the Meal Rating':
+			self.message.user.wantsToRateMeals = True
+			self.bot.sendMessage(self.message.user.chatID, "❤️ Opted you in to the meal rating system")
+			self.message.user.expectedMessageType = ''
 		elif self.message.text == '⏪ Back':
 			self.bot.sendMessageWithOptions(self.message.user.chatID, 'What do you want to change?',
 											self.bot.generateReplyMarkup([['️🧍 Personal Information'],
@@ -338,6 +352,11 @@ class MessageFunctions:
 				options.append(['❌ Unsubscribe the Public Transport Info'])
 			else:
 				options.append(['✅ Subscribe the Public Transport Info'])
+
+			if self.message.user.wantsToRateMeals:
+				options.append(['❌ Opt-out of the Meal Rating'])
+			else:
+				options.append(['✅ Opt-in to the Meal Rating'])
 
 			options.append(['⏪ Back'])
 

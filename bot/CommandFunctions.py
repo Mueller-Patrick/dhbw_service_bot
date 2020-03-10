@@ -73,6 +73,9 @@ class CommandFunctions:
 		else:
 			self.bot.sendMessage(self.message.user.chatID, "❌ You don't want to receive public transport info")
 
+		if not self.message.user.wantsToRateMeals:
+			self.bot.sendMessage(self.message.user.chatID, "❌ You don't want to rate meals")
+
 		if self.message.user.course:
 			self.bot.sendMessage(self.message.user.chatID,
 								 ("🏫 You are in the " + self.message.user.course + " course"))

@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from menu import MenuSaver as menu
 from maps import Directions
 from bot import User as usr
+import logging
 
 
 class HelperFunctions:
@@ -100,11 +101,18 @@ class HelperFunctions:
 					time = datetime(int(tomorrow.year), int(tomorrow.month), int(tomorrow.day),
 									int(firstLectureTime[:2]), int(firstLectureTime[3:]))
 
-					direc = Directions.Direction(time, user.address)
-					trainPlan = direc.create_message()
+					try:
+						direc = Directions.Direction(time, user.address)
+						trainPlan = direc.create_message()
 
-					self.main.bot.sendMessage(user.chatID, 'Here are the public transport directions:')
-					self.main.bot.sendMessage(user.chatID, trainPlan)
+						self.main.bot.sendMessage(user.chatID, 'Here are the public transport directions:')
+						self.main.bot.sendMessage(user.chatID, trainPlan)
+					except:
+						self.bot.sendMessage(self.message.user.chatID, (
+								'Could not fetch public transport directions for your address '
+								+ self.message.user.address))
+						logging.warning('In HelperFunctions(): Fetching directions for address %s not successful.',
+									  self.message.user.address)
 
 	# Send the given meme
 	def sendMeme(self, user, meme):

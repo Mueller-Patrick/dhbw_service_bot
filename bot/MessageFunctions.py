@@ -80,7 +80,10 @@ class MessageFunctions:
 						self.bot.sendMessage(self.message.user.chatID, 'Here are the public transport directions:')
 						self.bot.sendMessage(self.message.user.chatID, trainPlan)
 					except IndexError:
-						logging.error('In MessageFunctions(): Fetching directions for address %s not successful.',
+						self.bot.sendMessage(self.message.user.chatID, (
+								'Could not fetch public transport directions for your address '
+								+ self.message.user.address))
+						logging.warning('In MessageFunctions(): Fetching directions for address %s not successful.',
 									  self.message.user.address)
 
 		self.message.user.expectedMessageType = ''

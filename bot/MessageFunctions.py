@@ -172,6 +172,7 @@ class MessageFunctions:
 
 		if mealToBeRated == 'Don\'t rate':
 			self.bot.sendMessage(self.message.user.chatID, "Ok, no rating. This is fine.")
+			self.message.user.tempParams['ratingMealset'] = ''
 			self.message.user.expectedMessageType = ''
 		else:
 			if mealToBeRated in ('Meal 1', 'Meal 2', 'Meal 3'):

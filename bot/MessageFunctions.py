@@ -29,7 +29,8 @@ class MessageFunctions:
 				+ 'My Push-Service includes lecture plan pushes, daily menu pushes and public transport information for '
 				+ 'each day. If you receive the menu push, I\'ll also ask you to *rate your meal*. If you don\'t '
 				+ 'want that, you can opt-out in the subscription settings.\n\nTo *get the daily menu at any time*, send /getmenu. If you forgot '
-				+ '*what lectures you have today*, type /getlectures to get the plan again.\n\n'
+				+ '*what lectures you have today*, type /getlectures to get the plan again. And if you want the *public '
+			    + 'transport directions* now, type /getdirections.\n\n'
 				+ 'We all love *memes*. Type /getmeme to access all of your favorite ones.\n\n'
 				+ 'If you find a *bug*, report it via /reportbug.\n\nAnd because I '
 				+ 'respect your *privacy*, type /privacy and /whatdoyouknowaboutme to get Info about what we save '
@@ -208,6 +209,39 @@ class MessageFunctions:
 		self.bot.log(('Got a bug report by ' + self.message.user.name + ':\n\n' + self.message.text))
 		self.bot.sendMessage(self.message.user.chatID, "Thanks for reporting this bug. We will fix it ASAP.")
 		self.message.user.expectedMessageType = ''
+
+	def message_directionstype(self):
+		if self.message.text == '-> DHBW':
+			try:
+				direc = Directions.Direction(datetime.now(), self.message.user.address, False, True)
+				trainPlan = direc.create_message()
+
+				self.bot.sendMessage(self.message.user.chatID, 'Here are the public transport directions for your way home:')
+				self.bot.sendMessage(self.message.user.chatID, trainPlan)
+			except:
+				self.bot.sendMessage(self.message.user.chatID, (
+						'Could not fetch public transport directions for your address '
+						+ self.message.user.address))
+				logging.warning('In HelperFunctions(): Fetching directions for address %s not successful.',
+								self.message.user.address)
+			self.message.user.expectedMessageType = ''
+		elif self.message.text == '-> Home':
+			try:
+				direc = Directions.Direction(datetime.now(), self.message.user.address, True, True)
+				trainPlan = direc.create_message()
+
+				self.bot.sendMessage(self.message.user.chatID, 'Here are the public transport directions for your way to DHBW:')
+				self.bot.sendMessage(self.message.user.chatID, trainPlan)
+			except:
+				self.bot.sendMessage(self.message.user.chatID, (
+						'Could not fetch public transport directions for your address '
+						+ self.message.user.address))
+				logging.warning('In HelperFunctions(): Fetching directions for address %s not successful.',
+								self.message.user.address)
+			self.message.user.expectedMessageType = ''
+		else:
+			self.bot.sendMessageWithOptions(self.message.user.chatID, "Wrong input. Please try again:",
+											self.bot.generateReplyMarkup([['-> DHBW'], ['-> Home']]))
 
 	# Called when user sends the type of settings he wants to change
 	def message_settingstype(self):

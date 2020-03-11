@@ -57,6 +57,10 @@ class AsnycLoops:
 				self.main.askedForRatingToday = True
 				logging.info('Sending menu rating requests')
 				self.helpers.sendMenuRating()
+			elif str(timeString) == '10:00' and not self.main.sentReturnDirectionsToday:
+				self.main.sentReturnDirectionsToday = True
+				logging.info('Sending return directions')
+				self.helpers.sendReturnDirections()
 			# Reset the boolean to send the menu for today again.
 			# Do this only if seconds < 30 because otherwise it would happen twice.
 			elif timeString == '23:59' and int(datetime.now().strftime('%S')) < 30:

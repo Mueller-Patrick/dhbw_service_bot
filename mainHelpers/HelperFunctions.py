@@ -11,7 +11,7 @@ class HelperFunctions:
 		self.main = main
 
 	# Writes statistics to bot/usageStats.json in the format "DATE": ["AMOUNT_RECEIVED","AMOUNT_SENT"]
-	def writeUsageStats(self, addLog):
+	def writeUsageStats(self, addLog: bool):
 		try:
 			with open('bot/usageStats.json', 'r') as usageFile:
 				usageJson = usageFile.read()
@@ -145,6 +145,29 @@ class HelperFunctions:
 														 [['Meal 1', 'Meal 2', 'Meal 3'], ['Don\'t rate']]))
 				user.tempParams['ratingMealset'] = mealArr
 				user.expectedMessageType = 'mealtoberated'
+
+	def sendReturnDirections(self):
+		for user in self.main.bot.users:
+			if user.wantsTransportInfo:
+				if user.address is not None and user.wantsTransportInfo and user.address != '':
+					now = datetime.now()
+					lectures = self.main.lfetcher.getEventObjects(user.course, datetime.now().strftime('%Y-%m-%d'))
+					endTime = str(lectures[len(lectures)-1].end)[11:16]
+					time = datetime(int(now.year), int(now.month), int(now.day),
+									int(endTime[:2]), int(endTime[3:]))
+
+					try:
+						direc = Directions.Direction(time, user.address, True, True)
+						trainPlan = direc.create_message()
+
+						self.main.bot.sendMessage(user.chatID, 'Here are the public transport directions for your way home:')
+						self.main.bot.sendMessage(user.chatID, trainPlan)
+					except:
+						self.main.bot.sendMessage(user.chatID, (
+								'Could not fetch public transport directions for your address '
+								+ user.address))
+						logging.warning('In HelperFunctions(): Fetching directions for address %s not successful.',
+									  user.address)
 
 	def getUsers(self):
 		try:

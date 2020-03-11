@@ -24,13 +24,31 @@ def create_time_string(time):
 
 
 class Direction(object):
-    def __init__(self, arrival_date, initial_departure_place):
-        self.arrival_time = arrival_date.timestamp()
+    def __init__(self, date: datetime, place: str, return_journey=False, is_departure_time=False):
+        """
+        @param date: return_journey==True -> time of end of last lecture; else -> time of start of first lecture
+        @param place: home of student
+        @param return_journey: boolean whether its the return journey or not
+        """
+        self.date = date
+        self.arrival_time = date.timestamp()
 
-        self.directions_result = google_maps.directions(initial_departure_place,
-                                                        "Erzbergerstraße 121, 76133 Karlsruhe, Germany",
-                                                        mode="transit",
-                                                        arrival_time=self.arrival_time)
+        if return_journey:
+            self.directions_result = google_maps.directions("Erzbergerstraße 121, 76133 Karlsruhe, Germany",
+                                                            place,
+                                                            mode="transit",
+                                                            departure_time=self.date)
+        else:
+            if is_departure_time:
+                self.directions_result = google_maps.directions(place,
+                                                                "Erzbergerstraße 121, 76133 Karlsruhe, Germany",
+                                                                mode="transit",
+                                                                departure_time=self.arrival_time)
+            else:
+                self.directions_result = google_maps.directions(place,
+                                                            "Erzbergerstraße 121, 76133 Karlsruhe, Germany",
+                                                            mode="transit",
+                                                            arrival_time=self.arrival_time)
 
         self.result_as_json = json.dumps(self.directions_result, indent=4)
         self.result_as_json = json.loads(self.result_as_json)
@@ -121,7 +139,7 @@ class Direction(object):
             string += ") with "
             string += leg['train']['name']
             string += "_\n"
-        string += "🏫 *You're at DHBW at "
+        string += "🏫 *You reach your target at "
         string += create_time_string(trip_json['arrival_time'])
         string += "*"
         return string

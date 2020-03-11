@@ -12,25 +12,27 @@ class CommandFunctions:
 		# Provide help list for patrick with full command list and for other users with commands they can use.
 		if str(self.message.user.chatID) == str(telegram_secrets.patrick_telegram_id):
 			self.bot.sendMessageWithOptions(self.message.user.chatID,
-											"/help\n/stopbot\n/sendmessagetoeveryone\n\n/getmenu\n\n/getlectures\n\n/getmeme\n\n/reportbug\n\n/privacy\n/whatdoyouknowaboutme",
+											"/help\n/stopbot\n/sendmessagetoeveryone\n\n/getmenu\n\n/getlectures\n\n/getmeme\n\n/getdirections\n\n/reportbug\n\n/privacy\n/whatdoyouknowaboutme",
 											self.bot.generateReplyMarkup(
 												[['/stopbot'], ['/sendmessagetoeveryone'], ['/help'], ['/settings'],
-												 ['/getmenu'], ['/getlectures'], ['/getmeme'],
+												 ['/getmenu'], ['/getlectures'], ['/getmeme'], ['/getdirections']
 												 ['/reportbug'], ['/privacy'], ['/whatdoyouknowaboutme']]))
 		else:
 			replyString = ('*Help*: /help\n\n'
-				+ '*Settings*: /settings\n\n'
-				+ '*Menu*: /getmenu\n\n'
-				+ '*Lecture plan*: /getlectures\n\n'
-				+ 'Get your favorite *memes*: /getmeme\n\n'
-				+ 'To *report a bug*: /reportbug\n\n'
-				+ '*Privacy information*: /privacy\n'
-				+ 'To get *all information* we have about you: /whatdoyouknowaboutme\n\n'
-				+ 'If you have any questions, contact @PaddyOfficial on Telegram.')
+						   + '*Settings*: /settings\n\n'
+						   + '*Menu*: /getmenu\n\n'
+						   + '*Lecture plan*: /getlectures\n\n'
+						   + '*Public transport*: /getdirections\n\n'
+						   + 'Get your favorite *memes*: /getmeme\n\n'
+						   + '*Report a bug*: /reportbug\n\n'
+						   + '*Privacy information*: /privacy\n'
+						   + 'To get *all information* we have about you: /whatdoyouknowaboutme\n\n'
+						   + 'If you have any questions, contact @PaddyOfficial on Telegram.')
 			self.bot.sendMessageWithOptions(self.message.user.chatID, replyString,
 											self.bot.generateReplyMarkup(
 												[['/help'], ['/settings'], ['/getmenu'], ['/getlectures'], ['/getmeme'],
-												 ['/reportbug'], ['/privacy'], ['/whatdoyouknowaboutme']]))
+												 ['/getdirections']['/reportbug'], ['/privacy'],
+												 ['/whatdoyouknowaboutme']]))
 
 	def command_start(self):
 		self.bot.sendMessage(self.message.user.chatID, "Please send me your name so we get to know each other")
@@ -145,11 +147,21 @@ class CommandFunctions:
 				if user.wantsMenu and user.wantsToRateMeals:
 					self.bot.sendMessageWithOptions(user.chatID, (
 							"Please rate your meal today. The available meals were:\n\n" + mealString),
-														 self.bot.generateReplyMarkup(
-															 [['Meal 1', 'Meal 2', 'Meal 3'], ['Don\'t rate']]))
+													self.bot.generateReplyMarkup(
+														[['Meal 1', 'Meal 2', 'Meal 3'], ['Don\'t rate']]))
 					user.tempParams['ratingMealset'] = mealArr
 					user.expectedMessageType = 'mealtoberated'
 		else:
 			self.bot.log(("Wrong user " + str(self.message.user.chatID) + ", entered name " + str(
 				self.message.user.name) + " tried to stop the bot."))
 			self.bot.sendMessage(self.message.user.chatID, "You are not allowed to do this.")
+
+	def command_getdirections(self):
+		if self.message.user.address is not None and self.message.user.address != '':
+			print("here")
+			self.bot.sendMessageWithOptions(self.message.user.chatID, "What directions do you want?",
+											self.bot.generateReplyMarkup([['-> DHBW'], ['-> Home']]))
+			self.message.user.expectedMessageType = 'directionstype'
+		else:
+			self.bot.sendMessage(self.message.user.chatID,
+								 "I don\'t know your address. Please provide me this with /settings -> Personal Information")

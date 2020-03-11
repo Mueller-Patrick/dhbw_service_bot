@@ -27,6 +27,7 @@ class Main:
 		self.sentMenuToday = False
 		self.sentLecturesToday = False
 		self.askedForRatingToday = False
+		self.sentReturnDirectionsToday = False
 
 		# Configure logging
 		logfile = 'logs/main_application_' + datetime.now().strftime('%Y-%m-%d') + '.log'

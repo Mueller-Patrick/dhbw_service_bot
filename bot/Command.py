@@ -17,7 +17,7 @@ class Command:
 		# Defined commands
 		self.commands = ['/start', '/help', '/stopbot', '/privacy', '/whatdoyouknowaboutme', '/getmenu',
 						 '/sendmessagetoeveryone', '/getlectures', '/getmeme', '/reportbug', '/settings',
-						 '/adminrate']
+						 '/adminrate', '/getdirections']
 
 	# Used to find the requested command
 	def findCommand(self):
@@ -42,7 +42,8 @@ class Command:
 			# Commands only Patrick can use
 			'/stopbot': self.cfunctions.command_stopbot,
 			'/sendmessagetoeveryone': self.cfunctions.command_sendmessagetoeveryone,
-			'/adminrate': self.cfunctions.command_adminrate
+			'/adminrate': self.cfunctions.command_adminrate,
+			'/getdirections': self.cfunctions.command_getdirections
 		}
 
 		commandFunc = callCommandFunctions.get(command)
@@ -67,6 +68,8 @@ class Command:
 			'mealrating': self.mfunctions.message_mealrating,
 			# Expects a bug description
 			'bugdescription': self.mfunctions.message_bugdescription,
+			# Expects a direction type
+			'directionstype': self.mfunctions.message_directionstype,
 			# Settings
 			'settingstype': self.mfunctions.message_settingstype,
 			'settingspersonalinfo': self.mfunctions.message_settingspersonalinfo,

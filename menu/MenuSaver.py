@@ -186,6 +186,3 @@ class Reader(object):
 
     def get_day(self):
         return self.day
-
-
-print(Reader(1).get_menu_as_str())

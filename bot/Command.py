@@ -16,7 +16,8 @@ class Command:
 
 		# Defined commands
 		self.commands = ['/start', '/help', '/stopbot', '/privacy', '/whatdoyouknowaboutme', '/getmenu',
-						 '/sendmessagetoeveryone', '/getlectures', '/getmeme', '/reportbug', '/settings']
+						 '/sendmessagetoeveryone', '/getlectures', '/getmeme', '/reportbug', '/settings',
+						 '/adminrate']
 
 	# Used to find the requested command
 	def findCommand(self):
@@ -40,7 +41,8 @@ class Command:
 			'/settings': self.cfunctions.command_settings,
 			# Commands only Patrick can use
 			'/stopbot': self.cfunctions.command_stopbot,
-			'/sendmessagetoeveryone': self.cfunctions.command_sendmessagetoeveryone
+			'/sendmessagetoeveryone': self.cfunctions.command_sendmessagetoeveryone,
+			'/adminrate': self.cfunctions.command_adminrate
 		}
 
 		commandFunc = callCommandFunctions.get(command)

@@ -135,3 +135,21 @@ class CommandFunctions:
 											[['️🧍 Personal Information'], ['📲 Subscription-Settings'],
 											 ['🧨 Cancel']]))
 		self.message.user.expectedMessageType = 'settingstype'
+
+	def command_adminrate(self):
+		if str(self.message.user.chatID) == str(telegram_secrets.patrick_telegram_id):
+			mealArr = menu.Reader(1).get_food_with_ratings_as_string_array()
+
+			mealString = ("Meal 1:\n" + mealArr[0] + "\nMeal 2:\n" + mealArr[1] + "\nMeal 3:\n" + mealArr[2])
+			for user in self.bot.users:
+				if user.wantsMenu and user.wantsToRateMeals:
+					self.bot.sendMessageWithOptions(user.chatID, (
+							"Please rate your meal today. The available meals were:\n\n" + mealString),
+														 self.bot.generateReplyMarkup(
+															 [['Meal 1', 'Meal 2', 'Meal 3'], ['Don\'t rate']]))
+					user.tempParams['ratingMealset'] = mealArr
+					user.expectedMessageType = 'mealtoberated'
+		else:
+			self.bot.log(("Wrong user " + str(self.message.user.chatID) + ", entered name " + str(
+				self.message.user.name) + " tried to stop the bot."))
+			self.bot.sendMessage(self.message.user.chatID, "You are not allowed to do this.")

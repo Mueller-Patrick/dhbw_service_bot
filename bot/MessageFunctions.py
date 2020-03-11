@@ -84,7 +84,7 @@ class MessageFunctions:
 								'Could not fetch public transport directions for your address '
 								+ self.message.user.address))
 						logging.warning('In MessageFunctions(): Fetching directions for address %s not successful.',
-									  self.message.user.address)
+										self.message.user.address)
 
 		self.message.user.expectedMessageType = ''
 
@@ -93,8 +93,7 @@ class MessageFunctions:
 		if self.message.text == 'Today':
 			day = 0
 		elif self.message.text == 'Tomorrow':
-			# TODO: Change back after David's bugfix of the savedFoods
-			day = 0
+			day = 1
 		else:
 			day = 0
 
@@ -145,7 +144,7 @@ class MessageFunctions:
 
 		meme = self.bot.memes.getMeme(self.message.user.course, self.message.user.tempParams['requestedMemeType'],
 									  self.message.text)
-		# If the id is needed, clearly this getting sent here is the photo itself
+		# If the id is needed, clearly this getting sent here is the photo itself. Also make sure to save the file_id afterwards.
 		if meme[1]:
 			meme_id = self.bot.sendPhoto(self.message.user.chatID, meme[0], False)
 			self.bot.memes.addMemeId(self.message.user.course, meme[2], meme[3], meme_id)

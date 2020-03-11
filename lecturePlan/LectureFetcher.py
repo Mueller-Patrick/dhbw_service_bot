@@ -5,6 +5,7 @@ import json
 from icalevents.icalevents import events
 from icalendar import Calendar as cal, Event as ev
 import logging
+from datetime import datetime
 
 
 class LectureFetcher:
@@ -59,12 +60,12 @@ class LectureFetcher:
 	# The dayString needs to have the format YYYY-MM-DD (The only decent date format if you asked me)
 	def getLecturesByLink(self, link, dayString):
 		try:
-			lectures = events(link)
+			lectures = events(url=link)
 			lectures.sort()
 			returnList = []
 			for lec in lectures:
 				if dayString in str(lec):
-					returnList.append(str(lec))
+					returnList.append(lec)
 			return returnList
 		except:
 			print('LectureFetcher.getLecturesByLink: Invalid link or dayString given.')
@@ -92,7 +93,7 @@ class LectureFetcher:
 		lectures = self.getLecturesByCourseName(courseName, dayString)
 
 		if lectures and lectures != '':
-			beginTime = lectures[0][11:16]  # Get the substring from index 11 to index 16 of the first lecture (this
+			beginTime = str(lectures[0].start)[11:16]  # Get the substring from index 11 to index 16 of the first lecture (this
 			# substring is the HH:MM format of the begin time)
 			return beginTime
 		else:
@@ -108,14 +109,23 @@ class LectureFetcher:
 		else:
 			retString = ''
 			for lecture in lectures:
-				startIndexOfLecture = 26
-				endIndexOfLecture = lecture.index('(') - 1
+				beginTime = str(lecture.start)[11:16]
+				endTime = str(lecture.end)[11:16]
 				if retString != '':  # To skip the first item in the list
-					retString += ('\n' + lecture[11:16] + ': ' + lecture[startIndexOfLecture:endIndexOfLecture])
+					retString += ('\n' + beginTime + '-' + endTime + ': *' + lecture.summary + '*')
 				else:  # The first element doesnt need a line break at the start
-					retString += (lecture[11:16] + ': ' + lecture[startIndexOfLecture:endIndexOfLecture])
+					retString += (beginTime + '-' + endTime + ': *' + lecture.summary + '*')
 
 		return retString
+
+	def getEventObject(self, courseName, dayString):
+		lectures = self.getLecturesByCourseName(courseName, dayString)
+
+		# If no link for this course has been provided
+		if lectures == '':
+			return False
+		else:
+			return lectures
 
 	# Returns  true if the course has no users yet
 	def firstUserInCourse(self, courseName):

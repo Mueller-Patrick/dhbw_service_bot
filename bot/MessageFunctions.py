@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from maps import Directions
 from menu import Rater
 import logging
+import re
 
 
 class MessageFunctions:
@@ -30,7 +31,7 @@ class MessageFunctions:
 				+ 'each day. If you receive the menu push, I\'ll also ask you to *rate your meal*. If you don\'t '
 				+ 'want that, you can opt-out in the subscription settings.\n\nTo *get the daily menu at any time*, send /getmenu. If you forgot '
 				+ '*what lectures you have today*, type /getlectures to get the plan again. And if you want the *public '
-			    + 'transport directions* now, type /getdirections.\n\n'
+				+ 'transport directions* now, type /getdirections.\n\n'
 				+ 'We all love *memes*. Type /getmeme to access all of your favorite ones.\n\n'
 				+ 'If you find a *bug*, report it via /reportbug.\n\nAnd because I '
 				+ 'respect your *privacy*, type /privacy and /whatdoyouknowaboutme to get Info about what we save '
@@ -216,7 +217,8 @@ class MessageFunctions:
 				direc = Directions.Direction(datetime.now(), self.message.user.address, False, True)
 				trainPlan = direc.create_message()
 
-				self.bot.sendMessage(self.message.user.chatID, 'Here are the public transport directions for your way home:')
+				self.bot.sendMessage(self.message.user.chatID,
+									 'Here are the public transport directions for your way home:')
 				self.bot.sendMessage(self.message.user.chatID, trainPlan)
 			except:
 				self.bot.sendMessage(self.message.user.chatID, (
@@ -230,7 +232,8 @@ class MessageFunctions:
 				direc = Directions.Direction(datetime.now(), self.message.user.address, True, True)
 				trainPlan = direc.create_message()
 
-				self.bot.sendMessage(self.message.user.chatID, 'Here are the public transport directions for your way to DHBW:')
+				self.bot.sendMessage(self.message.user.chatID,
+									 'Here are the public transport directions for your way to DHBW:')
 				self.bot.sendMessage(self.message.user.chatID, trainPlan)
 			except:
 				self.bot.sendMessage(self.message.user.chatID, (
@@ -280,6 +283,16 @@ class MessageFunctions:
 											"Here are your Subscriptions:",
 											self.bot.generateReplyMarkup(options))
 			self.message.user.expectedMessageType = 'settingssubscriptions'
+		elif self.message.text == '⏰ Push Time Settings':
+			menuPushTime = self.message.user.pushTimes['menu']
+			lecturePushTime = self.message.user.pushTimes['lecture']
+			self.bot.sendMessageWithOptions(self.message.user.chatID,
+											"What push notification should come on another time? ",
+											self.bot.generateReplyMarkup(
+												[[('🍜 Menu Push (currently ' + menuPushTime + ')')],
+												 [('🕒 Lecture Plan Push (currently ' + lecturePushTime + ')')],
+												 ['⏪ Back']]))
+			self.message.user.expectedMessageType = 'settingstimes'
 		elif self.message.text == '🧨 Cancel':
 			self.bot.sendMessage(self.message.user.chatID, "ALLES BLEIBT HIER WIE ES IST.")
 			self.message.user.expectedMessageType = ''
@@ -287,7 +300,7 @@ class MessageFunctions:
 			self.bot.sendMessageWithOptions(self.message.user.chatID, "Wrong input. Please try again:",
 											self.bot.generateReplyMarkup(
 												[['️🧍 Personal Information'], ['📲 Subscription-Settings'],
-												 ['🧨 Cancel']]))
+												 ['⏰ Push Time Settings'], ['🧨 Cancel']]))
 
 	# Called when user sends the information that he wants to change his personal info
 	def message_settingspersonalinfo(self):
@@ -316,7 +329,7 @@ class MessageFunctions:
 			self.bot.sendMessageWithOptions(self.message.user.chatID, 'What do you want to change?',
 											self.bot.generateReplyMarkup(
 												[['️🧍 Personal Information'], ['📲 Subscription-Settings'],
-												 ['🧨 Cancel']]))
+												 ['⏰ Push Time Settings'], ['🧨 Cancel']]))
 			self.message.user.expectedMessageType = 'settingstype'
 		else:
 			self.bot.sendMessageWithOptions(self.message.user.chatID, "Wrong input. Please try again:",
@@ -371,7 +384,8 @@ class MessageFunctions:
 		elif self.message.text == '⏪ Back':
 			self.bot.sendMessageWithOptions(self.message.user.chatID, 'What do you want to change?',
 											self.bot.generateReplyMarkup([['️🧍 Personal Information'],
-																		  ['📲 Subscription-Settings'], ['🧨 Cancel']]))
+																		  ['📲 Subscription-Settings'],
+																		  ['⏰ Push Time Settings'], ['🧨 Cancel']]))
 			self.message.user.expectedMessageType = 'settingstype'
 		else:
 			# Fetch the user's subscriptions to show them the current status
@@ -401,6 +415,40 @@ class MessageFunctions:
 			self.bot.sendMessageWithOptions(self.message.user.chatID,
 											"Wrong input. Please try again:",
 											self.bot.generateReplyMarkup(options))
+
+	# Called when the user sends the information which push time he wants to change
+	def message_settingstimes(self):
+		if '🍜 Menu Push' in self.message.text:
+			menuPushTime = self.message.user.pushTimes['menu']
+			self.bot.sendMessage(self.message.user.chatID, (
+					"You currently receive the menu push at " + menuPushTime
+					+ ". To change that, send me the new time in the format *HH:MM*. Please notice that it has to be "
+					+ "between 00:00 and 10:59."))
+			self.message.user.tempParams['pushtimeToBeChanged'] = 'menu'
+			self.message.user.expectedMessageType = 'changepushtime'
+		elif '🕒 Lecture Plan Push' in self.message.text:
+			lecturePushTime = self.message.user.pushTimes['lecture']
+			self.bot.sendMessage(self.message.user.chatID, (
+					"You currently receive the lecture push at " + lecturePushTime
+					+ ". To change that, send me the new time in the format *HH:MM*. Please notice that it has to be "
+					+ "between 15:00 and 22:59."))
+			self.message.user.tempParams['pushtimeToBeChanged'] = 'lecture'
+			self.message.user.expectedMessageType = 'changepushtime'
+		elif '⏪ Back' in self.message.text:
+			self.bot.sendMessageWithOptions(self.message.user.chatID, "Wrong input. Please try again:",
+											self.bot.generateReplyMarkup(
+												[['️🧍 Personal Information'], ['📲 Subscription-Settings'],
+												 ['⏰ Push Time Settings'], ['🧨 Cancel']]))
+			self.message.user.expectedMessageType = 'settingstype'
+		else:
+			menuPushTime = self.message.user.pushTimes['menu']
+			lecturePushTime = self.message.user.pushTimes['lecture']
+			self.bot.sendMessageWithOptions(self.message.user.chatID,
+											"What push notification should come on another time? ",
+											self.bot.generateReplyMarkup(
+												[[('🍜 Menu Push (currently ' + menuPushTime + ')')],
+												 [('🕒 Lecture Plan Push (currently ' + lecturePushTime + ')')],
+												 ['⏪ Back']]))
 
 	# Called when the user sends the new info about him
 	def message_changepersonalinfo(self):
@@ -452,6 +500,62 @@ class MessageFunctions:
 		else:
 			logging.warning(
 				'Wrong type for changing personal info given in MessageFunctions.message_changepersonalinfo. Given type: %s',
+				type)
+
+	# Called when the user sends the new push time
+	def message_changepushtime(self):
+		type = self.message.user.tempParams['pushtimeToBeChanged']
+
+		#TODO: remove
+		print(self.message.text)
+
+		if type == 'menu':
+			# Possible values: 00:00 to 10:59
+			timeRegex = re.compile('[0-1][0-9]:[0-5][0-9]')
+			timeObj = timeRegex.search(self.message.text)
+
+			# A regex valid time is found and the time is valid
+			if timeObj is not None:
+				timeString = timeObj.group()
+				if int(timeString[:2]) <= 10:
+					self.message.user.pushTimes['menu'] = timeString
+					self.bot.sendMessage(self.message.user.chatID,
+									 ("Successfully updated your menu push time to " + timeString))
+					self.message.user.tempParams['pushtimeToBeChanged'] = ''
+					self.message.user.expectedMessageType = ''
+				else:
+					self.bot.sendMessage(self.message.user.chatID, (
+							"Invalid time: " + self.message.text
+							+ ". Please use the format HH:MM and notice that it has to be between 00:00 and 10:59"))
+			else:
+				self.bot.sendMessage(self.message.user.chatID, (
+						"Invalid time: " + self.message.text
+						+ ". Please use the format HH:MM and notice that it has to be between 00:00 and 10:59"))
+		elif type == 'lecture':
+			# Possible values: 15:00 to 22:59
+			timeRegex = re.compile('[1-2][0-9]:[0-5][0-9]')
+			timeObj = timeRegex.search(self.message.text)
+
+			# A regex valid time is found and the time is valid
+			if timeObj is not None:
+				timeString = timeObj.group()
+				if int(timeString[:2]) <= 22 and int(timeString[:2]) >= 15:
+					self.message.user.pushTimes['lecture'] = timeString
+					self.bot.sendMessage(self.message.user.chatID,
+									 ("Successfully updated your lecture push time to " + timeString))
+					self.message.user.tempParams['pushtimeToBeChanged'] = ''
+					self.message.user.expectedMessageType = ''
+				else:
+					self.bot.sendMessage(self.message.user.chatID, (
+							"Invalid time: " + self.message.text
+							+ ". Please use the format HH:MM and notice that it has to be between 15:00 and 22:59"))
+			else:
+				self.bot.sendMessage(self.message.user.chatID, (
+						"Invalid time: " + self.message.text
+						+ ". Please use the format HH:MM and notice that it has to be between 15:00 and 22:59"))
+		else:
+			logging.warning(
+				'Wrong type for changing push time given in MessageFunctions.message_changepushtime. Given type: %s',
 				type)
 
 	# Called when the user sends the new password for a course

@@ -112,9 +112,9 @@ class LectureFetcher:
 				beginTime = str(lecture.start)[11:16]
 				endTime = str(lecture.end)[11:16]
 				if retString != '':  # To skip the first item in the list
-					retString += ('\n' + beginTime + '-' + endTime + ': *' + lecture.summary + '*')
+					retString += ('\n' + beginTime + ' - ' + endTime + ': *' + lecture.summary + '*')
 				else:  # The first element doesnt need a line break at the start
-					retString += (beginTime + '-' + endTime + ': *' + lecture.summary + '*')
+					retString += (beginTime + ' - ' + endTime + ': *' + lecture.summary + '*')
 
 		return retString
 

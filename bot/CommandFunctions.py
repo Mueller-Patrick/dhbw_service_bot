@@ -83,7 +83,7 @@ class CommandFunctions:
 								 ("🏫 You are in the " + self.message.user.course + " course"))
 		else:
 			self.bot.sendMessage(self.message.user.chatID,
-								 "❓ But I don't know which course you are in, so I can't send you"
+								 "❓ But I don't know which course you are in, so I can't send you "
 								 + "your lecture plan :(")
 
 	def command_getmenu(self):
@@ -135,7 +135,7 @@ class CommandFunctions:
 		self.bot.sendMessageWithOptions(self.message.user.chatID, 'What do you want to change?',
 										self.bot.generateReplyMarkup(
 											[['️🧍 Personal Information'], ['📲 Subscription-Settings'],
-											 ['🧨 Cancel']]))
+											 ['⏰ Push Time Settings'], ['🧨 Cancel']]))
 		self.message.user.expectedMessageType = 'settingstype'
 
 	def command_adminrate(self):

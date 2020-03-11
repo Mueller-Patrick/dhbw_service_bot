@@ -24,10 +24,8 @@ class Main:
 		self.bot = bt.Bot(telegram_token=self.token, users=self.helperFunctions.getUsers(),
 						  lectureFetcher=self.lfetcher,
 						  memes=self.memes)
-		self.sentMenuToday = False
-		self.sentLecturesToday = False
-		self.askedForRatingToday = False
-		self.sentReturnDirectionsToday = False
+
+		self.customPushTimes = self.helperFunctions.getPreferredPushTimes()
 
 		# Configure logging
 		logfile = 'logs/main_application_' + datetime.now().strftime('%Y-%m-%d') + '.log'
@@ -62,7 +60,8 @@ class Main:
 				"wantsLecturePlan": user.wantsLecturePlan,
 				"address": user.address,
 				"wantsTransportInfo": user.wantsTransportInfo,
-				"wantsToRateMeals": user.wantsToRateMeals
+				"wantsToRateMeals": user.wantsToRateMeals,
+				"pushTimes": user.pushTimes
 			}
 			usersList.append(toAppend)
 		usersJson = json.dumps(usersList, indent=4)

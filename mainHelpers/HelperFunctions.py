@@ -47,72 +47,134 @@ class HelperFunctions:
 		self.main.bot.messagesReceivedToday = 0
 		self.main.bot.messagesSentToday = 0
 
-	def sendMenu(self):
-		for user in self.main.bot.users:
-			if user.wantsMenu:
-				fetchedMenu = menu.Reader(1).get_menu_as_arr()
-				self.main.bot.sendMessage(user.chatID, "Good morning " + user.name + ", here is the menu for today:")
-				for oneMenu in fetchedMenu:
-					self.main.bot.sendMessage(user.chatID, oneMenu)
+	def sendMenu(self, isCustomTime=False, customUser=None):
+		"""
+		Sends the menu to either all subscribers at normal time or a single subscriber at a special time
+		:param isCustomTime: Optional. If this is a custom time user or the regular push at 06:00
+		:param user: Optional. Just important if this is called for a specific user with a custom time
+		:return: void
+		"""
+		if isCustomTime:
+			fetchedMenu = menu.Reader(1).get_menu_as_arr()
+			self.main.bot.sendMessage(customUser.chatID,
+									  "Good morning " + customUser.name + ", here is the menu for today:")
+			for oneMenu in fetchedMenu:
+				self.main.bot.sendMessage(customUser.chatID, oneMenu)
+		else:
+			for user in self.main.bot.users:
+				if user.wantsMenu and user.pushTimes['menu'] == '06:00':
+					fetchedMenu = menu.Reader(1).get_menu_as_arr()
+					self.main.bot.sendMessage(user.chatID,
+											  "Good morning " + user.name + ", here is the menu for today:")
+					for oneMenu in fetchedMenu:
+						self.main.bot.sendMessage(user.chatID, oneMenu)
 
-	def sendLectures(self):
-		tomorrow = datetime.now() + timedelta(days=1)
-		dateString = tomorrow.strftime("%Y-%m-%d")  # to get the YYYY-MM-DD format that is required
+	def sendLectures(self, isCustomTime=False, customUser=None):
+		if isCustomTime:
+			tomorrow = datetime.now() + timedelta(days=1)
+			dateString = tomorrow.strftime("%Y-%m-%d")
 
-		# Fetch the lecture times for all courses
-		courses = self.main.lfetcher.getAllKnownCourses()
-		# Dict is gonna hold course as key and list[plan, firstLectureTime, meme] as value
-		courseDict = {}
+			if customUser.wantsLecturePlan and customUser.course != None:
+				plan = self.main.lfetcher.getFormattedLectures(customUser.course, dateString)
+				firstLectureTime = self.main.lfetcher.getFirstLectureTime(customUser.course, dateString)
 
-		for course in courses:
-			courseDict[course] = [self.main.lfetcher.getFormattedLectures(course, dateString),
-								  self.main.lfetcher.getFirstLectureTime(course, dateString),
-								  None]
-			if course == 'TINF19B4':
-				# Send memes for TINF19B4
 				meme = None
-				if 'Mathematik 1' in courseDict[course][0]:
-					meme = self.main.memes.getMeme(course, 'Felder-Memes', '-1')
-				elif 'Programmieren 1' in courseDict[course][0]:
-					meme = self.main.memes.getMeme(course, 'Geiger-Memes', '-1')
-				elif 'Theoretische Informatik I' in courseDict[course][0]:
-					meme = self.main.memes.getMeme(course, 'Rotzinger-Memes', '-1')
-				elif 'Projekt-Management 1' in courseDict[course][0]:
-					meme = self.main.memes.getMeme(course, 'Vetter-Memes', '-1')
-				elif 'Webengineering 1' in courseDict[course][0]:
-					meme = self.main.memes.getMeme(course, 'Eisenbiegler-Memes', '-1')
+				if customUser.course == 'TINF19B4':
+					# Send memes for TINF19B4
+					if 'Mathematik 1' in plan:
+						meme = self.main.memes.getMeme(customUser.course, 'Felder-Memes', '-1')
+					elif 'Programmieren 1' in plan:
+						meme = self.main.memes.getMeme(customUser.course, 'Geiger-Memes', '-1')
+					elif 'Theoretische Informatik I' in plan:
+						meme = self.main.memes.getMeme(customUser.course, 'Rotzinger-Memes', '-1')
+					elif 'Projekt-Management 1' in plan:
+						meme = self.main.memes.getMeme(customUser.course, 'Vetter-Memes', '-1')
+					elif 'Webengineering 1' in plan:
+						meme = self.main.memes.getMeme(customUser.course, 'Eisenbiegler-Memes', '-1')
 
-				courseDict[course][2] = meme
-
-		for user in self.main.bot.users:
-			if user.wantsLecturePlan and user.course != None:
-				plan = courseDict[user.course][0]
-				firstLectureTime = courseDict[user.course][1]
-
-				self.main.bot.sendMessage(user.chatID,
-										  ('Good evening ' + user.name + '. Tomorrow your first lecture begins '
+				self.main.bot.sendMessage(customUser.chatID,
+										  ('Good evening ' + customUser.name + '. Tomorrow your first lecture begins '
 										   + 'at ' + firstLectureTime + '. Here is the plan for tomorrow:'))
-				self.main.bot.sendMessage(user.chatID, plan)
+				self.main.bot.sendMessage(customUser.chatID, plan)
 
-				if courseDict[user.course][2] is not None:
-					self.sendMeme(user, courseDict[user.course][2])
+				if meme is not None:
+					self.sendMeme(customUser, meme)
 
-				if user.address is not None and user.wantsTransportInfo and user.address != '':
+				if customUser.address is not None and customUser.wantsTransportInfo and customUser.address != '':
 					time = datetime(int(tomorrow.year), int(tomorrow.month), int(tomorrow.day),
 									int(firstLectureTime[:2]), int(firstLectureTime[3:]))
 
 					try:
-						direc = Directions.Direction(time, user.address)
+						direc = Directions.Direction(time, customUser.address)
 						trainPlan = direc.create_message()
 
-						self.main.bot.sendMessage(user.chatID, 'Here are the public transport directions:')
-						self.main.bot.sendMessage(user.chatID, trainPlan)
+						self.main.bot.sendMessage(customUser.chatID, 'Here are the public transport directions:')
+						self.main.bot.sendMessage(customUser.chatID, trainPlan)
 					except:
-						self.main.bot.sendMessage(user.chatID, (
+						self.main.bot.sendMessage(customUser.chatID, (
 								'Could not fetch public transport directions for your address '
-								+ user.address))
+								+ customUser.address))
 						logging.warning('In HelperFunctions(): Fetching directions for address %s not successful.',
-									  user.address)
+										customUser.address)
+
+		else:
+			tomorrow = datetime.now() + timedelta(days=1)
+			dateString = tomorrow.strftime("%Y-%m-%d")  # to get the YYYY-MM-DD format that is required
+
+			# Fetch the lecture times for all courses
+			courses = self.main.lfetcher.getAllKnownCourses()
+			# Dict is gonna hold course as key and list[plan, firstLectureTime, meme] as value
+			courseDict = {}
+
+			for course in courses:
+				courseDict[course] = [self.main.lfetcher.getFormattedLectures(course, dateString),
+									  self.main.lfetcher.getFirstLectureTime(course, dateString),
+									  None]
+				if course == 'TINF19B4':
+					# Send memes for TINF19B4
+					meme = None
+					if 'Mathematik 1' in courseDict[course][0]:
+						meme = self.main.memes.getMeme(course, 'Felder-Memes', '-1')
+					elif 'Programmieren 1' in courseDict[course][0]:
+						meme = self.main.memes.getMeme(course, 'Geiger-Memes', '-1')
+					elif 'Theoretische Informatik I' in courseDict[course][0]:
+						meme = self.main.memes.getMeme(course, 'Rotzinger-Memes', '-1')
+					elif 'Projekt-Management 1' in courseDict[course][0]:
+						meme = self.main.memes.getMeme(course, 'Vetter-Memes', '-1')
+					elif 'Webengineering 1' in courseDict[course][0]:
+						meme = self.main.memes.getMeme(course, 'Eisenbiegler-Memes', '-1')
+
+					courseDict[course][2] = meme
+
+			for user in self.main.bot.users:
+				if user.wantsLecturePlan and user.course != None and user.pushTimes['lecture'] == '18:00':
+					plan = courseDict[user.course][0]
+					firstLectureTime = courseDict[user.course][1]
+
+					self.main.bot.sendMessage(user.chatID,
+											  ('Good evening ' + user.name + '. Tomorrow your first lecture begins '
+											   + 'at ' + firstLectureTime + '. Here is the plan for tomorrow:'))
+					self.main.bot.sendMessage(user.chatID, plan)
+
+					if courseDict[user.course][2] is not None:
+						self.sendMeme(user, courseDict[user.course][2])
+
+					if user.address is not None and user.wantsTransportInfo and user.address != '':
+						time = datetime(int(tomorrow.year), int(tomorrow.month), int(tomorrow.day),
+										int(firstLectureTime[:2]), int(firstLectureTime[3:]))
+
+						try:
+							direc = Directions.Direction(time, user.address)
+							trainPlan = direc.create_message()
+
+							self.main.bot.sendMessage(user.chatID, 'Here are the public transport directions:')
+							self.main.bot.sendMessage(user.chatID, trainPlan)
+						except:
+							self.main.bot.sendMessage(user.chatID, (
+									'Could not fetch public transport directions for your address '
+									+ user.address))
+							logging.warning('In HelperFunctions(): Fetching directions for address %s not successful.',
+											user.address)
 
 	# Send the given meme
 	def sendMeme(self, user, meme):
@@ -152,7 +214,7 @@ class HelperFunctions:
 				if user.address is not None and user.wantsTransportInfo and user.address != '':
 					now = datetime.now()
 					lectures = self.main.lfetcher.getEventObjects(user.course, datetime.now().strftime('%Y-%m-%d'))
-					endTime = str(lectures[len(lectures)-1].end)[11:16]
+					endTime = str(lectures[len(lectures) - 1].end)[11:16]
 					time = datetime(int(now.year), int(now.month), int(now.day),
 									int(endTime[:2]), int(endTime[3:]))
 
@@ -160,14 +222,15 @@ class HelperFunctions:
 						direc = Directions.Direction(time, user.address, True, True)
 						trainPlan = direc.create_message()
 
-						self.main.bot.sendMessage(user.chatID, 'Here are the public transport directions for your way home:')
+						self.main.bot.sendMessage(user.chatID,
+												  'Here are the public transport directions for your way home:')
 						self.main.bot.sendMessage(user.chatID, trainPlan)
 					except:
 						self.main.bot.sendMessage(user.chatID, (
 								'Could not fetch public transport directions for your address '
 								+ user.address))
 						logging.warning('In HelperFunctions(): Fetching directions for address %s not successful.',
-									  user.address)
+										user.address)
 
 	def getUsers(self):
 		try:
@@ -200,7 +263,41 @@ class HelperFunctions:
 				currentUser.wantsTransportInfo = user.get('wantsTransportInfo')
 			if user.get('wantsToRateMeals') is not None:
 				currentUser.wantsToRateMeals = user.get('wantsToRateMeals')
+			if user.get('pushTimes') is not None:
+				currentUser.pushTimes = user.get('pushTimes')
 
 			users.append(currentUser)
 
 		return users
+
+	"""
+	Returns all preferred pushTimes in this format:
+	
+	{
+		"time": [
+			[TYPE, USER]
+		]
+	}
+	
+	So we have a dict with all requested times where at each time every user that wants to get some type of push at 
+	this time is listed with his id and the type of message.
+	"""
+
+	def getPreferredPushTimes(self):
+		ret = {}
+		for user in self.main.bot.users:
+			# If it is not the standard push time
+			if user.pushTimes['menu'] != '06:00':
+				# If the time already exists in the array
+				if user.pushTimes['menu'] in list(ret):
+					ret[user.pushTimes['menu']].append(['menu', user])
+				else:
+					ret[user.pushTimes['menu']] = [['menu', user]]
+
+			if user.pushTimes['lecture'] != '18:00':
+				if user.pushTimes['lecture'] in list(ret):
+					ret[user.pushTimes['lecture']].append(['lecture', user])
+				else:
+					ret[user.pushTimes['lecture']] = [['lecture', user]]
+
+		return ret

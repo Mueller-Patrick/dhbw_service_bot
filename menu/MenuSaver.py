@@ -7,14 +7,14 @@ from menu import Utility as Util
 from datetime import timedelta
 
 
-def foods_to_json(food_array):
+def foods_to_json(food_array, day):
     foods = []
     for food_name in food_array:
         food = {
             "name": food_name,
             "rating": 0,
             "amount_of_ratings": 0,
-            "was_available_on": str(datetime.datetime.today().strftime("%Y-%m-%d"))
+            "was_available_on": str(day)
         }
         foods.append(food)
     return foods
@@ -81,7 +81,7 @@ class Saver(object):
 
         if self.menu.valid:
             # Save new foods
-            self.unsaved_foods = foods_to_json(self.menu.create_foods())
+            self.unsaved_foods = foods_to_json(self.menu.create_foods(), self.menu.create_date_string())
 
             self.foods = []
 
@@ -180,3 +180,6 @@ class Reader(object):
 
     def get_day(self):
         return self.day
+
+
+print(Reader(1).get_menu_as_str())

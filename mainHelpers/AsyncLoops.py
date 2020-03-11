@@ -27,7 +27,7 @@ class AsnycLoops:
 
 	async def pushLoop(self):
 		while True:
-			await asyncio.sleep(29)
+			await asyncio.sleep(31)
 			now = datetime.now()
 			timeString = now.strftime("%H:%M")
 			weekday = now.weekday()
@@ -45,29 +45,34 @@ class AsnycLoops:
 				sendPlanToday = False
 
 			# run daily at 06:00 for all users that want the menu
-			if str(timeString) == '06:00' and not self.main.sentMenuToday and canteenOpen:
-				self.main.sentMenuToday = True
+			if str(timeString) == '06:00' and canteenOpen:
 				logging.info('Sending menu')
 				self.helpers.sendMenu()
-			elif str(timeString) == '18:00' and not self.main.sentLecturesToday and sendPlanToday:
-				self.main.sentLecturesToday = True
+			elif str(timeString) == '18:00' and sendPlanToday:
 				logging.info('Sending lecture plans')
 				self.helpers.sendLectures()
-			elif str(timeString) == '14:30' and not self.main.askedForRatingToday and canteenOpen:
-				self.main.askedForRatingToday = True
+			elif str(timeString) == '14:30' and canteenOpen:
 				logging.info('Sending menu rating requests')
 				self.helpers.sendMenuRating()
-			elif str(timeString) == '10:00' and not self.main.sentReturnDirectionsToday:
-				self.main.sentReturnDirectionsToday = True
+			elif str(timeString) == '10:00':
 				logging.info('Sending return directions')
 				self.helpers.sendReturnDirections()
 			# Reset the boolean to send the menu for today again.
 			# Do this only if seconds < 30 because otherwise it would happen twice.
 			elif timeString == '23:59' and int(datetime.now().strftime('%S')) < 30:
-				logging.info('Resetting variables and writing usage stats')
+				logging.info('Writing usage stats')
 				self.helpers.writeUsageStats(True)
-				self.main.sentMenuToday = False
-				self.main.sentLecturesToday = False
+
+			# Run all the custom push times
+			if timeString in list(self.main.customPushTimes):
+				for pushPreference in self.main.customPushTimes[timeString]:
+					if pushPreference[0] == 'menu':
+						self.helpers.sendMenu(True, pushPreference[1])
+					elif pushPreference[0] == 'lecture':
+						self.helpers.sendLectures(True, pushPreference[1])
+					else:
+						logging.warning('AsyncLoops.pushLoop(): Tried to send custom push with unknown type %s',
+										pushPreference[0])
 
 			# Check if it should stop
 			if self.main.bot.tellMainToClose:
@@ -95,7 +100,8 @@ class AsnycLoops:
 						"wantsLecturePlan": user.wantsLecturePlan,
 						"address": user.address,
 						"wantsTransportInfo": user.wantsTransportInfo,
-						"wantsToRateMeals": user.wantsToRateMeals
+						"wantsToRateMeals": user.wantsToRateMeals,
+						"pushTimes": user.pushTimes
 					}
 					usersList.append(toAppend)
 				usersJson = json.dumps(usersList, indent=4)
@@ -109,6 +115,9 @@ class AsnycLoops:
 
 				# save usage stats
 				self.helpers.writeUsageStats(False)
+
+				# Also reload the custom push times in case something changed
+				self.main.customPushTimes = self.helpers.getPreferredPushTimes()
 
 				logging.info('Saved all preferences')
 

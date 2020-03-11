@@ -15,3 +15,7 @@ class User:
 		self.address = ''
 		self.wantsTransportInfo = False
 		self.wantsToRateMeals = True
+		self.pushTimes = {
+			'menu': '06:00',
+			'lecture': '18:00'
+		}

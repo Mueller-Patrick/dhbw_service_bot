@@ -15,7 +15,7 @@ class CommandFunctions:
 											"/help\n/stopbot\n/sendmessagetoeveryone\n\n/getmenu\n\n/getlectures\n\n/getmeme\n\n/getdirections\n\n/reportbug\n\n/privacy\n/whatdoyouknowaboutme",
 											self.bot.generateReplyMarkup(
 												[['/stopbot'], ['/sendmessagetoeveryone'], ['/help'], ['/settings'],
-												 ['/getmenu'], ['/getlectures'], ['/getmeme'], ['/getdirections']
+												 ['/getmenu'], ['/getlectures'], ['/getmeme'], ['/getdirections'],
 												 ['/reportbug'], ['/privacy'], ['/whatdoyouknowaboutme']]))
 		else:
 			replyString = ('*Help*: /help\n\n'
@@ -31,7 +31,7 @@ class CommandFunctions:
 			self.bot.sendMessageWithOptions(self.message.user.chatID, replyString,
 											self.bot.generateReplyMarkup(
 												[['/help'], ['/settings'], ['/getmenu'], ['/getlectures'], ['/getmeme'],
-												 ['/getdirections']['/reportbug'], ['/privacy'],
+												 ['/getdirections'], ['/reportbug'], ['/privacy'],
 												 ['/whatdoyouknowaboutme']]))
 
 	def command_start(self):
@@ -158,7 +158,6 @@ class CommandFunctions:
 
 	def command_getdirections(self):
 		if self.message.user.address is not None and self.message.user.address != '':
-			print("here")
 			self.bot.sendMessageWithOptions(self.message.user.chatID, "What directions do you want?",
 											self.bot.generateReplyMarkup([['-> DHBW'], ['-> Home']]))
 			self.message.user.expectedMessageType = 'directionstype'

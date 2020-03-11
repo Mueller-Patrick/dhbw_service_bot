@@ -193,7 +193,7 @@ class MessageFunctions:
 
 		rating = int(rating[:1])
 
-		if rating in (0, 5):
+		if rating in (0, 1, 2, 3, 4, 5):
 			ratedMeal = mealArr[int(self.message.user.tempParams['ratedMeal'][5]) - 1]
 			Rater.Rater(ratedMeal, rating)
 			self.bot.sendMessage(self.message.user.chatID, "Thank you for rating! 😁")

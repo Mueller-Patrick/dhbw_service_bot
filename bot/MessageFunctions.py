@@ -506,9 +506,6 @@ class MessageFunctions:
 	def message_changepushtime(self):
 		type = self.message.user.tempParams['pushtimeToBeChanged']
 
-		#TODO: remove
-		print(self.message.text)
-
 		if type == 'menu':
 			# Possible values: 00:00 to 10:59
 			timeRegex = re.compile('[0-1][0-9]:[0-5][0-9]')

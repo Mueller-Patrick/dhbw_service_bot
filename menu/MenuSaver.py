@@ -5,6 +5,7 @@ import datetime
 from menu import Requests
 from menu import Utility as Util
 from datetime import timedelta
+import logging
 
 
 def foods_to_json(food_array, day):
@@ -118,6 +119,8 @@ class Saver(object):
                 self.menus.append(self.unsaved_menu)
 
                 Util.save_data(menu_path, self.menus)
+        else:
+            logging.warning('In MenuSaver.Saver(): Fetched menu is not valid')
 
 
 def get_foods_as_arr():
@@ -134,6 +137,9 @@ class Reader(object):
         for x in data:
             if self.day == x['day']:
                 self.menu = x['menu']
+
+        if not self.menu:
+            logging.error('In MenuSaver.Reader(): Could not read today\'s menu')
 
     def get_food_with_ratings_as_string_array(self):
         data = Util.load_data("menu/savedFoods.json")

@@ -4,6 +4,7 @@
 import json
 from icalevents.icalevents import events
 from icalendar import Calendar as cal, Event as ev
+import logging
 
 
 class LectureFetcher:
@@ -35,10 +36,10 @@ class LectureFetcher:
 			return False
 
 	def addRaplaLink(self, courseName, link):
-		self.linkDict[courseName] = link
+		self.linkDict[courseName.upper()][0] = link
 
 	def writeLinksToJson(self):
-		linkJson = json.dumps(self.linkDict)
+		linkJson = json.dumps(self.linkDict, indent=4)
 
 		with open("lecturePlan/raplaLinks.json", "w") as raplaFile:
 			raplaFile.write(linkJson)
@@ -47,7 +48,10 @@ class LectureFetcher:
 	# Check if the course is already known. If not, returns false so we can go on and ask the user for the link.
 	def checkForCourse(self, course):
 		if course.upper() in self.linkDict:
-			return True
+			if self.linkDict[course.upper()][0] != '':
+				return True
+			else:
+				return False
 		else:
 			return False
 
@@ -69,31 +73,64 @@ class LectureFetcher:
 	# Get all events for this course
 	# The dayString needs to have the format YYYY-MM-DD (The only decent date format if you asked me)
 	def getLecturesByCourseName(self, courseName, dayString):
-		link = self.linkDict.get(courseName.upper())  # courseName.upper() writes the name in all caps
-		# just in case the user was to stupid to enter it right
-		return self.getLecturesByLink(link, dayString)
+		try:
+			link = self.linkDict.get(courseName.upper())[0]  # courseName.upper() writes the name in all caps
+			# just in case the user was to stupid to enter it right
+		except:
+			# If no link is found
+			link = ''
+
+		if link == '':
+			logging.warning('In LectureFetcher: Link for course %s not provided, but requested', courseName)
+			return ''
+		else:
+			return self.getLecturesByLink(link, dayString)
 
 	# Get the time when the first lecture begins
 	# The dayString needs to have the format YYYY-MM-DD (The only decent date format if you asked me)
 	def getFirstLectureTime(self, courseName, dayString):
 		lectures = self.getLecturesByCourseName(courseName, dayString)
-		if lectures:
+
+		if lectures and lectures != '':
 			beginTime = lectures[0][11:16]  # Get the substring from index 11 to index 16 of the first lecture (this
 			# substring is the HH:MM format of the begin time)
 			return beginTime
 		else:
+			logging.warning('In LectureFetcher.getFirstLectureTime(): Tried to fetch time but can\'t fetch plan')
 			return ''
 
 	def getFormattedLectures(self, courseName, dayString):
 		lectures = self.getLecturesByCourseName(courseName, dayString)
 
-		retString = ''
-		for lecture in lectures:
-			startIndexOfLecture = 26
-			endIndexOfLecture = lecture.index('(') - 1
-			if retString != '':  # To skip the first item in the list
-				retString += ('\n' + lecture[11:16] + ': ' + lecture[startIndexOfLecture:endIndexOfLecture])
-			else:  # The first element doesnt need a line break at the start
-				retString += (lecture[11:16] + ': ' + lecture[startIndexOfLecture:endIndexOfLecture])
+		# If no link for this course has been provided
+		if lectures == '':
+			retString = 'No RaPla link for this course has been provided. Please contact @PaddyOfficial.'
+		else:
+			retString = ''
+			for lecture in lectures:
+				startIndexOfLecture = 26
+				endIndexOfLecture = lecture.index('(') - 1
+				if retString != '':  # To skip the first item in the list
+					retString += ('\n' + lecture[11:16] + ': ' + lecture[startIndexOfLecture:endIndexOfLecture])
+				else:  # The first element doesnt need a line break at the start
+					retString += (lecture[11:16] + ': ' + lecture[startIndexOfLecture:endIndexOfLecture])
 
 		return retString
+
+	# Returns  true if the course has no users yet
+	def firstUserInCourse(self, courseName):
+		try:
+			firstUser = not self.linkDict.get(courseName.upper())[1]
+
+			return firstUser
+		except:
+			return True
+
+	def setUserOfCourse(self, courseName):
+		if courseName.upper() not in self.linkDict:
+			self.linkDict[courseName.upper()] = ['', True]
+		else:
+			self.linkDict[courseName.upper()][1] = True
+
+	def getAllKnownCourses(self):
+		return list(self.linkDict)

@@ -15,9 +15,8 @@ class Command:
 		self.mfunctions = mf.MessageFunctions(message, bot)
 
 		# Defined commands
-		self.commands = ['/start', '/help', '/stopbot', '/privacy', '/whatdoyouknowaboutme', '/subscribemenu',
-						 '/unsubscribemenu', '/getmenu', '/subscribelectureplan', '/unsubscribelectureplan',
-						 '/sendmessagetoeveryone', '/getlectures', '/subscribetraininfo', '/getmeme']
+		self.commands = ['/start', '/help', '/stopbot', '/privacy', '/whatdoyouknowaboutme', '/getmenu',
+						 '/sendmessagetoeveryone', '/getlectures', '/getmeme', '/reportbug', '/settings']
 
 	# Used to find the requested command
 	def findCommand(self):
@@ -29,20 +28,19 @@ class Command:
 
 	def performCommand(self, command):
 		callCommandFunctions = {
+			# Basic commands
 			'/help': self.cfunctions.command_help,
 			'/start': self.cfunctions.command_start,
-			'/stopbot': self.cfunctions.command_stopbot,
 			'/privacy': self.cfunctions.command_privacy,
-			'/subscribemenu': self.cfunctions.command_subscribemenu,
-			'/unsubscribemenu': self.cfunctions.command_unsubscribemenu,
 			'/whatdoyouknowaboutme': self.cfunctions.command_whatdoyouknowaboutme,
 			'/getmenu': self.cfunctions.command_getmenu,
-			'/subscribelectureplan': self.cfunctions.command_subscribelectureplan,
-			'/unsubscribelectureplan': self.cfunctions.command_unsubscribelectureplan,
-			'/sendmessagetoeveryone': self.cfunctions.command_sendmessagetoeveryone,
 			'/getlectures': self.cfunctions.command_getlectures,
-			'/subscribetraininfo': self.cfunctions.command_subscribetraininfo,
-			'/getmeme': self.cfunctions.command_getmeme
+			'/getmeme': self.cfunctions.command_getmeme,
+			'/reportbug': self.cfunctions.command_reportbug,
+			'/settings': self.cfunctions.command_settings,
+			# Commands only Patrick can use
+			'/stopbot': self.cfunctions.command_stopbot,
+			'/sendmessagetoeveryone': self.cfunctions.command_sendmessagetoeveryone
 		}
 
 		commandFunc = callCommandFunctions.get(command)
@@ -52,20 +50,31 @@ class Command:
 		type = self.message.user.expectedMessageType
 
 		callMessageFunctions = {
+			# No normal message expected
 			'': self.mfunctions.message_unknown,
-			'name': self.mfunctions.message_name,
-			'coursename': self.mfunctions.message_coursename,
-			'raplalink': self.mfunctions.message_raplalink,
-			'broadcastmessage': self.mfunctions.message_broadcastmessage,
-			'changecoursename': self.mfunctions.message_changecoursename,
-			'raplalinkwithoutpush': self.mfunctions.message_raplalinkwithoutpush,
-			'useraddress': self.mfunctions.message_useraddress,
+			# Name of user from /start
+			'startname': self.mfunctions.message_startname,
+			# Expects a day input from the user
 			'lectureplanday': self.mfunctions.message_lectureplanday,
 			'menuday': self.mfunctions.message_menuday,
+			# Meme-related stuff
 			'memetype': self.mfunctions.message_memetype,
 			'memeid': self.mfunctions.message_memeid,
+			# Meal-rating-related stuff
+			'mealtoberated': self.mfunctions.message_mealtoberated,
+			'mealrating': self.mfunctions.message_mealrating,
+			# Expects a bug description
+			'bugdescription': self.mfunctions.message_bugdescription,
+			# Settings
+			'settingstype': self.mfunctions.message_settingstype,
+			'settingspersonalinfo': self.mfunctions.message_settingspersonalinfo,
+			'settingssubscriptions': self.mfunctions.message_settingssubscriptions,
+			'changepersonalinfo': self.mfunctions.message_changepersonalinfo,
+			'newcoursepassword': self.mfunctions.message_newcoursepassword,
 			'coursepassword': self.mfunctions.message_coursepassword,
-			'changedcoursepassword': self.mfunctions.message_changedcoursepassword
+			'raplalink': self.mfunctions.message_raplalink,
+			# Broadcast function for Patrick
+			'broadcastmessage': self.mfunctions.message_broadcastmessage
 		}
 
 		messageFunc = callMessageFunctions.get(type)

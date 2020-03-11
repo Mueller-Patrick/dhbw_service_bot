@@ -89,10 +89,10 @@ class Memes:
 			return ['/help']
 
 	def addMemeId(self, course, typeIndex, memeIndex, file_id):
-		self.getMemeSourceList(typeIndex, memeIndex)[1] = file_id
+		self.getMemeSourceList(course, typeIndex, memeIndex)[1] = file_id
 
 		with open('memes/meme_meta.json', 'w')as memeFile:
-			memeFile.write(json.dumps(self.memeTypes[course]))
+			memeFile.write(json.dumps(self.memeTypes, indent=4))
 
 	def readMemeTypes(self):
 		try:
@@ -117,3 +117,9 @@ class Memes:
 	# Returns the access password for a given course
 	def getPassword(self, course):
 		return self.memeTypes['PASSWORDS'][course]
+
+	def setPassword(self, course, password):
+		self.memeTypes['PASSWORDS'][course] = password
+
+		with open('memes/meme_meta.json', 'w')as memeFile:
+			memeFile.write(json.dumps(self.memeTypes, indent=4))

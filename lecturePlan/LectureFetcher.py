@@ -118,7 +118,7 @@ class LectureFetcher:
 
 		return retString
 
-	def getEventObject(self, courseName, dayString):
+	def getEventObjects(self, courseName, dayString):
 		lectures = self.getLecturesByCourseName(courseName, dayString)
 
 		# If no link for this course has been provided

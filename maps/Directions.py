@@ -24,7 +24,7 @@ def create_time_string(time):
 
 
 class Direction(object):
-    def __init__(self, date: datetime, place: str, return_journey=False):
+    def __init__(self, date: datetime, place: str, return_journey=False, is_departure_time=False):
         """
         @param date: return_journey==True -> time of end of last lecture; else -> time of start of first lecture
         @param place: home of student
@@ -39,7 +39,13 @@ class Direction(object):
                                                             mode="transit",
                                                             departure_time=self.date)
         else:
-            self.directions_result = google_maps.directions(place,
+            if is_departure_time:
+                self.directions_result = google_maps.directions(place,
+                                                                "Erzbergerstraße 121, 76133 Karlsruhe, Germany",
+                                                                mode="transit",
+                                                                departure_time=self.arrival_time)
+            else:
+                self.directions_result = google_maps.directions(place,
                                                             "Erzbergerstraße 121, 76133 Karlsruhe, Germany",
                                                             mode="transit",
                                                             arrival_time=self.arrival_time)

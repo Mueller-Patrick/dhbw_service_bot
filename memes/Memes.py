@@ -40,6 +40,13 @@ class Memes:
 	# If type and meme are left blank, a random meme is returned.
 	# If only meme is blank, a random meme of this type is returned.
 	# list(DICTNAME)[INDEX] returns the key at this index
+	"""
+	This function returns the specified meme
+	@:param course The course in which the meme is to find
+	@:param type The type in which the meme is to find. Pass '-1' for random
+	@:param meme The unique name of the meme. Pass '-1' for random.
+	@:return A List with the required params of the meme, namingly: [FILE|FILE_ID, WE_NEED_THE_ID, TYPE_INDEX, MEME_INDEX]
+	"""
 	def getMeme(self, course, type, meme):
 		if type == '-1':
 			if meme == '-1':

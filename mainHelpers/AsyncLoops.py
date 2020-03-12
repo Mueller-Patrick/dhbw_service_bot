@@ -27,7 +27,7 @@ class AsnycLoops:
 
 	async def pushLoop(self):
 		while True:
-			await asyncio.sleep(31)
+			await asyncio.sleep(30)
 			now = datetime.now()
 			timeString = now.strftime("%H:%M")
 			weekday = now.weekday()
@@ -45,16 +45,16 @@ class AsnycLoops:
 				sendPlanToday = False
 
 			# run daily at 06:00 for all users that want the menu
-			if str(timeString) == '06:00' and canteenOpen:
+			if str(timeString) == '06:00' and canteenOpen and int(datetime.now().strftime('%S')) < 30:
 				logging.info('Sending menu')
 				self.helpers.sendMenu()
-			elif str(timeString) == '18:00' and sendPlanToday:
+			elif str(timeString) == '18:00' and sendPlanToday and int(datetime.now().strftime('%S')) < 30:
 				logging.info('Sending lecture plans')
 				self.helpers.sendLectures()
-			elif str(timeString) == '14:30' and canteenOpen:
+			elif str(timeString) == '14:30' and canteenOpen and int(datetime.now().strftime('%S')) < 30:
 				logging.info('Sending menu rating requests')
 				self.helpers.sendMenuRating()
-			elif str(timeString) == '10:00':
+			elif str(timeString) == '10:00' and int(datetime.now().strftime('%S')) < 30:
 				logging.info('Sending return directions')
 				self.helpers.sendReturnDirections()
 			# Reset the boolean to send the menu for today again.
@@ -64,7 +64,7 @@ class AsnycLoops:
 				self.helpers.writeUsageStats(True)
 
 			# Run all the custom push times
-			if timeString in list(self.main.customPushTimes):
+			if timeString in list(self.main.customPushTimes) and int(datetime.now().strftime('%S')) >= 30:
 				for pushPreference in self.main.customPushTimes[timeString]:
 					if pushPreference[0] == 'menu':
 						self.helpers.sendMenu(True, pushPreference[1])

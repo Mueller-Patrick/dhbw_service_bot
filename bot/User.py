@@ -19,3 +19,4 @@ class User:
 			'menu': '06:00',
 			'lecture': '18:00'
 		}
+		self.pauseAllNotifications = False

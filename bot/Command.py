@@ -80,6 +80,8 @@ class Command:
 			'newcoursepassword': self.mfunctions.message_newcoursepassword,
 			'coursepassword': self.mfunctions.message_coursepassword,
 			'raplalink': self.mfunctions.message_raplalink,
+			# If the user wants to unpause push notifications again when the next theory phase starts
+			'wantstounpausepush': self.mfunctions.message_wantstounpausepush,
 			# Broadcast function for Patrick
 			'broadcastmessage': self.mfunctions.message_broadcastmessage
 		}

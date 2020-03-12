@@ -29,7 +29,9 @@ class MessageFunctions:
 				+ 'you can set up which push-messages you want to get from me.\n\n'
 				+ 'My Push-Service includes lecture plan pushes, daily menu pushes and public transport information for '
 				+ 'each day. If you receive the menu push, I\'ll also ask you to *rate your meal*. If you don\'t '
-				+ 'want that, you can opt-out in the subscription settings.\n\nTo *get the daily menu at any time*, send /getmenu. If you forgot '
+				+ 'want that, you can opt-out in the subscription settings. To *pause all notifications* for example '
+			    + 'while you are in your practical phase, use /settings -> Subscription-Settings.\n\n'
+				+ 'To *get the daily menu at any time*, send /getmenu. If you forgot '
 				+ '*what lectures you have today*, type /getlectures to get the plan again. And if you want the *public '
 				+ 'transport directions* now, type /getdirections.\n\n'
 				+ 'We all love *memes*. Type /getmeme to access all of your favorite ones.\n\n'
@@ -257,6 +259,11 @@ class MessageFunctions:
 		elif self.message.text == '📲 Subscription-Settings':
 			# Fetch the user's subscriptions to show them the current status
 			options = []
+			if self.message.user.pauseAllNotifications:
+				options.append(['🔔 Unpause all Push Notifications'])
+			else:
+				options.append(['🔕 Pause all Push Notifications'])
+
 			if self.message.user.wantsMenu:
 				options.append(['❌ Unsubscribe the Menu Push'])
 			else:
@@ -338,7 +345,15 @@ class MessageFunctions:
 
 	# Called when user sends the information that he wants to change his subscription settings
 	def message_settingssubscriptions(self):
-		if self.message.text == '❌ Unsubscribe the Menu Push':
+		if self.message.text == '🔔 Unpause all Push Notifications':
+			self.message.user.pauseAllNotifications = False
+			self.bot.sendMessage(self.message.user.chatID, "Unpaused the Push Notifications. Just for you.")
+			self.message.user.expectedMessageType = ''
+		elif self.message.text == '🔕 Pause all Push Notifications':
+			self.message.user.pauseAllNotifications = True
+			self.bot.sendMessage(self.message.user.chatID, "Paused all Push Notifications. Just for you.")
+			self.message.user.expectedMessageType = ''
+		elif self.message.text == '❌ Unsubscribe the Menu Push':
 			self.message.user.wantsMenu = False
 			self.bot.sendMessage(self.message.user.chatID, "💔 Unsubscribed you from the menu push")
 			self.message.user.expectedMessageType = ''
@@ -390,6 +405,11 @@ class MessageFunctions:
 		else:
 			# Fetch the user's subscriptions to show them the current status
 			options = []
+			if self.message.user.pauseAllNotifications:
+				options.append(['🔔 Unpause all Push Notifications'])
+			else:
+				options.append(['🔕 Pause all Push Notifications'])
+
 			if self.message.user.wantsMenu:
 				options.append(['❌ Unsubscribe the Menu Push'])
 			else:
@@ -517,7 +537,7 @@ class MessageFunctions:
 				if int(timeString[:2]) <= 10:
 					self.message.user.pushTimes['menu'] = timeString
 					self.bot.sendMessage(self.message.user.chatID,
-									 ("Successfully updated your menu push time to " + timeString))
+										 ("Successfully updated your menu push time to " + timeString))
 					self.message.user.tempParams['pushtimeToBeChanged'] = ''
 					self.message.user.expectedMessageType = ''
 				else:
@@ -539,7 +559,7 @@ class MessageFunctions:
 				if int(timeString[:2]) <= 22 and int(timeString[:2]) >= 15:
 					self.message.user.pushTimes['lecture'] = timeString
 					self.bot.sendMessage(self.message.user.chatID,
-									 ("Successfully updated your lecture push time to " + timeString))
+										 ("Successfully updated your lecture push time to " + timeString))
 					self.message.user.tempParams['pushtimeToBeChanged'] = ''
 					self.message.user.expectedMessageType = ''
 				else:
@@ -611,3 +631,16 @@ class MessageFunctions:
 				self.bot.sendMessage(self.message.user.chatID,
 									 "Invalid link. Please try again. Write 'cancel' to cancel setup.")
 				self.message.user.expectedMessageType = 'raplalink'
+
+	def message_wantstounpausepush(self):
+		if self.message.text == 'Yes':
+			self.message.user.pauseAllNotifications = False
+			self.bot.sendMessage(self.message.user.chatID, "Unpaused your push notifications. Have a good start!")
+			self.message.user.expectedMessageType = ''
+		elif self.message.text == 'No':
+			self.bot.sendMessage(self.message.user.chatID, ("Ok, you still don\'t want any messages from me. If I can "
+															+ "do anything better, please tell me via /reportbug."))
+			self.message.user.expectedMessageType = ''
+		else:
+			self.bot.sendMessageWithOptions(self.message.user.chatID, "Wrong input. Please try again: ",
+											self.bot.generateReplyMarkup([['Yes', 'No']]))

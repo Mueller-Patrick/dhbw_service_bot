@@ -17,7 +17,7 @@ class AsnycLoops:
 				await self.main.bot.getUpdates()
 				self.main.bot.handleMessages()
 			except Exception as exc:
-				logging.error('Exception on mainLoop: %s', exc)
+				logging.error('Exception on mainLoop: %s, Traceback %s, context: %s', exc, exc.__traceback__, exc.__context__)
 
 			# Check if it should stop
 			if self.main.bot.tellMainToClose:

@@ -61,6 +61,11 @@ class HelperFunctions:
 			for oneMenu in fetchedMenu:
 				self.main.bot.sendMessage(customUser.chatID, oneMenu)
 		else:
+			# To save todays menu no matter if anyone gets the push, just so we have good statistics
+			# TODO: Before deployment: Davids fix of false fetches required!!!
+			# menu.Saver(1)
+
+			# Iterate over users and push the menu
 			for user in self.main.bot.users:
 				if user.wantsMenu and not user.pauseAllNotifications and user.pushTimes['menu'] == '06:00':
 					fetchedMenu = menu.Reader(1).get_menu_as_arr()

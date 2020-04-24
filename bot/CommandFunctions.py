@@ -87,13 +87,10 @@ class CommandFunctions:
 								 + "your lecture plan :(")
 
 	def command_getmenu(self):
-		# TODO: Re-enable after Corona Crisis is over
-		self.bot.sendMessage(self.message.user.chatID, 'Temporarily disabled because canteen is closed due to COVID-19.')
-		self.message.user.expectedMessageType = ''
-		# self.bot.sendMessageWithOptions(self.message.user.chatID, 'For which day do you want the plan?',
-		# 								self.bot.generateReplyMarkup([['Today', 'Tomorrow']]))
-		#
-		# self.message.user.expectedMessageType = 'menuday'
+		self.bot.sendMessageWithOptions(self.message.user.chatID, 'For which day do you want the plan?',
+										self.bot.generateReplyMarkup([['Today', 'Tomorrow']]))
+
+		self.message.user.expectedMessageType = 'menuday'
 
 	def command_getlectures(self):
 		if self.message.user.course == None or self.message.user.course == '':

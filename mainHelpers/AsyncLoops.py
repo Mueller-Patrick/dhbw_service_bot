@@ -46,16 +46,14 @@ class AsnycLoops:
 
 			# run daily at 06:00 for all users that want the menu
 			if str(timeString) == '06:00' and canteenOpen and int(datetime.now().strftime('%S')) < 30:
-				# TODO: Re-enable after Corona Crisis is over
 				logging.info('Sending menu')
-				# self.helpers.sendMenu()
+				self.helpers.sendMenu()
 			elif str(timeString) == '18:00' and sendPlanToday and int(datetime.now().strftime('%S')) < 30:
 				logging.info('Sending lecture plans')
 				self.helpers.sendLectures()
 			elif str(timeString) == '14:30' and canteenOpen and int(datetime.now().strftime('%S')) < 30:
-				# TODO: Re-enable after Corona Crisis is over
 				logging.info('Sending menu rating requests')
-				# self.helpers.sendMenuRating()
+				self.helpers.sendMenuRating()
 			elif str(timeString) == '10:00' and int(datetime.now().strftime('%S')) < 30:
 				logging.info('Sending return directions')
 				self.helpers.sendReturnDirections()

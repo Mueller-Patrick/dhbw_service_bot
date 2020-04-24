@@ -54,25 +54,29 @@ class HelperFunctions:
 		:param user: Optional. Just important if this is called for a specific user with a custom time
 		:return: void
 		"""
-		if isCustomTime and not customUser.pauseAllNotifications:
-			fetchedMenu = menu.Reader(1).get_menu_as_arr()
-			self.main.bot.sendMessage(customUser.chatID,
-									  "Good morning " + customUser.name + ", here is the menu for today:")
-			for oneMenu in fetchedMenu:
-				self.main.bot.sendMessage(customUser.chatID, oneMenu)
-		else:
-			# To save todays menu no matter if anyone gets the push, just so we have good statistics
-			# TODO: Before deployment: Davids fix of false fetches required!!!
-			# menu.Saver(1)
 
-			# Iterate over users and push the menu
-			for user in self.main.bot.users:
-				if user.wantsMenu and not user.pauseAllNotifications and user.pushTimes['menu'] == '06:00':
-					fetchedMenu = menu.Reader(1).get_menu_as_arr()
-					self.main.bot.sendMessage(user.chatID,
-											  "Good morning " + user.name + ", here is the menu for today:")
-					for oneMenu in fetchedMenu:
-						self.main.bot.sendMessage(user.chatID, oneMenu)
+		try:
+			if isCustomTime and not customUser.pauseAllNotifications:
+				fetchedMenu = menu.Reader(1).get_menu_as_arr()
+				self.main.bot.sendMessage(customUser.chatID,
+										  "Good morning " + customUser.name + ", here is the menu for today:")
+				for oneMenu in fetchedMenu:
+					self.main.bot.sendMessage(customUser.chatID, oneMenu)
+			else:
+				# To save todays menu no matter if anyone gets the push, just so we have good statistics
+				# TODO: Before deployment: Davids fix of false fetches required!!!
+				# menu.Saver(1)
+
+				# Iterate over users and push the menu
+				for user in self.main.bot.users:
+					if user.wantsMenu and not user.pauseAllNotifications and user.pushTimes['menu'] == '06:00':
+						fetchedMenu = menu.Reader(1).get_menu_as_arr()
+						self.main.bot.sendMessage(user.chatID,
+												  "Good morning " + user.name + ", here is the menu for today:")
+						for oneMenu in fetchedMenu:
+							self.main.bot.sendMessage(user.chatID, oneMenu)
+		except:
+			logging.error('Error occured during menu fetching for daily menu push. No push has been sent.')
 
 	def sendLectures(self, isCustomTime=False, customUser=None):
 		if isCustomTime:

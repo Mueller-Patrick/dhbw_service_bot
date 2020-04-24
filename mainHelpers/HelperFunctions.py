@@ -55,6 +55,7 @@ class HelperFunctions:
 		:return: void
 		"""
 
+		# Try-except to prevent bot from crashing due to an error during the fetching process
 		try:
 			if isCustomTime and not customUser.pauseAllNotifications:
 				fetchedMenu = menu.Reader(1).get_menu_as_arr()
@@ -299,20 +300,19 @@ class HelperFunctions:
 
 		return users
 
-	"""
-	Returns all preferred pushTimes in this format:
-	
-	{
-		"time": [
-			[TYPE, USER]
-		]
-	}
-	
-	So we have a dict with all requested times where at each time every user that wants to get some type of push at 
-	this time is listed with his id and the type of message.
-	"""
-
 	def getPreferredPushTimes(self):
+		"""
+			Returns all preferred pushTimes in this format:
+
+			{
+				"time": [
+					[TYPE, USER]
+				]
+			}
+
+			So we have a dict with all requested times where at each time every user that wants to get some type of push at
+			this time is listed with his id and the type of message.
+		"""
 		ret = {}
 		for user in self.main.bot.users:
 			# If it is not the standard push time

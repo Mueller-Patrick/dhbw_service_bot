@@ -461,10 +461,10 @@ class MessageFunctions:
 			self.message.user.tempParams['pushtimeToBeChanged'] = 'lecture'
 			self.message.user.expectedMessageType = 'changepushtime'
 		elif '⏪ Back' in self.message.text:
-			self.bot.sendMessageWithOptions(self.message.user.chatID, "Wrong input. Please try again:",
-											self.bot.generateReplyMarkup(
-												[['️🧍 Personal Information'], ['📲 Subscription-Settings'],
-												 ['⏰ Push Time Settings'], ['🧨 Cancel']]))
+			self.bot.sendMessageWithOptions(self.message.user.chatID, 'What do you want to change?',
+											self.bot.generateReplyMarkup([['️🧍 Personal Information'],
+																		  ['📲 Subscription-Settings'],
+																		  ['⏰ Push Time Settings'], ['🧨 Cancel']]))
 			self.message.user.expectedMessageType = 'settingstype'
 		else:
 			menuPushTime = self.message.user.pushTimes['menu']

@@ -28,10 +28,12 @@ class Main:
 		self.customPushTimes = self.helperFunctions.getPreferredPushTimes()
 
 		# Configure logging
-		logfile = 'logs/main_application_' + datetime.now().strftime('%Y-%m-%d') + '.log'
+		logfile = 'logs/main_application/main_application_' + datetime.now().strftime('%Y-%m-%d') + '.log'
 		logging.basicConfig(filename=logfile, level=logging.INFO,
 							format='%(asctime)s---%(levelname)s:%(message)s',
 							datefmt='%Y-%m-%d %H:%M:%S')
+		logging.getLogger("urrlib3").addHandler(
+			logging.FileHandler(('logs/urllib3/urllib3_' + datetime.now().strftime('%Y-%m-%d') + '.log')))
 
 		# Runs the three coroutines independent from each other
 		loop = asyncio.get_event_loop()

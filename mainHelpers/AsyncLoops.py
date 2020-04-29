@@ -67,8 +67,10 @@ class AsnycLoops:
 			if timeString in list(self.main.customPushTimes) and int(datetime.now().strftime('%S')) >= 30:
 				for pushPreference in self.main.customPushTimes[timeString]:
 					if pushPreference[0] == 'menu':
+						logging.info('Sending custom menu push')
 						self.helpers.sendMenu(True, pushPreference[1])
 					elif pushPreference[0] == 'lecture':
+						logging.info('Sending custom lecture push')
 						self.helpers.sendLectures(True, pushPreference[1])
 					else:
 						logging.warning('AsyncLoops.pushLoop(): Tried to send custom push with unknown type %s',

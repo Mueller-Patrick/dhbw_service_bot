@@ -20,3 +20,7 @@ class User:
 			'lecture': '18:00'
 		}
 		self.pauseAllNotifications = False
+
+		# Temporary variables that dont need to be persisted
+		self.sentMenuPushToday = False
+		self.sentLecturePushToday = False

@@ -1,10 +1,10 @@
-import telegram_secrets
 from menu import MenuSaver as menu
 from datetime import datetime, timedelta
 from maps import Directions
 from menu import Rater
 import logging
 import re
+import os
 
 
 class MessageFunctions:

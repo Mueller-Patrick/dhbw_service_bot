@@ -1,9 +1,9 @@
 import googlemaps
 import json
 from datetime import datetime
-import telegram_secrets
+import os
 
-google_maps = googlemaps.Client(key=telegram_secrets.google_API)
+google_maps = googlemaps.Client(key=os.environ.get('GOOGLE_API_TOKEN'))
 
 '''
     arrival_date: has to be a datetime object

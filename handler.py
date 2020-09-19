@@ -2,6 +2,7 @@ import json
 import telegram
 import os
 import logging
+import serverlessHandlers.HandleMessage as messageHandler
 
 
 # Logging is cool!
@@ -50,16 +51,10 @@ def webhook(event, context):
         update = telegram.Update.de_json(json.loads(event.get('body')), bot)
         chat_id = update.message.chat.id
         text = update.message.text
+        message_id = update.message.message_id
 
         # Entry point for incoming messages
-
-        ret_text = ("Hello fellow Nerd! I'm currently being ported to a new system and am therefore unavailable."
-            + " If you want to help or just check the progress, you can do that here:"
-            + " https://github.com/Mueller-Patrick/dhbw_service_bot. I'm going to be up and running again as soon"
-            + " as possible, so stay tuned!")
-
-        bot.sendMessage(chat_id=chat_id, text=ret_text)
-        logger.info('Message sent')
+        messageHandler.HandleMessage(bot, chat_id, text, message_id)
 
         return OK_RESPONSE
 

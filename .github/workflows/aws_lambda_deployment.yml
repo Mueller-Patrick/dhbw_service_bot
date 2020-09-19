@@ -12,10 +12,10 @@ jobs:
     - name: npm install
       uses: actions/setup-node@v1
       with:
-        node-version: '12'
+        node-version: '13'
     - run: npm install
     - name: serverless deploy
-      uses: serverless/github-action@master
+      uses: jackdcasey/github-action@python3.8-nodejs13
       with:
         args: deploy
       env:

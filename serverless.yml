@@ -3,9 +3,8 @@ service: aws-python-telegram-bot
 provider:
   name: aws
   runtime: python3.8
-  profile: ckl
   environment:
-    TELEGRAM_TOKEN: ${file(./serverless.env.yml):TELEGRAM_TOKEN, ''}
+    TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
 
 functions:
   webhook:

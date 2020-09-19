@@ -4,8 +4,6 @@ provider:
   name: aws
   runtime: python3.8
   stage: dev
-  environment:
-    TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
 
 functions:
   webhook:

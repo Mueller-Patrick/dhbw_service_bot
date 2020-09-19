@@ -52,12 +52,14 @@ def webhook(event, context):
         chat_id = update.message.chat.id
         text = update.message.text
 
-        if text == '/start':
-            text = """Hello, human! I am an echo bot, built with Python and the Serverless Framework.
-            You can take a look at my source code here: https://github.com/jonatasbaldin/serverless-telegram-bot.
-            If you have any issues, please drop a tweet to my creator: https://twitter.com/jonatsbaldin. Happy botting!"""
+        # Entry point for incoming messages
 
-        bot.sendMessage(chat_id=chat_id, text=text)
+        ret_text = """Hello fellow Nerd! I'm currently being ported to a new system and am therefore unavailable.
+            If you want to help or just check the progress, you can do that here: 
+            https://github.com/Mueller-Patrick/dhbw_service_bot. I'm going to be up and running again as soon
+            as possible, so stay tuned!"""
+
+        bot.sendMessage(chat_id=chat_id, text=ret_text)
         logger.info('Message sent')
 
         return OK_RESPONSE

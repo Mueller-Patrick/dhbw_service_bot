@@ -1,7 +1,6 @@
 """
  This class is used by the bot to run the commands.
 """
-import telegram_secrets
 from menu import MenuSaver as menu
 from datetime import datetime
 from bot import CommandFunctions as cf, MessageFunctions as mf

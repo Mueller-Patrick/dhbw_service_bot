@@ -1,6 +1,6 @@
-import telegram_secrets
 from menu import MenuSaver as menu
 from datetime import datetime
+import os
 
 
 class CommandFunctions:
@@ -10,7 +10,7 @@ class CommandFunctions:
 
 	def command_help(self):
 		# Provide help list for patrick with full command list and for other users with commands they can use.
-		if str(self.message.user.chatID) == str(telegram_secrets.patrick_telegram_id):
+		if str(self.message.user.chatID) == os.environ.get('PATRICK_TELEGRAM_ID'):
 			self.bot.sendMessageWithOptions(self.message.user.chatID,
 											"/help\n/stopbot\n/sendmessagetoeveryone\n\n/getmenu\n\n/getlectures\n\n/getmeme\n\n/getdirections\n\n/reportbug\n\n/privacy\n/whatdoyouknowaboutme",
 											self.bot.generateReplyMarkup(
@@ -39,7 +39,7 @@ class CommandFunctions:
 		self.message.user.expectedMessageType = 'startname'
 
 	def command_stopbot(self):
-		if str(self.message.user.chatID) == str(telegram_secrets.patrick_telegram_id):
+		if str(self.message.user.chatID) == os.environ.get('PATRICK_TELEGRAM_ID'):
 			self.bot.log("Stopping the bot now.")
 			self.bot.tellMainToClose = True
 		else:
@@ -103,7 +103,7 @@ class CommandFunctions:
 			self.message.user.expectedMessageType = 'lectureplanday'
 
 	def command_sendmessagetoeveryone(self):
-		if str(self.message.user.chatID) == str(telegram_secrets.patrick_telegram_id):
+		if str(self.message.user.chatID) == os.environ.get('PATRICK_TELEGRAM_ID'):
 			self.bot.sendMessage(self.message.user.chatID, "What do you want to broadcast?")
 			self.message.user.expectedMessageType = "broadcastmessage"
 		else:
@@ -139,7 +139,7 @@ class CommandFunctions:
 		self.message.user.expectedMessageType = 'settingstype'
 
 	def command_adminrate(self):
-		if str(self.message.user.chatID) == str(telegram_secrets.patrick_telegram_id):
+		if str(self.message.user.chatID) == os.environ.get('PATRICK_TELEGRAM_ID'):
 			mealArr = menu.Reader(1).get_food_with_ratings_as_string_array()
 
 			mealString = ("Meal 1:\n" + mealArr[0] + "\nMeal 2:\n" + mealArr[1] + "\nMeal 3:\n" + mealArr[2])

@@ -30,6 +30,7 @@ def configure_telegram():
     """
 
     TELEGRAM_TOKEN = os.environ.get('TELEGRAM_TOKEN')
+    logger.info('Telegram token: ' + TELEGRAM_TOKEN)
     if not TELEGRAM_TOKEN:
         logger.error('The TELEGRAM_TOKEN must be set')
         raise NotImplementedError

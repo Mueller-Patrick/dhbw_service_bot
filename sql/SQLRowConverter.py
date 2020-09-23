@@ -13,8 +13,8 @@ def getUser(sql_row):
 	address = sql_row[8]
 	wantsTransportInfo = sql_row[9] == 1
 	wantsToRateMeals = sql_row[10] == 1
-	menuPushTime = sql_row[11]
-	lecturePushTime = sql_row[12]
+	menuPushTime = str(sql_row[11])[0:5]
+	lecturePushTime = str(sql_row[12])[0:5]
 	pauseAllNotifications = sql_row[13] == 1
 
 

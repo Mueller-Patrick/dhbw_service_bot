@@ -19,7 +19,7 @@ class MessageFunctions:
 	def message_unknown(self):
 		self.bot.sendMessage(self.message.user.chatID,
 										'I don\'t know what to do with your input :( Use /help to get help:',
-										InlineKeyboardMarkup([[InlineKeyboardButton('/help')]]))
+										reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton('/help')]]))
 
 	# Called when user registers for the first time and sends his name
 	def message_startname(self):

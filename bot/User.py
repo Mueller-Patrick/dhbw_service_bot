@@ -5,6 +5,7 @@
 
 class User:
 	def __init__(self, chatID):
+		self.userID = ''
 		self.chatID = chatID
 		self.name = ''
 		self.expectedMessageType = ''

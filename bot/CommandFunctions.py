@@ -4,9 +4,10 @@ import os
 
 
 class CommandFunctions:
-	def __init__(self, message, bot):
+	def __init__(self, message, bot, conn):
 		self.message = message
 		self.bot = bot
+		self.conn = conn
 
 	def command_help(self):
 		# Provide help list for patrick with full command list and for other users with commands they can use.
@@ -37,15 +38,6 @@ class CommandFunctions:
 	def command_start(self):
 		self.bot.sendMessage(self.message.user.chatID, "Please send me your name so we get to know each other")
 		self.message.user.expectedMessageType = 'startname'
-
-	def command_stopbot(self):
-		if str(self.message.user.chatID) == os.environ.get('PATRICK_TELEGRAM_ID'):
-			self.bot.log("Stopping the bot now.")
-			self.bot.tellMainToClose = True
-		else:
-			self.bot.log(("Wrong user " + str(self.message.user.chatID) + ", entered name " + str(
-				self.message.user.name) + " tried to stop the bot."))
-			self.bot.sendMessage(self.message.user.chatID, "You are not allowed to do this.")
 
 	def command_privacy(self):
 		self.bot.sendMessage(self.message.user.chatID,

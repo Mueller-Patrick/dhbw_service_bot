@@ -42,7 +42,10 @@ class HandleMessage:
 
 		# Process message
 		try:
-			cmd.Command(message, bot, conn)
+			if message.isCommand:
+				cmd.Command(message, bot, conn).findCommand()
+			else:
+				cmd.Command(message, bot, conn).interpretMessage()
 		except:
 			e = sys.exc_info()[0]
 			logging.warning("An error occured handling the following message: %s. Error: %s", text, e)

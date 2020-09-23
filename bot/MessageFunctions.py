@@ -7,6 +7,7 @@ import re
 import os
 import bot.User as usr
 from telegram import ReplyKeyboardMarkup, KeyboardButton
+import logging
 
 
 class MessageFunctions:
@@ -246,9 +247,11 @@ class MessageFunctions:
 
 	# Called when user sends the description of a bug he encountered
 	def message_bugdescription(self):
-			self.bot.log(('Got a bug report by ' + self.message.user.name + ':\n\n' + self.message.text))
-			self.bot.sendMessage(self.message.user.chatID, "Thanks for reporting this bug. We will fix it ASAP.")
-			self.message.user.expectedMessageType = ''
+		logging.warning(('Got a bug report by ' + self.message.user.name + ':\n\n' + self.message.text))
+		self.bot.sendMessage(os.environ.get['PATRICK_TELEGRAM_ID'],
+							 ('Got a bug report by ' + self.message.user.name + ':\n\n' + self.message.text))
+		self.bot.sendMessage(self.message.user.chatID, "Thanks for reporting this bug. We will fix it ASAP.")
+		self.message.user.expectedMessageType = ''
 
 	def message_directionstype(self):
 		if self.message.text == '-> DHBW':

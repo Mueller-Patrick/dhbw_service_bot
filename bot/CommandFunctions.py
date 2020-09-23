@@ -2,6 +2,7 @@ from menu import MenuSaver as menu
 from datetime import datetime
 import os
 from telegram import ReplyKeyboardMarkup, KeyboardButton
+import logging
 
 
 class CommandFunctions:
@@ -117,7 +118,7 @@ class CommandFunctions:
 			self.bot.sendMessage(self.message.user.chatID, "What do you want to broadcast?")
 			self.message.user.expectedMessageType = "broadcastmessage"
 		else:
-			self.bot.log(("Wrong user " + str(self.message.user.chatID) + ", entered name " + str(
+			logging.warning(("Wrong user " + str(self.message.user.chatID) + ", entered name " + str(
 				self.message.user.name) + " tried to broadcast a message"))
 			self.bot.sendMessage(self.message.user.chatID, "You are not allowed to do this.")
 
@@ -169,7 +170,7 @@ class CommandFunctions:
 					user.tempParams['ratingMealset'] = mealArr
 					user.expectedMessageType = 'mealtoberated'
 		else:
-			self.bot.log(("Wrong user " + str(self.message.user.chatID) + ", entered name " + str(
+			logging.warning(("Wrong user " + str(self.message.user.chatID) + ", entered name " + str(
 				self.message.user.name) + " tried to stop the bot."))
 			self.bot.sendMessage(self.message.user.chatID, "You are not allowed to do this.")
 

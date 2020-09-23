@@ -47,7 +47,7 @@ class HandleMessage:
 			else:
 				cmd.Command(message, bot, conn).interpretMessage()
 		except:
-			e = sys.exc_info()[0]
+			e = sys.exc_info()
 			logging.warning("An error occured handling the following message: %s. Error: %s", text, e)
 			bot.sendMessage(chat_id,
 							"An Error occured while trying to fulfill your request. Currently, not all commands"

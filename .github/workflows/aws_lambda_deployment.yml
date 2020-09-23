@@ -14,7 +14,7 @@ jobs:
       with:
         node-version: '13'
     - name: Remove files that prevent successful deployment
-      run: rm README.md && rm LICENSE.md && rm CONTRIBUTING.md && rm -rf .docs
+      run: rm README.md && rm LICENSE.md && rm CONTRIBUTING.md && rm -rf docs/
     - run: npm install
     - name: serverless deploy
       uses: jackdcasey/github-action@python3.8-nodejs13

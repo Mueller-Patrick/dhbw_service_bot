@@ -15,7 +15,7 @@ class CommandFunctions:
 		# Provide help list for patrick with full command list and for other users with commands they can use.
 		if str(self.message.user.chatID) == os.environ.get('PATRICK_TELEGRAM_ID'):
 			self.bot.sendMessage(self.message.user.chatID,
-								 "/help\n/stopbot\n/sendmessagetoeveryone\n\n/getmenu\n\n/getlectures\n\n/getmeme\n\n/getdirections\n\n/reportbug\n\n/privacy\n/whatdoyouknowaboutme",
+								 "/help\n/stopbot\n/sendmessagetoeveryone\n\n/getmenu\n\n/getlectures\n\n/getdirections\n\n/reportbug\n\n/privacy\n/whatdoyouknowaboutme",
 								 reply_markup=ReplyKeyboardMarkup(
 									 [[KeyboardButton('/sendmessagetoeveryone')],
 									  [KeyboardButton('/help')],
@@ -33,7 +33,6 @@ class CommandFunctions:
 						   + '*Menu*: /getmenu\n\n'
 						   + '*Lecture plan*: /getlectures\n\n'
 						   + '*Public transport*: /getdirections\n\n'
-						   + 'Get your favorite *memes*: /getmeme\n\n'
 						   + '*Report a bug*: /reportbug\n\n'
 						   + '*Privacy information*: /privacy\n'
 						   + 'To get *all information* we have about you: /whatdoyouknowaboutme\n\n'
@@ -48,7 +47,8 @@ class CommandFunctions:
 									  [KeyboardButton('/reportbug')],
 									  [KeyboardButton('/privacy')],
 									  [KeyboardButton('/whatdoyouknowaboutme')]], resize_keyboard=True,
-									 one_time_keyboard=True))
+									 one_time_keyboard=True),
+								 parse_mode='Markdown')
 
 	def command_start(self):
 		self.bot.sendMessage(self.message.user.chatID, "Please send me your name so we get to know each other")

@@ -39,12 +39,11 @@ class MessageFunctions:
 				+ 'To *get the daily menu at any time*, send /getmenu. If you forgot '
 				+ '*what lectures you have today*, type /getlectures to get the plan again. And if you want the *public '
 				+ 'transport directions* now, type /getdirections.\n\n'
-				+ 'We all love *memes*. Type /getmeme to access all of your favorite ones.\n\n'
 				+ 'If you find a *bug*, report it via /reportbug.\n\nAnd because I '
 				+ 'respect your *privacy*, type /privacy and /whatdoyouknowaboutme to get Info about what we save '
 				+ 'about you. Last but not least, type /help to get a list of available commands.\n\n'
-				+ 'If you have any questions, contact @PaddyOfficial on Telegram.')
-		self.bot.sendMessage(self.message.user.chatID, welcomeMsg)
+				+ 'If you have any questions, contact @P4ddy_m on Telegram.')
+		self.bot.sendMessage(self.message.user.chatID, welcomeMsg, parse_mode='Markdown')
 		self.message.user.expectedMessageType = ''
 
 	# Called when Patrick wants to broadcast something
@@ -248,7 +247,7 @@ class MessageFunctions:
 	# Called when user sends the description of a bug he encountered
 	def message_bugdescription(self):
 		logging.warning(('Got a bug report by ' + self.message.user.name + ':\n\n' + self.message.text))
-		self.bot.sendMessage(os.environ.get['PATRICK_TELEGRAM_ID'],
+		self.bot.sendMessage(os.environ['PATRICK_TELEGRAM_ID'],
 							 ('Got a bug report by ' + self.message.user.name + ':\n\n' + self.message.text))
 		self.bot.sendMessage(self.message.user.chatID, "Thanks for reporting this bug. We will fix it ASAP.")
 		self.message.user.expectedMessageType = ''

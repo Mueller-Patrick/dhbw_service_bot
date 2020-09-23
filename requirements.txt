@@ -1,2 +1,2 @@
 python-telegram-bot==8.1.1
-
+mariadb

@@ -116,19 +116,19 @@ class Direction(object):
 
     def create_message(self):
         trip_json = json.loads(self.get_as_json())
-        string = "🌱 *Your ride starts at "
+        string = "🌱 <b>Your ride starts at "
         string += create_time_string(trip_json['departure_time'])
-        string += "*\n"
+        string += "</b>\n"
         for leg in trip_json['legs']:
             try:
                 if leg['train']['type'] == "Tram":
-                    string += "🚋 _"
+                    string += "🚋 <i>"
                 elif leg['train']['type'] == "Bus":
-                    string += "🚌 _"
+                    string += "🚌 <i>"
                 else:
-                    string += "🚅 _"
+                    string += "🚅 <i>"
             except:
-                string += "🚅 _"
+                string += "🚅 <i>"
             string += leg['departure']['station']
             string += " ("
             string += create_time_string(leg['departure']['scheduled'])
@@ -138,8 +138,8 @@ class Direction(object):
             string += create_time_string(leg['arrival']['scheduled'])
             string += ") with "
             string += leg['train']['name']
-            string += "_\n"
-        string += "🏫 *You reach your target at "
+            string += "</i>\n"
+        string += "🏫 <b>You reach your target at "
         string += create_time_string(trip_json['arrival_time'])
-        string += "*"
+        string += "</b>"
         return string

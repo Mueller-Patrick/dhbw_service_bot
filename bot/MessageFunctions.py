@@ -95,7 +95,7 @@ class MessageFunctions:
 						trainPlan = direc.create_message()
 
 						self.bot.sendMessage(self.message.user.chatID, 'Here are the public transport directions:')
-						self.bot.sendMessage(self.message.user.chatID, trainPlan)
+						self.bot.sendMessage(self.message.user.chatID, trainPlan, parse_mode=ParseMode.HTML)
 					except IndexError:
 						self.bot.sendMessage(self.message.user.chatID, (
 								'Could not fetch public transport directions for your address '
@@ -260,7 +260,7 @@ class MessageFunctions:
 
 				self.bot.sendMessage(self.message.user.chatID,
 									 'Here are the public transport directions for your way to DHBW:')
-				self.bot.sendMessage(self.message.user.chatID, trainPlan)
+				self.bot.sendMessage(self.message.user.chatID, trainPlan, parse_mode=ParseMode.HTML)
 			except:
 				self.bot.sendMessage(self.message.user.chatID, (
 						'Could not fetch public transport directions for your address '
@@ -275,7 +275,7 @@ class MessageFunctions:
 
 				self.bot.sendMessage(self.message.user.chatID,
 									 'Here are the public transport directions for your way home:')
-				self.bot.sendMessage(self.message.user.chatID, trainPlan)
+				self.bot.sendMessage(self.message.user.chatID, trainPlan, parse_mode=ParseMode.HTML)
 			except:
 				self.bot.sendMessage(self.message.user.chatID, (
 						'Could not fetch public transport directions for your address '

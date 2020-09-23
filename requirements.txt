@@ -1,6 +1,2 @@
 python-telegram-bot==8.1.1
-icalendar
-icalevents
-requests_html
-googlemaps
-mariadb
+

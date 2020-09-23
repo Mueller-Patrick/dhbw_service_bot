@@ -1,11 +1,11 @@
-import mariadb
+import pymysql
 import os
 import sys
 import logging
 
 def getConnection():
 	try:
-		conn = mariadb.connect(
+		conn = pymysql.connect(
 			user=os.environ['AWS_DHBW_Bot_SQL_USER'],
 			password=os.environ['AWS_DHBW_Bot_SQL_PASSWORD'],
 			host=os.environ['AWS_DHBW_Bot_SQL_SERVER'],
@@ -14,6 +14,6 @@ def getConnection():
 		)
 
 		return conn
-	except mariadb.Error as e:
+	except pymysql.Error as e:
 		logging.error('SQL Connection error: %s', e)
 		return

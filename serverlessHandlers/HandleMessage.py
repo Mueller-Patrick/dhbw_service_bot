@@ -20,7 +20,7 @@ class HandleMessage:
 	def __init__(self, bot, chat_id, text, message_id):
 		# Get user object from SQL
 		conn = sqlhandler.getConnection()
-		cur = conn.cursor(prepared=True)
+		cur = conn.cursor()
 		select_user_query = """SELECT userID, chatID, name, expectedMsgType, tempParams, wantsMenu, course, wantsLecturePlan, address, wantsTransportInfo, wantsToRateMeals, menuPushTime, lecturePushTime, pauseAllNotifications FROM users WHERE chatID = %s"""
 		cur.execute(select_user_query, (chat_id,))
 		userSqlRow = cur.fetchall()
@@ -37,10 +37,6 @@ class HandleMessage:
 			newUser = True
 		cur.close()
 
-		if bot == 12:
-			print(user.name)
-			return
-
 		# Create the message object
 		message = msg.Message(user, text, message_id)
 
@@ -56,7 +52,7 @@ class HandleMessage:
 							+ " here: https://github.com/Mueller-Patrick/dhbw_service_bot")
 
 		# Save user object to SQL
-		cur = conn.cursor(prepared=True)
+		cur = conn.cursor()
 		if newUser:
 			print("new")
 			insert_user_query = """INSERT INTO users (chatID, name, expectedMsgType, tempParams, wantsMenu, course, wantsLecturePlan, address, wantsTransportInfo, wantsToRateMeals, menuPushTime, lecturePushTime, pauseAllNotifications) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
@@ -68,7 +64,3 @@ class HandleMessage:
 
 		conn.commit()
 		conn.close()
-
-
-if __name__ == '__main__':
-	HandleMessage(12, 230970888, "Test", 123456778)

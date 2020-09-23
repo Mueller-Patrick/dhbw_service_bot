@@ -47,7 +47,7 @@ class MessageFunctions:
 	# Called when Patrick wants to broadcast something
 	def message_broadcastmessage(self):
 		users = []
-		cur = self.conn.cursor(prepared=True)
+		cur = self.conn.cursor()
 		getAllUsersString = """SELECT chatID FROM users WHERE userID = 1"""
 		cur.execute(getAllUsersString)
 		userRows = cur.fetchall()

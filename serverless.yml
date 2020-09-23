@@ -18,3 +18,9 @@ functions:
 
 plugins:
   - serverless-python-requirements
+
+package:
+  exclude:
+    - README.md
+    - LICENSE.md
+    - CONTRIBUTING.md

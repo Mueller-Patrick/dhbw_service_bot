@@ -28,15 +28,15 @@ class CommandFunctions:
 									  [KeyboardButton('/whatdoyouknowaboutme')]], resize_keyboard=True,
 									 one_time_keyboard=True))
 		else:
-			replyString = ('*Help*: /help\n\n'
-						   + '*Settings*: /settings\n\n'
-						   + '*Menu*: /getmenu\n\n'
-						   + '*Lecture plan*: /getlectures\n\n'
-						   + '*Public transport*: /getdirections\n\n'
-						   + '*Report a bug*: /reportbug\n\n'
-						   + '*Privacy information*: /privacy\n'
-						   + 'To get *all information* we have about you: /whatdoyouknowaboutme\n\n'
-						   + 'If you have any questions, contact @PaddyOfficial on Telegram.')
+			replyString = ('<b>Help</b>: /help\n\n'
+						   + '<b>Settings</b>: /settings\n\n'
+						   + '<b>Menu</b>: /getmenu\n\n'
+						   + '<b>Lecture plan</b>: /getlectures\n\n'
+						   + '<b>Public transport</b>: /getdirections\n\n'
+						   + '<b>Report a bug</b>: /reportbug\n\n'
+						   + '<b>Privacy information</b>: /privacy\n'
+						   + 'To get <b>all information</b> we have about you: /whatdoyouknowaboutme\n\n'
+						   + 'If you have any questions, contact @P4ddy_m on Telegram.')
 			self.bot.sendMessage(self.message.user.chatID, replyString,
 								 reply_markup=ReplyKeyboardMarkup(
 									 [[KeyboardButton('/help')],
@@ -48,7 +48,7 @@ class CommandFunctions:
 									  [KeyboardButton('/privacy')],
 									  [KeyboardButton('/whatdoyouknowaboutme')]], resize_keyboard=True,
 									 one_time_keyboard=True),
-								 parse_mode=ParseMode.MARKDOWN)
+								 parse_mode=ParseMode.HTML)
 
 	def command_start(self):
 		self.bot.sendMessage(self.message.user.chatID, "Please send me your name so we get to know each other")

@@ -6,7 +6,7 @@ import logging
 import re
 import os
 import bot.User as usr
-from telegram import ReplyKeyboardMarkup, KeyboardButton
+from telegram import ReplyKeyboardMarkup, KeyboardButton, ParseMode
 import logging
 
 
@@ -43,7 +43,7 @@ class MessageFunctions:
 				+ 'respect your *privacy*, type /privacy and /whatdoyouknowaboutme to get Info about what we save '
 				+ 'about you. Last but not least, type /help to get a list of available commands.\n\n'
 				+ 'If you have any questions, contact @P4ddy_m on Telegram.')
-		self.bot.sendMessage(self.message.user.chatID, welcomeMsg, parse_mode='Markdown')
+		self.bot.sendMessage(self.message.user.chatID, welcomeMsg, parse_mode=ParseMode.MARKDOWN)
 		self.message.user.expectedMessageType = ''
 
 	# Called when Patrick wants to broadcast something

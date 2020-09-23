@@ -1,7 +1,7 @@
 from menu import MenuSaver as menu
 from datetime import datetime
 import os
-from telegram import ReplyKeyboardMarkup, KeyboardButton
+from telegram import ReplyKeyboardMarkup, KeyboardButton, ParseMode
 import logging
 
 
@@ -48,7 +48,7 @@ class CommandFunctions:
 									  [KeyboardButton('/privacy')],
 									  [KeyboardButton('/whatdoyouknowaboutme')]], resize_keyboard=True,
 									 one_time_keyboard=True),
-								 parse_mode='Markdown')
+								 parse_mode=ParseMode.MARKDOWN)
 
 	def command_start(self):
 		self.bot.sendMessage(self.message.user.chatID, "Please send me your name so we get to know each other")

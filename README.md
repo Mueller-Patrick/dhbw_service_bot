@@ -39,11 +39,8 @@ For a list of supported commands, see
 
 **KNOWN ISSUES**<br>
 Due to the port to AWS Lambda and the simultaneous switch to the official python telegram library, some commands
-are currently not working, including, but not limited to:<br>
+are currently not working, including, but not certainly limited to:<br>
 <ul>
-    <li>/help</li>
-    <li>/settings</li>
-    <li>/getmenu</li>
+    <li>/getlectures</li>
 </ul>
-This is because for these commands, we generate a reply markup, which is done differently with the new library, so we
-need to switch that to the new behavior first. This is going to be done ASAP by Patrick.
+This is because for these commands, we use old data types or functions that don't work on the new system yet.

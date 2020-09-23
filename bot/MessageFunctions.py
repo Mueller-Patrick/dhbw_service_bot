@@ -27,23 +27,23 @@ class MessageFunctions:
 	def message_startname(self):
 		self.message.user.name = self.message.text
 		welcomeMsg = (
-				'Hello, *' + self.message.text + '*! Pleased to meet you! To get you started, I\'ll now explain to '
+				'Hello, <b>' + self.message.text + '</b>! Pleased to meet you! To get you started, I\'ll now explain to '
 				+ 'you the stuff I\'m able to do and what commands you may use.\n\n'
-				+ 'To *set everything up*, use the /settings command. Under \'Personal Information\' you can add or '
+				+ 'To <b>set everything up</b>, use the /settings command. Under \'Personal Information\' you can add or '
 				+ 'change the Information that I need about you to provide my services to you. Under \'Subscription-Settings\' '
 				+ 'you can set up which push-messages you want to get from me.\n\n'
 				+ 'My Push-Service includes lecture plan pushes, daily menu pushes and public transport information for '
-				+ 'each day. If you receive the menu push, I\'ll also ask you to *rate your meal*. If you don\'t '
-				+ 'want that, you can opt-out in the subscription settings. To *pause all notifications* for example '
+				+ 'each day. If you receive the menu push, I\'ll also ask you to <b>rate your meal</b>. If you don\'t '
+				+ 'want that, you can opt-out in the subscription settings. To <b>pause all notifications</b> for example '
 				+ 'while you are in your practical phase, use /settings -> Subscription-Settings.\n\n'
-				+ 'To *get the daily menu at any time*, send /getmenu. If you forgot '
-				+ '*what lectures you have today*, type /getlectures to get the plan again. And if you want the *public '
-				+ 'transport directions* now, type /getdirections.\n\n'
-				+ 'If you find a *bug*, report it via /reportbug.\n\nAnd because I '
-				+ 'respect your *privacy*, type /privacy and /whatdoyouknowaboutme to get Info about what we save '
+				+ 'To <b>get the daily menu at any time</b>, send /getmenu. If you forgot '
+				+ '<b>what lectures you have today</b>, type /getlectures to get the plan again. And if you want the <b>public '
+				+ 'transport directions</b> now, type /getdirections.\n\n'
+				+ 'If you find a <b>bug</b>, report it via /reportbug.\n\nAnd because I '
+				+ 'respect your <b>privacy</b>, type /privacy and /whatdoyouknowaboutme to get Info about what we save '
 				+ 'about you. Last but not least, type /help to get a list of available commands.\n\n'
 				+ 'If you have any questions, contact @P4ddy_m on Telegram.')
-		self.bot.sendMessage(self.message.user.chatID, welcomeMsg, parse_mode=ParseMode.MARKDOWN)
+		self.bot.sendMessage(self.message.user.chatID, welcomeMsg, parse_mode=ParseMode.HTML)
 		self.message.user.expectedMessageType = ''
 
 	# Called when Patrick wants to broadcast something
@@ -510,7 +510,7 @@ class MessageFunctions:
 			menuPushTime = self.message.user.pushTimes['menu']
 			self.bot.sendMessage(self.message.user.chatID, (
 					"You currently receive the menu push at " + menuPushTime
-					+ ". To change that, send me the new time in the format *HH:MM*. Please notice that it has to be "
+					+ ". To change that, send me the new time in the format <b>HH:MM</b>. Please notice that it has to be "
 					+ "between 00:00 and 10:59."))
 			self.message.user.tempParams['pushtimeToBeChanged'] = 'menu'
 			self.message.user.expectedMessageType = 'changepushtime'
@@ -518,8 +518,8 @@ class MessageFunctions:
 			lecturePushTime = self.message.user.pushTimes['lecture']
 			self.bot.sendMessage(self.message.user.chatID, (
 					"You currently receive the lecture push at " + lecturePushTime
-					+ ". To change that, send me the new time in the format *HH:MM*. Please notice that it has to be "
-					+ "between 15:00 and 22:59."))
+					+ ". To change that, send me the new time in the format <b>HH:MM</b>. Please notice that it has to be "
+					+ "between 15:00 and 22:59."), parse_mode=ParseMode.HTML)
 			self.message.user.tempParams['pushtimeToBeChanged'] = 'lecture'
 			self.message.user.expectedMessageType = 'changepushtime'
 		elif '⏪ Back' in self.message.text:

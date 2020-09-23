@@ -259,7 +259,7 @@ class MessageFunctions:
 				trainPlan = direc.create_message()
 
 				self.bot.sendMessage(self.message.user.chatID,
-									 'Here are the public transport directions for your way home:')
+									 'Here are the public transport directions for your way to DHBW:')
 				self.bot.sendMessage(self.message.user.chatID, trainPlan)
 			except:
 				self.bot.sendMessage(self.message.user.chatID, (
@@ -274,7 +274,7 @@ class MessageFunctions:
 				trainPlan = direc.create_message()
 
 				self.bot.sendMessage(self.message.user.chatID,
-									 'Here are the public transport directions for your way to DHBW:')
+									 'Here are the public transport directions for your way home:')
 				self.bot.sendMessage(self.message.user.chatID, trainPlan)
 			except:
 				self.bot.sendMessage(self.message.user.chatID, (

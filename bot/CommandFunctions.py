@@ -1,6 +1,7 @@
 from menu import MenuSaver as menu
 from datetime import datetime
 import os
+from telegram import ReplyKeyboardMarkup, KeyboardButton
 
 
 class CommandFunctions:
@@ -12,12 +13,19 @@ class CommandFunctions:
 	def command_help(self):
 		# Provide help list for patrick with full command list and for other users with commands they can use.
 		if str(self.message.user.chatID) == os.environ.get('PATRICK_TELEGRAM_ID'):
-			self.bot.sendMessageWithOptions(self.message.user.chatID,
-											"/help\n/stopbot\n/sendmessagetoeveryone\n\n/getmenu\n\n/getlectures\n\n/getmeme\n\n/getdirections\n\n/reportbug\n\n/privacy\n/whatdoyouknowaboutme",
-											self.bot.generateReplyMarkup(
-												[['/stopbot'], ['/sendmessagetoeveryone'], ['/help'], ['/settings'],
-												 ['/getmenu'], ['/getlectures'], ['/getmeme'], ['/getdirections'],
-												 ['/reportbug'], ['/privacy'], ['/whatdoyouknowaboutme']]))
+			self.bot.sendMessage(self.message.user.chatID,
+								 "/help\n/stopbot\n/sendmessagetoeveryone\n\n/getmenu\n\n/getlectures\n\n/getmeme\n\n/getdirections\n\n/reportbug\n\n/privacy\n/whatdoyouknowaboutme",
+								 reply_markup=ReplyKeyboardMarkup(
+									 [[KeyboardButton('/sendmessagetoeveryone')],
+									  [KeyboardButton('/help')],
+									  [KeyboardButton('/settings')],
+									  [KeyboardButton('/getmenu')],
+									  [KeyboardButton('/getlectures')],
+									  [KeyboardButton('/getdirections')],
+									  [KeyboardButton('/reportbug')],
+									  [KeyboardButton('/privacy')],
+									  [KeyboardButton('/whatdoyouknowaboutme')]], resize_keyboard=True,
+									 one_time_keyboard=True))
 		else:
 			replyString = ('*Help*: /help\n\n'
 						   + '*Settings*: /settings\n\n'
@@ -29,11 +37,17 @@ class CommandFunctions:
 						   + '*Privacy information*: /privacy\n'
 						   + 'To get *all information* we have about you: /whatdoyouknowaboutme\n\n'
 						   + 'If you have any questions, contact @PaddyOfficial on Telegram.')
-			self.bot.sendMessageWithOptions(self.message.user.chatID, replyString,
-											self.bot.generateReplyMarkup(
-												[['/help'], ['/settings'], ['/getmenu'], ['/getlectures'], ['/getmeme'],
-												 ['/getdirections'], ['/reportbug'], ['/privacy'],
-												 ['/whatdoyouknowaboutme']]))
+			self.bot.sendMessage(self.message.user.chatID, replyString,
+								 reply_markup=ReplyKeyboardMarkup(
+									 [[KeyboardButton('/help')],
+									  [KeyboardButton('/settings')],
+									  [KeyboardButton('/getmenu')],
+									  [KeyboardButton('/getlectures')],
+									  [KeyboardButton('/getdirections')],
+									  [KeyboardButton('/reportbug')],
+									  [KeyboardButton('/privacy')],
+									  [KeyboardButton('/whatdoyouknowaboutme')]], resize_keyboard=True,
+									 one_time_keyboard=True))
 
 	def command_start(self):
 		self.bot.sendMessage(self.message.user.chatID, "Please send me your name so we get to know each other")
@@ -79,8 +93,10 @@ class CommandFunctions:
 								 + "your lecture plan :(")
 
 	def command_getmenu(self):
-		self.bot.sendMessageWithOptions(self.message.user.chatID, 'For which day do you want the plan?',
-										self.bot.generateReplyMarkup([['Today', 'Tomorrow']]))
+		self.bot.sendMessage(self.message.user.chatID, 'For which day do you want the plan?',
+							 reply_markup=ReplyKeyboardMarkup([[KeyboardButton('Today'),
+																KeyboardButton('Tomorrow')]], resize_keyboard=True,
+															  one_time_keyboard=True))
 
 		self.message.user.expectedMessageType = 'menuday'
 
@@ -89,8 +105,10 @@ class CommandFunctions:
 			self.bot.sendMessage(self.message.user.chatID,
 								 'I don\'t know which course you are in. Please provide me this information under /settings -> Personal Information')
 		else:
-			self.bot.sendMessageWithOptions(self.message.user.chatID, 'For which day do you want the plan?',
-											self.bot.generateReplyMarkup([['Today', 'Tomorrow']]))
+			self.bot.sendMessage(self.message.user.chatID, 'For which day do you want the plan?',
+								 reply_markup=ReplyKeyboardMarkup([[KeyboardButton('Today'),
+																	KeyboardButton('Tomorrow')]], resize_keyboard=True,
+																  one_time_keyboard=True))
 
 			self.message.user.expectedMessageType = 'lectureplanday'
 
@@ -124,10 +142,13 @@ class CommandFunctions:
 		self.message.user.expectedMessageType = 'bugdescription'
 
 	def command_settings(self):
-		self.bot.sendMessageWithOptions(self.message.user.chatID, 'What do you want to change?',
-										self.bot.generateReplyMarkup(
-											[['️🧍 Personal Information'], ['📲 Subscription-Settings'],
-											 ['⏰ Push Time Settings'], ['🧨 Cancel']]))
+		self.bot.sendMessage(self.message.user.chatID, 'What do you want to change?',
+							 reply_markup=ReplyKeyboardMarkup(
+								 [[KeyboardButton('️🧍 Personal Information')],
+								  [KeyboardButton('📲 Subscription-Settings')],
+								  [KeyboardButton('⏰ Push Time Settings')],
+								  [KeyboardButton('🧨 Cancel')]], resize_keyboard=True,
+								 one_time_keyboard=True))
 		self.message.user.expectedMessageType = 'settingstype'
 
 	def command_adminrate(self):
@@ -137,10 +158,14 @@ class CommandFunctions:
 			mealString = ("Meal 1:\n" + mealArr[0] + "\nMeal 2:\n" + mealArr[1] + "\nMeal 3:\n" + mealArr[2])
 			for user in self.bot.users:
 				if user.wantsMenu and user.wantsToRateMeals:
-					self.bot.sendMessageWithOptions(user.chatID, (
+					self.bot.sendMessage(user.chatID, (
 							"Please rate your meal today. The available meals were:\n\n" + mealString),
-													self.bot.generateReplyMarkup(
-														[['Meal 1', 'Meal 2', 'Meal 3'], ['Don\'t rate']]))
+										 reply_markup=ReplyKeyboardMarkup(
+											 [[KeyboardButton('Meal 1'),
+											   KeyboardButton('Meal 2'),
+											   KeyboardButton('Meal 3')],
+											  [KeyboardButton('Don\'t rate')]], resize_keyboard=True,
+											 one_time_keyboard=True))
 					user.tempParams['ratingMealset'] = mealArr
 					user.expectedMessageType = 'mealtoberated'
 		else:
@@ -150,8 +175,10 @@ class CommandFunctions:
 
 	def command_getdirections(self):
 		if self.message.user.address is not None and self.message.user.address != '':
-			self.bot.sendMessageWithOptions(self.message.user.chatID, "What directions do you want?",
-											self.bot.generateReplyMarkup([['-> DHBW'], ['-> Home']]))
+			self.bot.sendMessage(self.message.user.chatID, "What directions do you want?",
+								 reply_markup=ReplyKeyboardMarkup([[KeyboardButton('-> DHBW')],
+																   [KeyboardButton('-> Home')]], resize_keyboard=True,
+																  one_time_keyboard=True))
 			self.message.user.expectedMessageType = 'directionstype'
 		else:
 			self.bot.sendMessage(self.message.user.chatID,

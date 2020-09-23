@@ -6,7 +6,7 @@ import logging
 import re
 import os
 import bot.User as usr
-from telegram import InlineKeyboardMarkup, InlineKeyboardButton
+from telegram import ReplyKeyboardMarkup, KeyboardButton
 
 
 class MessageFunctions:
@@ -19,7 +19,7 @@ class MessageFunctions:
 	def message_unknown(self):
 		self.bot.sendMessage(self.message.user.chatID,
 										'I don\'t know what to do with your input :( Use /help to get help:',
-										reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton('/help')]]))
+										reply_markup=ReplyKeyboardMarkup([[KeyboardButton('/help')]], resize_keyboard=True, one_time_keyboard=True))
 
 	# Called when user registers for the first time and sends his name
 	def message_startname(self):

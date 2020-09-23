@@ -13,6 +13,8 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: '13'
+    - name: Remove Readme, License
+      run: rm README.md && rm LICENSE.md && rm CONTRIBUTING.md
     - run: npm install
     - name: serverless deploy
       uses: jackdcasey/github-action@python3.8-nodejs13

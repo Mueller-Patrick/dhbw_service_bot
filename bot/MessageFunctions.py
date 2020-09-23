@@ -6,6 +6,7 @@ import logging
 import re
 import os
 import bot.User as usr
+from telegram import InlineKeyboardMarkup, InlineKeyboardButton
 
 
 class MessageFunctions:
@@ -16,9 +17,9 @@ class MessageFunctions:
 
 	# Called when user sends a normal message but we don't expect any input
 	def message_unknown(self):
-		self.bot.sendMessageWithOptions(self.message.user.chatID,
+		self.bot.sendMessage(self.message.user.chatID,
 										'I don\'t know what to do with your input :( Use /help to get help:',
-										self.bot.generateReplyMarkup([['/help']]))
+										InlineKeyboardMarkup([[InlineKeyboardButton('/help')]]))
 
 	# Called when user registers for the first time and sends his name
 	def message_startname(self):
@@ -48,7 +49,7 @@ class MessageFunctions:
 	def message_broadcastmessage(self):
 		users = []
 		cur = self.conn.cursor()
-		getAllUsersString = """SELECT chatID FROM users WHERE userID = 1"""
+		getAllUsersString = """SELECT chatID FROM users"""
 		cur.execute(getAllUsersString)
 		userRows = cur.fetchall()
 		self.conn.commit()

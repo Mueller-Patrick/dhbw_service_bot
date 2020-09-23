@@ -37,6 +37,10 @@ class HandleMessage:
 			newUser = True
 		cur.close()
 
+		if bot == 12:
+			print(user.name)
+			return
+
 		# Create the message object
 		message = msg.Message(user, text, message_id)
 

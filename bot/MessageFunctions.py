@@ -5,12 +5,14 @@ from menu import Rater
 import logging
 import re
 import os
+import bot.User as usr
 
 
 class MessageFunctions:
-	def __init__(self, message, bot):
+	def __init__(self, message, bot, conn):
 		self.message = message
 		self.bot = bot
+		self.conn = conn
 
 	# Called when user sends a normal message but we don't expect any input
 	def message_unknown(self):
@@ -44,8 +46,17 @@ class MessageFunctions:
 
 	# Called when Patrick wants to broadcast something
 	def message_broadcastmessage(self):
-		for user in self.bot.users:
-			self.bot.sendMessage(user.chatID, self.message.text)
+		users = []
+		cur = self.conn.cursor(prepared=True)
+		getAllUsersString = """SELECT chatID FROM users WHERE userID = 1"""
+		cur.execute(getAllUsersString)
+		userRows = cur.fetchall()
+		self.conn.commit()
+
+		for user in userRows:
+			self.bot.sendMessage(user[0], self.message.text)
+
+		cur.close()
 
 		self.message.user.expectedMessageType = ''
 

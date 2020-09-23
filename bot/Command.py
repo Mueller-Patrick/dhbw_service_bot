@@ -7,14 +7,15 @@ from bot import CommandFunctions as cf, MessageFunctions as mf
 
 
 class Command:
-	def __init__(self, message, bot):
+	def __init__(self, message, bot, conn):
 		self.message = message
 		self.bot = bot
-		self.cfunctions = cf.CommandFunctions(message, bot)
-		self.mfunctions = mf.MessageFunctions(message, bot)
+		self.cfunctions = cf.CommandFunctions(message, bot, conn)
+		self.mfunctions = mf.MessageFunctions(message, bot, conn)
+		self.conn = conn
 
 		# Defined commands
-		self.commands = ['/start', '/help', '/stopbot', '/privacy', '/whatdoyouknowaboutme', '/getmenu',
+		self.commands = ['/start', '/help', '/privacy', '/whatdoyouknowaboutme', '/getmenu',
 						 '/sendmessagetoeveryone', '/getlectures', '/getmeme', '/reportbug', '/settings',
 						 '/adminrate', '/getdirections']
 
@@ -39,7 +40,6 @@ class Command:
 			'/reportbug': self.cfunctions.command_reportbug,
 			'/settings': self.cfunctions.command_settings,
 			# Commands only Patrick can use
-			'/stopbot': self.cfunctions.command_stopbot,
 			'/sendmessagetoeveryone': self.cfunctions.command_sendmessagetoeveryone,
 			'/adminrate': self.cfunctions.command_adminrate,
 			'/getdirections': self.cfunctions.command_getdirections

@@ -7,30 +7,64 @@ import logging
 
 import bot.User as usr
 import bot.Message as msg
-#import bot.Command as cmd
+import sql.SQLConnectionHandler as sqlhandler
+import sql.SQLRowConverter as sqlconverter
+import sys
+
+import bot.Command as cmd
 
 logger = logging.getLogger()
+
 
 class HandleMessage:
 	def __init__(self, bot, chat_id, text, message_id):
 		# Get user object from SQL
-		# TODO
+		conn = sqlhandler.getConnection()
+		cur = conn.cursor(prepared=True)
+		select_user_query = """SELECT userID, chatID, name, expectedMsgType, tempParams, wantsMenu, course, wantsLecturePlan, address, wantsTransportInfo, wantsToRateMeals, menuPushTime, lecturePushTime, pauseAllNotifications FROM users WHERE chatID = %s"""
+		cur.execute(select_user_query, (chat_id,))
+		userSqlRow = cur.fetchall()
+		conn.commit()
 		user = usr.User(chat_id)
+		newUser = False
+		if cur.rowcount == 1:
+			user = sqlconverter.getUser(userSqlRow[0])
+		elif cur.rowcount > 1:
+			logging.warning('More than one user with chatID %s found!', chat_id)
+			user = sqlconverter.getUser(userSqlRow[0])
+		else:
+			logging.info('Creating new user for chatID %s.', chat_id)
+			newUser = True
+		cur.close()
 
 		# Create the message object
 		message = msg.Message(user, text, message_id)
 
 		# Process message
-		#if text == '/privacy' or text == '/help':
-			#cmd.Command(message, bot)
-		#else:
-		ret_text = ("Hello fellow Nerd! I'm currently being ported to a new system and am therefore unavailable."
-					+ " If you want to help or just check the progress, you can do that here:"
-					+ " https://github.com/Mueller-Patrick/dhbw_service_bot. I'm going to be up and running again as soon"
-					+ " as possible, so stay tuned!")
-
-		bot.sendMessage(chat_id=chat_id, text=ret_text)
-		logger.info('Message sent')
+		try:
+			cmd.Command(message, bot, conn)
+		except:
+			e = sys.exc_info()[0]
+			logging.warning("An error occured handling the following message: %s. Error: %s", text, e)
+			bot.sendMessage(chat_id,
+							"An Error occured while trying to fulfill your request. Currently, not all commands"
+							+ " are available due to the porting. Please try again another time. You can check the progress"
+							+ " here: https://github.com/Mueller-Patrick/dhbw_service_bot")
 
 		# Save user object to SQL
-		# TODO
+		cur = conn.cursor(prepared=True)
+		if newUser:
+			print("new")
+			insert_user_query = """INSERT INTO users (chatID, name, expectedMsgType, tempParams, wantsMenu, course, wantsLecturePlan, address, wantsTransportInfo, wantsToRateMeals, menuPushTime, lecturePushTime, pauseAllNotifications) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
+			cur.execute(insert_user_query, sqlconverter.getUserInsertTuple(user))
+		else:
+			print("Update")
+			update_user_query = """UPDATE users SET name = %s, expectedMsgType = %s, tempParams = %s, wantsMenu = %s, course = %s, wantsLecturePlan = %s, address = %s, wantsTransportInfo = %s, wantsToRateMeals = %s, menuPushTime = %s, lecturePushTime = %s, pauseAllNotifications = %s WHERE userID = %s"""
+			cur.execute(update_user_query, sqlconverter.getUserUpdateTuple(user))
+
+		conn.commit()
+		conn.close()
+
+
+if __name__ == '__main__':
+	HandleMessage(12, 230970888, "Test", 123456778)

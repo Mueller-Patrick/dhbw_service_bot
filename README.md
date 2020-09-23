@@ -36,3 +36,14 @@ We also used the `os` library, but this should come with vanilla python.
 
 For a list of supported commands, see 
 `docs/telegram_command_description.md`
+
+**KNOWN ISSUES**<br>
+Due to the port to AWS Lambda and the simultaneous switch to the official python telegram library, some commands
+are currently not working, including, but not limited to:<br>
+<ul>
+    <li>/help</li>
+    <li>/settings</li>
+    <li>/getmenu</li>
+</ul>
+This is because for these commands, we generate a reply markup, which is done differently with the new library, so we
+need to switch that to the new behavior first. This is going to be done ASAP by Patrick.

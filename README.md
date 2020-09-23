@@ -19,11 +19,12 @@ To contribute, follow the steps in `CONTRIBUTING.md`
 
 <br><br>
 Used libraries are <br>
+`telegram`<br>
+`pymysql`<br>
 `requests`<br>
 `requests_html`<br>
 `datetime`<br>
 `json`<br>
-`asyncio`<br>
 `icalendar`<br>
 `icalevents`<br>
 `logging`.<br>

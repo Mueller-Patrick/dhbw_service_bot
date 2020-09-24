@@ -36,7 +36,6 @@ class Command:
 			'/whatdoyouknowaboutme': self.cfunctions.command_whatdoyouknowaboutme,
 			'/getmenu': self.cfunctions.command_getmenu,
 			'/getlectures': self.cfunctions.command_getlectures,
-			'/getmeme': self.cfunctions.command_getmeme,
 			'/reportbug': self.cfunctions.command_reportbug,
 			'/settings': self.cfunctions.command_settings,
 			# Commands only Patrick can use

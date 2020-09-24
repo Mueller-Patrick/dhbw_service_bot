@@ -66,4 +66,5 @@ class HandleMessage:
 			cur.execute(update_user_query, sqlconverter.getUserUpdateTuple(user))
 
 		conn.commit()
+		cur.close()
 		conn.close()

@@ -16,7 +16,7 @@ class Command:
 
 		# Defined commands
 		self.commands = ['/start', '/help', '/privacy', '/whatdoyouknowaboutme', '/getmenu',
-						 '/sendmessagetoeveryone', '/getlectures', '/getmeme', '/reportbug', '/settings',
+						 '/sendmessagetoeveryone', '/getlectures', '/reportbug', '/settings',
 						 '/adminrate', '/getdirections']
 
 	# Used to find the requested command

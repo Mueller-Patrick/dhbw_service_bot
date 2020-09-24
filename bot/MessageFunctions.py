@@ -8,6 +8,7 @@ import os
 import bot.User as usr
 from telegram import ReplyKeyboardMarkup, KeyboardButton, ParseMode
 import logging
+from lecturePlan import LectureFetcher
 
 
 class MessageFunctions:
@@ -71,8 +72,9 @@ class MessageFunctions:
 
 		forDay = datetime.now() + timedelta(days=day)
 		dateString = forDay.strftime("%Y-%m-%d")
-		plan = self.bot.lectureFetcher.getFormattedLectures(self.message.user.course, dateString)
-		firstLectureTime = self.bot.lectureFetcher.getFirstLectureTime(self.message.user.course, dateString)
+		lf = LectureFetcher(self.conn)
+		plan = lf.getFormattedLectures(self.message.user.course, dateString)
+		firstLectureTime = lf.getFirstLectureTime(self.message.user.course, dateString)
 
 		if not plan:
 			self.bot.sendMessage(self.message.user.chatID, 'No more lectures for that day.')
@@ -575,7 +577,8 @@ class MessageFunctions:
 				self.message.user.expectedMessageType = ''
 				self.message.user.tempParams['personalInfoToBeChanged'] = ''
 			else:
-				if self.bot.lectureFetcher.firstUserInCourse(self.message.text):
+				lf = LectureFetcher(self.conn)
+				if lf.firstUserInCourse(self.message.text):
 					self.message.user.course = self.message.text
 					self.bot.sendMessage(self.message.user.chatID,
 										 "You are the first user in this course. Please send me "
@@ -583,7 +586,7 @@ class MessageFunctions:
 										 + "join this course. Write it down somewhere save because "
 										 + "I will delete your message after I received it:")
 					self.message.user.expectedMessageType = 'newcoursepassword'
-					self.bot.lectureFetcher.setUserOfCourse(self.message.user.course)
+					lf.setUserOfCourse(self.message.user.course)
 				else:
 					self.message.user.tempParams['enteredCourse'] = self.message.text
 					self.bot.sendMessage(self.message.user.chatID,
@@ -655,7 +658,7 @@ class MessageFunctions:
 
 		self.bot.memes.setPassword(self.message.user.course, password)
 
-		if self.bot.lectureFetcher.checkForCourse(self.message.user.course):
+		if LectureFetcher(self.conn).checkForCourse(self.message.user.course):
 			self.bot.sendMessage(self.message.user.chatID, (
 					"You successfully joined the course " + self.message.user.course + " and set the passwort."))
 			self.message.user.expectedMessageType = ''
@@ -695,8 +698,10 @@ class MessageFunctions:
 			logging.warning('User %s, name %s created a new course but didn\'t supply a link!',
 							self.message.user.chatID, self.message.user.name)
 		else:
-			if self.bot.lectureFetcher.validateLink(self.message.text):
-				self.bot.lectureFetcher.addRaplaLink(self.message.user.course, self.message.text)
+			lf = LectureFetcher(self.conn)
+
+			if lf.validateLink(self.message.text):
+				lf.addRaplaLink(self.message.user.course, self.message.text)
 				self.bot.sendMessage(self.message.user.chatID,
 									 "Thank you for sending me the link! ❤️❤️❤️")
 				self.message.user.expectedMessageType = ''

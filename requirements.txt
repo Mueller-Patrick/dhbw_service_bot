@@ -1,6 +1,6 @@
 python-telegram-bot==8.1.1
 pymysql
 icalendar
-icalevents
+icalevents==0.1.24
 requests_html
 googlemaps

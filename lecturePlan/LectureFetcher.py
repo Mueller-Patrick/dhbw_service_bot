@@ -6,6 +6,8 @@ from icalevents.icalevents import events
 from icalendar import Calendar as cal, Event as ev
 import logging
 from datetime import datetime
+import sys
+import traceback
 
 
 class LectureFetcher:
@@ -75,6 +77,10 @@ class LectureFetcher:
 					returnList.append(lec)
 			return returnList
 		except:
+			e = sys.exc_info()
+			exc_type, exc_value, exc_traceback = sys.exc_info()
+			stack = traceback.extract_tb(exc_traceback)
+			logging.warning('Error while fetching lectures, Error: %s, Stacktrace: %s', e, stack)
 			logging.warning('LectureFetcher.getLecturesByLink: Invalid link or dayString given: %s, %s', link, dayString)
 			return ''
 

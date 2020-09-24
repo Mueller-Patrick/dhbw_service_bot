@@ -72,8 +72,6 @@ class Command:
 			'settingstimes': self.mfunctions.message_settingstimes,
 			'changepersonalinfo': self.mfunctions.message_changepersonalinfo,
 			'changepushtime': self.mfunctions.message_changepushtime,
-			'newcoursepassword': self.mfunctions.message_newcoursepassword,
-			'coursepassword': self.mfunctions.message_coursepassword,
 			'raplalink': self.mfunctions.message_raplalink,
 			# If the user wants to unpause push notifications again when the next theory phase starts
 			'wantstounpausepush': self.mfunctions.message_wantstounpausepush,

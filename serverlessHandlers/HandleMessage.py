@@ -10,6 +10,7 @@ import bot.Message as msg
 import sql.SQLConnectionHandler as sqlhandler
 import sql.SQLRowConverter as sqlconverter
 import sys
+import traceback
 
 import bot.Command as cmd
 
@@ -47,10 +48,10 @@ class HandleMessage:
 			else:
 				cmd.Command(message, bot, conn).interpretMessage()
 		except:
-			e = sys.exc_info()[0]
-			traceback_frame = sys.exc_info()[2].tb_frame
-			traceback_line = sys.exc_info()[2].tb_lineno
-			logging.warning("An error occured handling the following message: %s. Error: %s, Frame %s, Line %s", text, e, traceback_frame, traceback_line)
+			e = sys.exc_info()
+			exc_type, exc_value, exc_traceback = sys.exc_info()
+			traceback.print_tb(exc_traceback)
+			logging.warning("An error occured handling the following message: %s. Error: %s, Traceback: %s", text, e, sys.stderr)
 			bot.sendMessage(chat_id,
 							"An Error occured while trying to fulfill your request. Currently, not all commands"
 							+ " are available due to the porting. Please try again another time. You can check the progress"

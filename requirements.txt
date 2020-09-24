@@ -1,6 +1,6 @@
 python-telegram-bot==8.1.1
 pymysql
 icalendar
-git+git://github.com/Mueller-Patrick/icalevents@master#egg=icalevents
+git+git://github.com/Mueller-Patrick/icalevents@hotfix#egg=icalevents
 requests_html
 googlemaps

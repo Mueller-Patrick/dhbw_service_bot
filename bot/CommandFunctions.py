@@ -122,22 +122,6 @@ class CommandFunctions:
 				self.message.user.name) + " tried to broadcast a message"))
 			self.bot.sendMessage(self.message.user.chatID, "You are not allowed to do this.")
 
-	def command_getmeme(self):
-		if self.message.user.course != '':
-			# Convert the memeTypes to a list of lists so they appear as a vertical keyboard instead of horizontal
-			memeTypes = self.bot.memes.getMemeTypes(self.message.user.course)
-			memeTypesConverted = []
-			for meme in memeTypes:
-				memeTypesConverted.append([meme])
-			memeTypesConverted.append(['Random'])
-
-			self.bot.sendMessageWithOptions(self.message.user.chatID, "Please select the type of meme:",
-											self.bot.generateReplyMarkup(memeTypesConverted))
-			self.message.user.expectedMessageType = 'memetype'
-		else:
-			self.bot.sendMessage(self.message.user.chatID, "I can't send you memes because you are in no course. "
-								 + "Enter your course under /settings -> Personal Information")
-
 	def command_reportbug(self):
 		self.bot.sendMessage(self.message.user.chatID, "Please describe the bug:")
 		self.message.user.expectedMessageType = 'bugdescription'

@@ -138,59 +138,6 @@ class MessageFunctions:
 								 "There was an error during the fetching process. Please try again later.")
 			self.message.user.expectedMessageType = ''
 
-	# Called when user sends the type of meme he wants to get
-	def message_memetype(self):
-		if self.message.text == 'Random':
-			self.message.text = '-1'
-			self.message.user.tempParams['requestedMemeType'] = '-1'
-			self.message_memeid()
-		else:
-			memeIds = self.bot.memes.getMemeId(self.message.user.course, self.message.text)
-			memeIdsConverted = []
-
-			for meme in memeIds:
-				memeIdsConverted.append([meme])
-			memeIdsConverted.append(['Random'])
-
-			self.bot.sendMessageWithOptions(self.message.user.chatID, "Please select the meme:",
-											self.bot.generateReplyMarkup(memeIdsConverted))
-			self.message.user.tempParams['requestedMemeType'] = self.message.text
-			self.message.user.expectedMessageType = 'memeid'
-
-	# Called when user sends the exact meme he wants to get
-	def message_memeid(self):
-		# Memes.getMeme returns a list in this format: ['MEME_FILE_OR_ID', FETCH_ID, TYPEINDEX, MEMEINDEX]
-		# If the meme has not been uploaded to telegram yet, the file itself is sent with the boolean FETCH_ID
-		# set to true so the file_id provided by telegram gets saved.
-
-		self.bot.sendMessage(self.message.user.chatID, "Here is the requested meme:")
-
-		if self.message.text == 'Random':
-			self.message.text = '-1'
-
-		meme = self.bot.memes.getMeme(self.message.user.course, self.message.user.tempParams['requestedMemeType'],
-									  self.message.text)
-		# If the id is needed, clearly this getting sent here is the photo itself. Also make sure to save the file_id afterwards.
-		if meme[1]:
-			meme_id = self.bot.sendPhoto(self.message.user.chatID, meme[0], False)
-			self.bot.memes.addMemeId(self.message.user.course, meme[2], meme[3], meme_id)
-		else:
-			meme_id = self.bot.sendPhoto(self.message.user.chatID, meme[0], True)
-
-			# If telegram returned an error whilst sending the photo via id, the id is invalid and has to be refreshed
-			if meme_id == '-1':
-				# Resets the id
-				self.bot.memes.addMemeId(self.message.user.course, meme[2], meme[3], '')
-
-				# Fetches the meme again to get the file itself and send it to the user. Also note the new file_id.
-				meme = self.bot.memes.getMeme(self.message.user.course,
-											  self.message.user.tempParams['requestedMemeType'], self.message.text)
-				meme_id = self.bot.sendPhoto(self.message.user.chatID, meme[0], False)
-				self.bot.memes.addMemeId(self.message.user.course, meme[2], meme[3], meme_id)
-
-		self.message.user.expectedMessageType = ''
-		self.message.user.tempParams['requestedMemeType'] = ''
-
 	# Called when user sends the meal that he wants to rate
 	def message_mealtoberated(self):
 		mealToBeRated = self.message.text
@@ -572,27 +519,23 @@ class MessageFunctions:
 				self.message.user.expectedMessageType = ''
 				self.message.user.tempParams['personalInfoToBeChanged'] = ''
 		elif type == 'course':
-			if self.message.user.course == self.message.text:
+			if self.message.user.course == self.message.text.upper():
 				self.bot.sendMessage(self.message.user.chatID, "That\'s the course I already know")
 				self.message.user.expectedMessageType = ''
 				self.message.user.tempParams['personalInfoToBeChanged'] = ''
 			else:
+				self.message.user.course = self.message.text.upper()
+				self.bot.sendMessage(self.message.user.chatID,
+									 ("Added you to the {} course!").format(self.message.text.upper()))
+				# Check if the course already exists. If not, add it to SQL
 				lf = LectureFetcher(self.conn)
 				if lf.firstUserInCourse(self.message.text):
-					self.message.user.course = self.message.text
-					self.bot.sendMessage(self.message.user.chatID,
-										 "You are the first user in this course. Please send me "
-										 + "a password that future users have to enter in order to "
-										 + "join this course. Write it down somewhere save because "
-										 + "I will delete your message after I received it:")
-					self.message.user.expectedMessageType = 'newcoursepassword'
 					lf.setUserOfCourse(self.message.user.course)
+					self.bot.sendMessage("I don't know the RaPla link for this course yet. Please be so kind and supply me"
+										 + " with the link for your course ❤️")
+					self.message.user.expectedMessageType = 'raplalink'
 				else:
-					self.message.user.tempParams['enteredCourse'] = self.message.text
-					self.bot.sendMessage(self.message.user.chatID,
-										 "Please send me the password for " + self.message.text)
-					self.message.user.expectedMessageType = 'coursepassword'
-				self.message.user.tempParams['personalInfoToBeChanged'] = ''
+					self.message.user.expectedMessageType = ''
 		else:
 			logging.warning(
 				'Wrong type for changing personal info given in MessageFunctions.message_changepersonalinfo. Given type: %s',
@@ -650,45 +593,6 @@ class MessageFunctions:
 			logging.warning(
 				'Wrong type for changing push time given in MessageFunctions.message_changepushtime. Given type: %s',
 				type)
-
-	# Called when the user sends the new password for a course
-	def message_newcoursepassword(self):
-		password = self.message.text
-		self.bot.deleteMessage(self.message.user.chatID, self.message.id)
-
-		self.bot.memes.setPassword(self.message.user.course, password)
-
-		if LectureFetcher(self.conn).checkForCourse(self.message.user.course):
-			self.bot.sendMessage(self.message.user.chatID, (
-					"You successfully joined the course " + self.message.user.course + " and set the passwort."))
-			self.message.user.expectedMessageType = ''
-		else:
-			self.bot.sendMessage(self.message.user.chatID,
-								 ("I don\'t know the RaPla link for this course yet. Would you "
-								  + "be so kind and send me the link?"))
-			self.message.user.expectedMessageType = "raplalink"
-
-	# Called when the users sends the password for a course
-	def message_coursepassword(self):
-		if self.message.text == 'cancel':
-			self.bot.sendMessage(self.message.user.chatID, 'Cancelled course setup.')
-			self.message.user.expectedMessageType = ''
-		else:
-			password = self.message.text
-			self.bot.deleteMessage(self.message.user.chatID, self.message.id)
-
-			if password == self.bot.memes.getPassword(self.message.user.tempParams['enteredCourse']):
-				self.message.user.course = self.message.user.tempParams['enteredCourse']
-				self.message.user.tempParams['enteredCourse'] = ''
-
-				self.bot.sendMessage(self.message.user.chatID,
-									 ("You successfully joined the course " + self.message.user.course))
-				self.message.user.expectedMessageType = ''
-			else:
-				self.bot.sendMessage(self.message.user.chatID,
-									 "Wrong password. Please try again. Write 'cancel' to cancel and contact "
-									 + "@PaddyOfficial for help.")
-				self.message.user.expectedMessageType = 'coursepassword'
 
 	# Called when a user sends the RaPla link for a newly created course.
 	def message_raplalink(self):

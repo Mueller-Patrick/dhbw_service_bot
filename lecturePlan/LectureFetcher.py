@@ -17,14 +17,13 @@ class LectureFetcher:
 
 	def getRaplaLinks(self):
 		cur = self.conn.cursor()
-		fetch_links_sql = """SELECT name, rapla_link, has_users FROM courses"""
+		fetch_links_sql = """SELECT name, rapla_link FROM courses"""
 		linkList = {}
 		cur.execute(fetch_links_sql)
 		for course in cur.fetchall():
 			name = course[0]
 			link = course[1]
-			has_users = course[2]
-			linkList[name] = [link, has_users]
+			linkList[name] = link
 
 		self.conn.commit()
 		cur.close()
@@ -41,24 +40,17 @@ class LectureFetcher:
 			return False
 
 	def addRaplaLink(self, courseName, link):
-		self.linkDict[courseName.upper()][0] = link
+		self.linkDict[courseName.upper()] = link
 		cur = self.conn.cursor()
 		insert_link_sql = """UPDATE courses SET rapla_link = %s WHERE name = %s"""
 		cur.execute(insert_link_sql, (link, courseName.upper()))
 		self.conn.commit()
 		cur.close()
 
-	def writeLinksToJson(self):
-		linkJson = json.dumps(self.linkDict, indent=4)
-
-		with open("lecturePlan/raplaLinks.json", "w") as raplaFile:
-			raplaFile.write(linkJson)
-		raplaFile.close()
-
 	# Check if the course is already known. If not, returns false so we can go on and ask the user for the link.
 	def checkForCourse(self, course):
 		if course.upper() in self.linkDict:
-			if self.linkDict[course.upper()][0] != '':
+			if self.linkDict[course.upper()] != '':
 				return True
 			else:
 				return False
@@ -88,7 +80,7 @@ class LectureFetcher:
 	# The dayString needs to have the format YYYY-MM-DD (The only decent date format if you asked me)
 	def getLecturesByCourseName(self, courseName, dayString):
 		try:
-			link = self.linkDict.get(courseName.upper())[0]  # courseName.upper() writes the name in all caps
+			link = self.linkDict.get(courseName.upper())  # courseName.upper() writes the name in all caps
 		# just in case the user was to stupid to enter it right
 		except:
 			# If no link is found
@@ -141,30 +133,15 @@ class LectureFetcher:
 		else:
 			return lectures
 
-	# Returns  true if the course has no users yet
-	def firstUserInCourse(self, courseName):
-		try:
-			firstUser = not self.linkDict.get(courseName.upper())[1]
-
-			return firstUser
-		except:
-			return True
-
 	def setUserOfCourse(self, courseName):
-		cur = self.conn.cursor()
 		if courseName.upper() not in self.linkDict:
-			self.linkDict[courseName.upper()] = ['', True]
+			cur = self.conn.cursor()
+			self.linkDict[courseName.upper()] = ''
 			# Insert the new course
-			course_insert_sql = """INSERT INTO courses (name, has_users) VALUES (%s, %s)"""
-			cur.execute(course_insert_sql, (courseName.upper(), True))
-		else:
-			self.linkDict[courseName.upper()][1] = True
-			# Update existing course
-			course_update_sql = """UPDATE courses SET has_users  = %s WHERE name = %s"""
-			cur.execute(course_update_sql, (True, courseName.upper()))
-
-		self.conn.commit()
-		cur.close()
+			course_insert_sql = """INSERT INTO courses (name) VALUES (%s)"""
+			cur.execute(course_insert_sql, (courseName.upper(),))
+			self.conn.commit()
+			cur.close()
 
 	def getAllKnownCourses(self):
 		return list(self.linkDict)

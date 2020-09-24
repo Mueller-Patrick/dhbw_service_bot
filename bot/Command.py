@@ -59,9 +59,6 @@ class Command:
 			# Expects a day input from the user
 			'lectureplanday': self.mfunctions.message_lectureplanday,
 			'menuday': self.mfunctions.message_menuday,
-			# Meme-related stuff
-			'memetype': self.mfunctions.message_memetype,
-			'memeid': self.mfunctions.message_memeid,
 			# Meal-rating-related stuff
 			'mealtoberated': self.mfunctions.message_mealtoberated,
 			'mealrating': self.mfunctions.message_mealrating,

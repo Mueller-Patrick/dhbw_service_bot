@@ -8,7 +8,6 @@
 /lecturePlan/raplaLinks.json
 /bot/usageStats.json
 /memes/*
-!/memes/Memes.py
 /menu/savedFoods.json
 /logs/*
 

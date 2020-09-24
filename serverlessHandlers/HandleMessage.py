@@ -50,8 +50,8 @@ class HandleMessage:
 		except:
 			e = sys.exc_info()
 			exc_type, exc_value, exc_traceback = sys.exc_info()
-			traceback.print_tb(exc_traceback)
-			logging.warning("An error occured handling the following message: %s. Error: %s, Traceback: %s", text, e, sys.stderr)
+			stack = traceback.extract_tb(exc_traceback)
+			logging.warning("An error occured handling the following message: %s. Error: %s, Stacktrace: %s", text, e, stack)
 			bot.sendMessage(chat_id,
 							"An Error occured while trying to fulfill your request. Currently, not all commands"
 							+ " are available due to the porting. Please try again another time. You can check the progress"

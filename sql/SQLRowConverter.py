@@ -14,7 +14,7 @@ def getUser(sql_row):
 	wantsTransportInfo = sql_row[9] == 1
 	wantsToRateMeals = sql_row[10] == 1
 	menuPushTime = str(sql_row[11])[0:5]
-	menuPushTime = menuPushTime if menuPushTime[len(menuPushTime)-1] is not ':' else ('0' + menuPushTime)[0:5]
+	menuPushTime = menuPushTime if menuPushTime[len(menuPushTime)-1] != ':' else ('0' + menuPushTime)[0:5]
 	lecturePushTime = str(sql_row[12])[0:5]
 	pauseAllNotifications = sql_row[13] == 1
 

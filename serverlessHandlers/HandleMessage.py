@@ -47,8 +47,9 @@ class HandleMessage:
 			else:
 				cmd.Command(message, bot, conn).interpretMessage()
 		except:
-			e = sys.exc_info()
-			logging.warning("An error occured handling the following message: %s. Error: %s", text, e)
+			e = sys.exc_info()[0]
+			traceback = sys.exc_info()[2].print_tb()
+			logging.warning("An error occured handling the following message: %s. Error: %s, Traceback: %s", text, e, traceback)
 			bot.sendMessage(chat_id,
 							"An Error occured while trying to fulfill your request. Currently, not all commands"
 							+ " are available due to the porting. Please try again another time. You can check the progress"

@@ -529,10 +529,11 @@ class MessageFunctions:
 									 ("Added you to the {} course!").format(self.message.text.upper()))
 				# Check if the course already exists. If not, add it to SQL
 				lf = LectureFetcher(self.conn)
-				if lf.firstUserInCourse(self.message.text):
+				if lf.courseExists(self.message.text):
 					lf.setUserOfCourse(self.message.user.course)
-					self.bot.sendMessage("I don't know the RaPla link for this course yet. Please be so kind and supply me"
-										 + " with the link for your course ❤️")
+					self.bot.sendMessage(
+						"I don't know the RaPla link for this course yet. Please be so kind and supply me"
+						+ " with the link for your course ❤️")
 					self.message.user.expectedMessageType = 'raplalink'
 				else:
 					self.message.user.expectedMessageType = ''

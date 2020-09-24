@@ -29,6 +29,9 @@ class LectureFetcher:
 		cur.close()
 		return linkList
 
+	def courseExists(self, course):
+		return course.upper() in self.linkDict
+
 	def validateLink(self, link):
 		try:
 			events(link)

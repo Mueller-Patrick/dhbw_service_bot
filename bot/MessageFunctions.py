@@ -8,7 +8,7 @@ import os
 import bot.User as usr
 from telegram import ReplyKeyboardMarkup, KeyboardButton, ParseMode
 import logging
-from lecturePlan import LectureFetcher
+from lecturePlan.LectureFetcher import LectureFetcher
 
 
 class MessageFunctions:

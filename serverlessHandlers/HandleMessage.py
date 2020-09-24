@@ -22,7 +22,9 @@ class HandleMessage:
 		# Get user object from SQL
 		conn = sqlhandler.getConnection()
 		cur = conn.cursor()
-		select_user_query = """SELECT userID, chatID, name, expectedMsgType, tempParams, wantsMenu, course, wantsLecturePlan, address, wantsTransportInfo, wantsToRateMeals, menuPushTime, lecturePushTime, pauseAllNotifications FROM users WHERE chatID = %s"""
+		select_user_query = """SELECT userID, chatID, name, expectedMsgType, tempParams, wantsMenu, course, 
+		wantsLecturePlan, address, wantsTransportInfo, wantsToRateMeals, menuPushTime, lecturePushTime, 
+		pauseAllNotifications FROM users WHERE chatID = %s """
 		cur.execute(select_user_query, (chat_id,))
 		userSqlRow = cur.fetchall()
 		conn.commit()
@@ -51,7 +53,8 @@ class HandleMessage:
 			e = sys.exc_info()
 			exc_type, exc_value, exc_traceback = sys.exc_info()
 			stack = traceback.extract_tb(exc_traceback)
-			logging.warning("An error occured handling the following message: %s. Error: %s, Stacktrace: %s", text, e, stack)
+			logging.warning("An error occured handling the following message: %s. Error: %s, Stacktrace: %s", text, e,
+							stack)
 			bot.sendMessage(chat_id,
 							"An Error occured while trying to fulfill your request. Currently, not all commands"
 							+ " are available due to the porting. Please try again another time. You can check the progress"
@@ -61,11 +64,15 @@ class HandleMessage:
 		cur = conn.cursor()
 		if newUser:
 			print("new")
-			insert_user_query = """INSERT INTO users (chatID, name, expectedMsgType, tempParams, wantsMenu, course, wantsLecturePlan, address, wantsTransportInfo, wantsToRateMeals, menuPushTime, lecturePushTime, pauseAllNotifications) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
+			insert_user_query = """INSERT INTO users (chatID, name, expectedMsgType, tempParams, wantsMenu, course, 
+			wantsLecturePlan, address, wantsTransportInfo, wantsToRateMeals, menuPushTime, lecturePushTime, 
+			pauseAllNotifications) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) """
 			cur.execute(insert_user_query, sqlconverter.getUserInsertTuple(user))
 		else:
 			print("Update")
-			update_user_query = """UPDATE users SET name = %s, expectedMsgType = %s, tempParams = %s, wantsMenu = %s, course = %s, wantsLecturePlan = %s, address = %s, wantsTransportInfo = %s, wantsToRateMeals = %s, menuPushTime = %s, lecturePushTime = %s, pauseAllNotifications = %s WHERE userID = %s"""
+			update_user_query = """UPDATE users SET name = %s, expectedMsgType = %s, tempParams = %s, wantsMenu = %s, 
+			course = %s, wantsLecturePlan = %s, address = %s, wantsTransportInfo = %s, wantsToRateMeals = %s, 
+			menuPushTime = %s, lecturePushTime = %s, pauseAllNotifications = %s WHERE userID = %s """
 			cur.execute(update_user_query, sqlconverter.getUserUpdateTuple(user))
 
 		conn.commit()

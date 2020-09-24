@@ -39,9 +39,5 @@ For a list of supported commands, see
 `docs/telegram_command_description.md`
 
 **KNOWN ISSUES**<br>
-Due to the port to AWS Lambda and the simultaneous switch to the official python telegram library, some commands
-are currently not working, including, but not certainly limited to:<br>
-<ul>
-    <li>/getlectures</li>
-</ul>
-This is because for these commands, we use old data types or functions that don't work on the new system yet.
+Currently, apart from the fact that the push service is not active yet, no known issues exist. Feel free to create an
+issue directly in this repository or via /reportbug if you use the bot.

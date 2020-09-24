@@ -75,7 +75,7 @@ class LectureFetcher:
 					returnList.append(lec)
 			return returnList
 		except:
-			print('LectureFetcher.getLecturesByLink: Invalid link or dayString given.')
+			logging.warning('LectureFetcher.getLecturesByLink: Invalid link or dayString given: %s, %s', link, dayString)
 			return ''
 
 	# Get all events for this course
@@ -113,7 +113,7 @@ class LectureFetcher:
 
 		# If no link for this course has been provided
 		if lectures == '':
-			retString = 'No RaPla link for this course has been provided. Please contact @PaddyOfficial.'
+			retString = 'No RaPla link for this course has been provided. Please contact @P4ddy_m.'
 		else:
 			retString = ''
 			for lecture in lectures:

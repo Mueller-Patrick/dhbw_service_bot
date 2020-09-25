@@ -80,6 +80,7 @@ class MessageFunctions:
 		lf = LectureFetcher(self.conn)
 		plan = lf.getFormattedLectures(self.message.user.course, dateString)
 		firstLectureTime = lf.getFirstLectureTime(self.message.user.course, dateString)
+		print(('First lecture time for {}: {}').format(dateString, firstLectureTime))
 
 		if not plan:
 			self.bot.sendMessage(self.message.user.chatID, 'No more lectures for that day.')

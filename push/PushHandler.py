@@ -8,6 +8,7 @@ from lecturePlan.LectureFetcher import LectureFetcher
 import menu.MenuSaver as menu
 import sys
 import traceback
+from maps import Directions
 
 
 def configure_telegram():
@@ -32,10 +33,22 @@ def sendPushes():
 
 	conn = sqlhandler.getvServerConnection()
 
+	lf = LectureFetcher(conn)
+	firstLectureTime = lf.getFirstLectureTime('TINF19B4', '2020-09-28')
+	print(firstLectureTime)
+	forDay = datetime.now() + timedelta(days=3)
+	time = datetime(int(forDay.year), int(forDay.month), int(forDay.day),
+					int(firstLectureTime[:2]), int(firstLectureTime[3:]))
+	print(time)
+	direc = Directions.Direction(time, 'Eppingen Bahnhof')
+	trainPlan = direc.create_message()
+	print(trainPlan)
+	return
+
 	# Menu currently not sent because it doesnt work yet
-	#sendMenuPushes(conn, bot, current_time_minutes)
+	# sendMenuPushes(conn, bot, current_time_minutes)
 	sendReturnDirections(conn, bot, current_time_minutes)
-	#sendMenuRatingPushes(conn, bot, current_time_minutes)
+	# sendMenuRatingPushes(conn, bot, current_time_minutes)
 	sendLecturePushes(conn, bot, current_time_minutes)
 	sendUnpauseNotificationsPushes(conn, bot, current_time_minutes)
 
@@ -44,7 +57,7 @@ def sendMenuPushes(conn, bot, current_time_minutes):
 	# For the same day
 	# Normally at 06:00 but customizable
 	cur = conn.cursor()
-	get_users_sql = """SELECT chatID, name FROM users WHERE menuPushTime = %s AND wantsMenu = true AND pauseAllNotifications = false AND userID = 1"""
+	get_users_sql = """SELECT chatID, name FROM users WHERE menuPushTime = %s AND wantsMenu = true AND pauseAllNotifications = false"""
 	cur.execute(get_users_sql, (current_time_minutes,))
 	users = cur.fetchall()
 	cur.close()
@@ -69,19 +82,21 @@ def sendMenuPushes(conn, bot, current_time_minutes):
 			stack = traceback.extract_tb(exc_traceback)
 			logging.warning("Could not fetch menu for today. Error: %s, Stacktrace: %s", sys.exc_info(), stack)
 
+
 def sendReturnDirections(conn, bot, current_time_minutes):
 	# For the same day
 	# At 10:00
 	if current_time_minutes == '10:00':
 		pass
-		# Condition: wantsTransportInfo, !pauseAllNotifications
+	# Condition: wantsTransportInfo, !pauseAllNotifications
+
 
 def sendMenuRatingPushes(conn, current_time_minutes):
 	# For the same day
 	# At 14:30
 	if current_time_minutes == '14:30':
 		pass
-		# Condition: wantsMenu, wantsToRateMeals, !pauseAllNotifications
+	# Condition: wantsMenu, wantsToRateMeals, !pauseAllNotifications
 
 
 def sendLecturePushes(conn, bot, current_time_minutes):
@@ -115,17 +130,19 @@ def sendLecturePushes(conn, bot, current_time_minutes):
 				firstLectureTime = courseDict[course][1]
 
 				bot.sendMessage(chatID,
-										  ('Howdy {}. Tomorrow your first lecture begins '
-										   + 'at {}. Here is the plan for tomorrow:').format(name, firstLectureTime))
+								('Howdy {}. Tomorrow your first lecture begins '
+								 + 'at {}. Here is the plan for tomorrow:').format(name, firstLectureTime))
 				bot.sendMessage(chatID, plan, parse_mode=ParseMode.HTML)
+
 
 def sendUnpauseNotificationsPushes(conn, bot, current_time_minutes):
 	# At 18:00
 	if current_time_minutes == '18:00':
 		pass
-		# Condition: pauseAllNotifications, plan fpr tomorrow contains "Beginn Theoriephase"
+	# Condition: pauseAllNotifications, plan fpr tomorrow contains "Beginn Theoriephase"
+
 
 if __name__ == '__main__':
 	sendPushes()
-	# For debugging
-	#sendMenuPushes(sqlhandler.getvServerConnection(), configure_telegram(), '06:00')
+# For debugging
+# sendMenuPushes(sqlhandler.getvServerConnection(), configure_telegram(), '06:00')

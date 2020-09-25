@@ -32,7 +32,7 @@ class Direction(object):
         """
         self.date = date
         self.arrival_time = date.timestamp()
-        print(("Arrival time: {}").format(self.arrival_time))
+        print(("Arrival time1: {}, time2: {}").format(self.date, self.arrival_time))
 
         if return_journey:
             self.directions_result = google_maps.directions("Erzbergerstraße 121, 76133 Karlsruhe, Germany",
@@ -44,12 +44,12 @@ class Direction(object):
                 self.directions_result = google_maps.directions(place,
                                                                 "Erzbergerstraße 121, 76133 Karlsruhe, Germany",
                                                                 mode="transit",
-                                                                departure_time=self.arrival_time)
+                                                                departure_time=self.date)
             else:
                 self.directions_result = google_maps.directions(place,
                                                             "Erzbergerstraße 121, 76133 Karlsruhe, Germany",
                                                             mode="transit",
-                                                            arrival_time=self.arrival_time)
+                                                            arrival_time=self.date)
 
         self.result_as_json = json.dumps(self.directions_result, indent=4)
         self.result_as_json = json.loads(self.result_as_json)

@@ -531,7 +531,7 @@ class MessageFunctions:
 				lf = LectureFetcher(self.conn)
 				if not lf.courseExists(self.message.text):
 					lf.setUserOfCourse(self.message.user.course)
-					self.bot.sendMessage(
+					self.bot.sendMessage(self.message.user.chatID,
 						"I don't know the RaPla link for this course yet. Please be so kind and supply me"
 						+ " with the link for your course ❤️")
 					self.message.user.expectedMessageType = 'raplalink'

@@ -17,3 +17,27 @@ def getConnection():
 	except pymysql.Error as e:
 		logging.error('SQL Connection error: %s', e)
 		return
+
+def getvServerConnection():
+	try:
+		if os.environ['IS_VSERVER'] == 'true':
+			conn = pymysql.connect(
+				user=os.environ['vServer_SQL_User'],
+				password=os.environ['vServer_SQL_Password'],
+				host=os.environ['localhost'],
+				port=3306,
+				database=os.environ['DHBW_Bot_Database']
+			)
+		else:
+			conn = pymysql.connect(
+				user=os.environ['PADDY_SQL_USER'],
+				password=os.environ['PADDY_SQL_PASSWORD'],
+				host=os.environ['SQL_SERVER'],
+				port=3306,
+				database=os.environ['DHBW_Bot_Database']
+			)
+
+		return conn
+	except pymysql.Error as e:
+		logging.error('SQL Connection error: %s', e)
+		return

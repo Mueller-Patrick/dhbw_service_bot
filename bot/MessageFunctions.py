@@ -460,7 +460,7 @@ class MessageFunctions:
 			self.bot.sendMessage(self.message.user.chatID, (
 					"You currently receive the menu push at " + menuPushTime
 					+ ". To change that, send me the new time in the format <b>HH:MM</b>. Please notice that it has to be "
-					+ "between 00:00 and 10:59."))
+					+ "a quarter of an hour, e.g. 10:15"))
 			self.message.user.tempParams['pushtimeToBeChanged'] = 'menu'
 			self.message.user.expectedMessageType = 'changepushtime'
 		elif '🕒 Lecture Plan Push' in self.message.text:
@@ -468,7 +468,7 @@ class MessageFunctions:
 			self.bot.sendMessage(self.message.user.chatID, (
 					"You currently receive the lecture push at " + lecturePushTime
 					+ ". To change that, send me the new time in the format <b>HH:MM</b>. Please notice that it has to be "
-					+ "between 15:00 and 22:59."), parse_mode=ParseMode.HTML)
+					+ "a quarter of an hour, e.g. 17:15"), parse_mode=ParseMode.HTML)
 			self.message.user.tempParams['pushtimeToBeChanged'] = 'lecture'
 			self.message.user.expectedMessageType = 'changepushtime'
 		elif '⏪ Back' in self.message.text:
@@ -547,14 +547,15 @@ class MessageFunctions:
 		type = self.message.user.tempParams['pushtimeToBeChanged']
 
 		if type == 'menu':
-			# Possible values: 00:00 to 10:59
-			timeRegex = re.compile('[0-1][0-9]:[0-5][0-9]')
+			# Possible values: Quarter hours
+			timeRegex = re.compile('[0-1][0-9]:(00|15|30|45)')
 			timeObj = timeRegex.search(self.message.text)
 
-			# A regex valid time is found and the time is valid
+			# A regex valid time is found
 			if timeObj is not None:
 				timeString = timeObj.group()
-				if int(timeString[:2]) <= 10:
+				# Is a valid time
+				if int(timeString[:2]) <= 24:
 					self.message.user.pushTimes['menu'] = timeString
 					self.bot.sendMessage(self.message.user.chatID,
 										 ("Successfully updated your menu push time to " + timeString))
@@ -563,20 +564,21 @@ class MessageFunctions:
 				else:
 					self.bot.sendMessage(self.message.user.chatID, (
 							"Invalid time: " + self.message.text
-							+ ". Please use the format HH:MM and notice that it has to be between 00:00 and 10:59"))
+							+ ". Please use the format HH:MM and notice that it has to be a quarter of an hour, e.g. 10:15"))
 			else:
 				self.bot.sendMessage(self.message.user.chatID, (
 						"Invalid time: " + self.message.text
-						+ ". Please use the format HH:MM and notice that it has to be between 00:00 and 10:59"))
+						+ ". Please use the format HH:MM and notice that it has to be a quarter of an hour, e.g. 10:15"))
 		elif type == 'lecture':
-			# Possible values: 15:00 to 22:59
-			timeRegex = re.compile('[1-2][0-9]:[0-5][0-9]')
+			# Possible values: Quarter hours
+			timeRegex = re.compile('[0-2][0-9]:(00|15|30|45)')
 			timeObj = timeRegex.search(self.message.text)
 
-			# A regex valid time is found and the time is valid
+			# A regex valid time is found
 			if timeObj is not None:
 				timeString = timeObj.group()
-				if int(timeString[:2]) <= 22 and int(timeString[:2]) >= 15:
+				# Is a valid time
+				if int(timeString[:2]) <= 24:
 					self.message.user.pushTimes['lecture'] = timeString
 					self.bot.sendMessage(self.message.user.chatID,
 										 ("Successfully updated your lecture push time to " + timeString))
@@ -585,11 +587,11 @@ class MessageFunctions:
 				else:
 					self.bot.sendMessage(self.message.user.chatID, (
 							"Invalid time: " + self.message.text
-							+ ". Please use the format HH:MM and notice that it has to be between 15:00 and 22:59"))
+							+ ". Please use the format HH:MM and notice that it has to be a quarter of an hour, e.g. 17:15"))
 			else:
 				self.bot.sendMessage(self.message.user.chatID, (
 						"Invalid time: " + self.message.text
-						+ ". Please use the format HH:MM and notice that it has to be between 15:00 and 22:59"))
+						+ ". Please use the format HH:MM and notice that it has to be a quarter of an hour, e.g. 17:15"))
 		else:
 			logging.warning(
 				'Wrong type for changing push time given in MessageFunctions.message_changepushtime. Given type: %s',

@@ -103,7 +103,7 @@ class CommandFunctions:
 
 	def command_getlectures(self):
 		# TODO: On fridays, options should be Today / Monday
-		isFriday = datetime.now().weekday() == 5
+		isFriday = datetime.now().weekday() == 4
 		if self.message.user.course == None or self.message.user.course == '':
 			self.bot.sendMessage(self.message.user.chatID,
 								 'I don\'t know which course you are in. Please provide me this information under /settings -> Personal Information')

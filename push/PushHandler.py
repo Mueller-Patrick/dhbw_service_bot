@@ -44,7 +44,7 @@ def sendMenuPushes(conn, bot, current_time_minutes):
 	# For the same day
 	# Normally at 06:00 but customizable
 	cur = conn.cursor()
-	get_users_sql = """SELECT chatID, name FROM users WHERE menuPushTime = %s AND wantsMenu = true AND pauseAllNotifications = false"""
+	get_users_sql = """SELECT chatID, name FROM users WHERE menuPushTime = %s AND wantsMenu = true AND pauseAllNotifications = false AND userID = 1"""
 	cur.execute(get_users_sql, (current_time_minutes,))
 	users = cur.fetchall()
 	cur.close()
@@ -128,4 +128,4 @@ def sendUnpauseNotificationsPushes(conn, bot, current_time_minutes):
 if __name__ == '__main__':
 	sendPushes()
 	# For debugging
-	#sendLecturePushes(sqlhandler.getvServerConnection(), configure_telegram(), '18:00')
+	#sendMenuPushes(sqlhandler.getvServerConnection(), configure_telegram(), '06:00')

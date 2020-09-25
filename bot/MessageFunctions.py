@@ -458,7 +458,8 @@ class MessageFunctions:
 			self.bot.sendMessage(self.message.user.chatID, (
 					"You currently receive the menu push at " + menuPushTime
 					+ ". To change that, send me the new time in the format <b>HH:MM</b>. Please notice that it has to be "
-					+ "a quarter of an hour, e.g. 10:15 and that the push is always for the <b>current</b> day."))
+					+ "a quarter of an hour, e.g. 10:15 and that the push is always for the <b>current</b> day."),
+								 parse_mode=ParseMode.HTML)
 			self.message.user.tempParams['pushtimeToBeChanged'] = 'menu'
 			self.message.user.expectedMessageType = 'changepushtime'
 		elif '🕒 Lecture Plan Push' in self.message.text:
@@ -466,7 +467,8 @@ class MessageFunctions:
 			self.bot.sendMessage(self.message.user.chatID, (
 					"You currently receive the lecture push at " + lecturePushTime
 					+ ". To change that, send me the new time in the format <b>HH:MM</b>. Please notice that it has to be "
-					+ "a quarter of an hour, e.g. 17:15 and that the push is always for the <b>next</b> day."), parse_mode=ParseMode.HTML)
+					+ "a quarter of an hour, e.g. 17:15 and that the push is always for the <b>next</b> day."),
+								 parse_mode=ParseMode.HTML)
 			self.message.user.tempParams['pushtimeToBeChanged'] = 'lecture'
 			self.message.user.expectedMessageType = 'changepushtime'
 		elif '⏪ Back' in self.message.text:
@@ -530,8 +532,8 @@ class MessageFunctions:
 				if not lf.courseExists(self.message.text):
 					lf.setUserOfCourse(self.message.user.course)
 					self.bot.sendMessage(self.message.user.chatID,
-						"I don't know the RaPla link for this course yet. Please be so kind and supply me"
-						+ " with the link for your course ❤️")
+										 "I don't know the RaPla link for this course yet. Please be so kind and supply me"
+										 + " with the link for your course ❤️")
 					self.message.user.expectedMessageType = 'raplalink'
 				else:
 					self.message.user.expectedMessageType = ''

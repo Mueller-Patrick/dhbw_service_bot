@@ -102,14 +102,24 @@ class CommandFunctions:
 		self.message.user.expectedMessageType = 'menuday'
 
 	def command_getlectures(self):
+		# TODO: On fridays, options should be Today / Monday
+		isFriday = datetime.now().weekday() == 5
 		if self.message.user.course == None or self.message.user.course == '':
 			self.bot.sendMessage(self.message.user.chatID,
 								 'I don\'t know which course you are in. Please provide me this information under /settings -> Personal Information')
 		else:
-			self.bot.sendMessage(self.message.user.chatID, 'For which day do you want the plan?',
-								 reply_markup=ReplyKeyboardMarkup([[KeyboardButton('Today'),
-																	KeyboardButton('Tomorrow')]], resize_keyboard=True,
-																  one_time_keyboard=True))
+			if isFriday:
+				self.bot.sendMessage(self.message.user.chatID, 'For which day do you want the plan?',
+									 reply_markup=ReplyKeyboardMarkup([[KeyboardButton('Today'),
+																		KeyboardButton('Monday')]],
+																	  resize_keyboard=True,
+																	  one_time_keyboard=True))
+			else:
+				self.bot.sendMessage(self.message.user.chatID, 'For which day do you want the plan?',
+									 reply_markup=ReplyKeyboardMarkup([[KeyboardButton('Today'),
+																		KeyboardButton('Tomorrow')]],
+																	  resize_keyboard=True,
+																	  one_time_keyboard=True))
 
 			self.message.user.expectedMessageType = 'lectureplanday'
 

@@ -67,8 +67,13 @@ class MessageFunctions:
 	def message_lectureplanday(self):
 		if self.message.text == 'Today':
 			day = 0
-		else:
+		elif self.message.text == 'Tomorrow':
 			day = 1
+		elif self.message.text == 'Monday':
+			day = 3
+		else:
+			self.bot.sendMessage(self.message.user.chatID, "Wrong input. Please try again.")
+			return
 
 		forDay = datetime.now() + timedelta(days=day)
 		dateString = forDay.strftime("%Y-%m-%d")

@@ -65,13 +65,13 @@ class HandleMessage:
 			print("new")
 			insert_user_query = """INSERT INTO users (chatID, name, expectedMsgType, tempParams, wantsMenu, course, 
 			wantsLecturePlan, address, wantsTransportInfo, wantsToRateMeals, menuPushTime, lecturePushTime, 
-			pauseAllNotifications) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) """
+			pauseAllNotifications, lastMessage) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, now()) """
 			cur.execute(insert_user_query, sqlconverter.getUserInsertTuple(user))
 		else:
 			print("Update")
 			update_user_query = """UPDATE users SET name = %s, expectedMsgType = %s, tempParams = %s, wantsMenu = %s, 
 			course = %s, wantsLecturePlan = %s, address = %s, wantsTransportInfo = %s, wantsToRateMeals = %s, 
-			menuPushTime = %s, lecturePushTime = %s, pauseAllNotifications = %s WHERE userID = %s """
+			menuPushTime = %s, lecturePushTime = %s, pauseAllNotifications = %s, lastMessage = now() WHERE userID = %s """
 			cur.execute(update_user_query, sqlconverter.getUserUpdateTuple(user))
 
 		conn.commit()

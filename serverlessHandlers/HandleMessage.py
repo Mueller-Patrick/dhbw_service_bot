@@ -40,11 +40,10 @@ class HandleMessage:
 			newUser = True
 		cur.close()
 
-		# Create the message object
-		message = msg.Message(user, text, message_id)
-
 		# Process message
 		try:
+			message = msg.Message(user, text, message_id)
+
 			if message.isCommand:
 				cmd.Command(message, bot, conn).findCommand()
 			else:

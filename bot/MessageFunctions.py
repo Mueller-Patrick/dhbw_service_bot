@@ -140,7 +140,8 @@ class MessageFunctions:
 		except:
 			self.bot.sendMessage(self.message.user.chatID,
 								 "There was an error during the fetching process. Please try again later.")
-			self.message.user.expectedMessageType = ''
+
+		self.message.user.expectedMessageType = ''
 
 	# Called when user sends the meal that he wants to rate
 	def message_mealtoberated(self):

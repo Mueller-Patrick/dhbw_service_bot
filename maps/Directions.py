@@ -30,6 +30,7 @@ class Direction(object):
         @param place: home of student
         @param return_journey: boolean whether its the return journey or not
         """
+        # TODO: This has to be time-zone adjusted for some reason
         self.date = date
         self.arrival_time = date.timestamp()
         print(("Arrival time1: {}, time2: {}").format(self.date, self.arrival_time))
@@ -53,6 +54,8 @@ class Direction(object):
 
         self.result_as_json = json.dumps(self.directions_result, indent=4)
         self.result_as_json = json.loads(self.result_as_json)
+        # TODO maybe print-debug here as well
+        print(self.result_as_json)
 
         self.trips = []
         for step in self.result_as_json[0]['legs'][0]['steps']:

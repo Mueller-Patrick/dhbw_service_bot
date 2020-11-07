@@ -8,7 +8,9 @@ from lecturePlan.LectureFetcher import LectureFetcher
 import menu.MenuSaver as menu
 import sys
 import traceback
-from maps import Directions
+
+
+# from maps import Directions
 
 
 def configure_telegram():
@@ -33,21 +35,13 @@ def sendPushes():
 
 	conn = sqlhandler.getvServerConnection()
 
-	lf = LectureFetcher(conn)
-	firstLectureTime = lf.getFirstLectureTime('TINF19B4', '2020-09-28')
-	print(firstLectureTime)
-	forDay = datetime.now() + timedelta(days=3)
-	time = datetime(int(forDay.year), int(forDay.month), int(forDay.day),
-					int(firstLectureTime[:2]), int(firstLectureTime[3:]))
-	print(time)
-	direc = Directions.Direction(time, 'Eppingen Bahnhof')
-	trainPlan = direc.create_message()
-	print(trainPlan)
-	return
-
 	# Menu currently not sent because it doesnt work yet
 	# sendMenuPushes(conn, bot, current_time_minutes)
-	sendReturnDirections(conn, bot, current_time_minutes)
+
+	# Directions not supported currently due to shutdown of google maps API key
+	# sendReturnDirections(conn, bot, current_time_minutes)
+
+	# Menu rating currently not sent because it doesnt work yet
 	# sendMenuRatingPushes(conn, bot, current_time_minutes)
 	sendLecturePushes(conn, bot, current_time_minutes)
 	sendUnpauseNotificationsPushes(conn, bot, current_time_minutes)
@@ -88,7 +82,9 @@ def sendReturnDirections(conn, bot, current_time_minutes):
 	# At 10:00
 	if current_time_minutes == '10:00':
 		pass
-	# Condition: wantsTransportInfo, !pauseAllNotifications
+
+
+# Condition: wantsTransportInfo, !pauseAllNotifications
 
 
 def sendMenuRatingPushes(conn, current_time_minutes):
@@ -96,7 +92,7 @@ def sendMenuRatingPushes(conn, current_time_minutes):
 	# At 14:30
 	if current_time_minutes == '14:30':
 		pass
-	# Condition: wantsMenu, wantsToRateMeals, !pauseAllNotifications
+		# Condition: wantsMenu, wantsToRateMeals, !pauseAllNotifications
 
 
 def sendLecturePushes(conn, bot, current_time_minutes):

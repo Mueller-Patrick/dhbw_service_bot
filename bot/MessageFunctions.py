@@ -87,27 +87,28 @@ class MessageFunctions:
 		else:
 			self.bot.sendMessage(self.message.user.chatID, plan, parse_mode=ParseMode.HTML)
 
-			if self.message.user.wantsTransportInfo and self.message.user.address is not None and self.message.user.address != '':
-				time = datetime(int(forDay.year), int(forDay.month), int(forDay.day),
-								int(firstLectureTime[:2]), int(firstLectureTime[3:]))
-
-				if time < datetime.now():
-					self.bot.sendMessage(self.message.user.chatID,
-										 ('Your first lecture already began, so I suppose you '
-										  + 'are at the DHBW already and don\'t need the public transport Info.'))
-				else:
-					try:
-						direc = Directions.Direction(time, self.message.user.address)
-						trainPlan = direc.create_message()
-
-						self.bot.sendMessage(self.message.user.chatID, 'Here are the public transport directions:')
-						self.bot.sendMessage(self.message.user.chatID, trainPlan, parse_mode=ParseMode.HTML)
-					except IndexError:
-						self.bot.sendMessage(self.message.user.chatID, (
-								'Could not fetch public transport directions for your address '
-								+ self.message.user.address))
-						logging.warning('In MessageFunctions(): Fetching directions for address %s not successful.',
-										self.message.user.address)
+			# Not available due to missing google maps API key
+			# if self.message.user.wantsTransportInfo and self.message.user.address is not None and self.message.user.address != '':
+			# 	time = datetime(int(forDay.year), int(forDay.month), int(forDay.day),
+			# 					int(firstLectureTime[:2]), int(firstLectureTime[3:]))
+			#
+			# 	if time < datetime.now():
+			# 		self.bot.sendMessage(self.message.user.chatID,
+			# 							 ('Your first lecture already began, so I suppose you '
+			# 							  + 'are at the DHBW already and don\'t need the public transport Info.'))
+			# 	else:
+			# 		try:
+			# 			direc = Directions.Direction(time, self.message.user.address)
+			# 			trainPlan = direc.create_message()
+			#
+			# 			self.bot.sendMessage(self.message.user.chatID, 'Here are the public transport directions:')
+			# 			self.bot.sendMessage(self.message.user.chatID, trainPlan, parse_mode=ParseMode.HTML)
+			# 		except IndexError:
+			# 			self.bot.sendMessage(self.message.user.chatID, (
+			# 					'Could not fetch public transport directions for your address '
+			# 					+ self.message.user.address))
+			# 			logging.warning('In MessageFunctions(): Fetching directions for address %s not successful.',
+			# 							self.message.user.address)
 
 		self.message.user.expectedMessageType = ''
 
@@ -130,7 +131,7 @@ class MessageFunctions:
 				forDay = datetime.now() + timedelta(days=day)
 				weekday = forDay.weekday()
 				if weekday < 5:  # Because monday is 0...
-					fetchedMenu = menu.Reader(day + 1).get_menu_as_arr()  # day+1 because 1 is today, 2 is tomorrow...
+					fetchedMenu = menu.Reader(self.conn, day + 1).get_menu_as_arr()  # day+1 because 1 is today, 2 is tomorrow...
 					self.bot.sendMessage(self.message.user.chatID, "Here you go: ")
 					for oneMenu in fetchedMenu:
 						self.bot.sendMessage(self.message.user.chatID, oneMenu)
@@ -206,6 +207,7 @@ class MessageFunctions:
 		self.bot.sendMessage(self.message.user.chatID, "Thanks for reporting this bug. We will fix it ASAP.")
 		self.message.user.expectedMessageType = ''
 
+	# DEPRECATED
 	def message_directionstype(self):
 		if self.message.text == '-> DHBW':
 			try:

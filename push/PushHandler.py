@@ -135,10 +135,4 @@ def sendUnpauseNotificationsPushes(conn, bot, current_time_minutes):
 	# At 18:00
 	if current_time_minutes == '18:00':
 		pass
-	# Condition: pauseAllNotifications, plan fpr tomorrow contains "Beginn Theoriephase"
-
-
-if __name__ == '__main__':
-	sendPushes()
-# For debugging
-# sendMenuPushes(sqlhandler.getvServerConnection(), configure_telegram(), '06:00')
+		# Condition: pauseAllNotifications, plan fpr tomorrow contains "Beginn Theoriephase"

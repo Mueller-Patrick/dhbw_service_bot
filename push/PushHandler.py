@@ -20,7 +20,7 @@ def configure_telegram():
 	Returns a bot instance.
 	"""
 
-	TELEGRAM_TOKEN = os.environ.get('DHBW_TELEGRAM_TOKEN')
+	TELEGRAM_TOKEN = os.environ['DHBW_TELEGRAM_TOKEN']
 	if not TELEGRAM_TOKEN:
 		logging.error('The TELEGRAM_TOKEN must be set')
 		raise NotImplementedError

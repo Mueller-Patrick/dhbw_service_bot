@@ -24,7 +24,7 @@ def getvServerConnection():
 			conn = pymysql.connect(
 				user=os.environ['vServer_SQL_User'],
 				password=os.environ['vServer_SQL_Password'],
-				host=os.environ['localhost'],
+				host='localhost',
 				port=3306,
 				database=os.environ['DHBW_Bot_Database']
 			)

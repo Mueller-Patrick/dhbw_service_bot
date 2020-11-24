@@ -39,5 +39,4 @@ For a list of supported commands, see
 `docs/telegram_command_description.md`
 
 **KNOWN ISSUES**<br>
-Currently, apart from the fact that the push service is not active yet, no known issues exist. Feel free to create an
-issue directly in this repository or via /reportbug if you use the bot.
+Currently, no bigger known issues exist. Feel free to create an issue directly in this repository or via /reportbug if you use the bot.

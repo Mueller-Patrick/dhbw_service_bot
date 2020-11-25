@@ -92,7 +92,7 @@ def sendMenuRatingPushes(conn, current_time_minutes):
 	# At 14:30
 	if current_time_minutes == '14:30':
 		pass
-		# Condition: wantsMenu, wantsToRateMeals, !pauseAllNotifications
+	# Condition: wantsMenu, wantsToRateMeals, !pauseAllNotifications
 
 
 def sendLecturePushes(conn, bot, current_time_minutes):
@@ -113,8 +113,12 @@ def sendLecturePushes(conn, bot, current_time_minutes):
 			courses = lf.getAllKnownCourses()
 			courseDict = {}
 			for course in courses:
-				courseDict[course] = [lf.getFormattedLectures(course, dateString),
-									  lf.getFirstLectureTime(course, dateString)]
+				plan = lf.getFormattedLectures(course, dateString)
+				if plan:
+					time = lf.getFirstLectureTime(course, dateString)
+					courseDict[course] = [plan, time]
+				else:
+					courseDict[course] = [None, None]
 
 			# Send the push for the users
 			for user in users:
@@ -123,16 +127,21 @@ def sendLecturePushes(conn, bot, current_time_minutes):
 				course = user[2]
 
 				plan = courseDict[course][0]
-				firstLectureTime = courseDict[course][1]
+				if plan:
+					firstLectureTime = courseDict[course][1]
 
-				bot.sendMessage(chatID,
-								('Howdy {}. Tomorrow your first lecture begins '
-								 + 'at {}. Here is the plan for tomorrow:').format(name, firstLectureTime))
-				bot.sendMessage(chatID, plan, parse_mode=ParseMode.HTML)
+					bot.sendMessage(chatID,
+									('Howdy {}. Tomorrow your first lecture begins '
+									 + 'at {}. Here is the plan for tomorrow:').format(name, firstLectureTime))
+					bot.sendMessage(chatID, plan, parse_mode=ParseMode.HTML)
+				else:
+					bot.sendMessage(chatID,
+									('Howdy {}. Tomorrow, you don\'t have any lectures! Enjoy your free time!').format(
+										name))
 
 
 def sendUnpauseNotificationsPushes(conn, bot, current_time_minutes):
 	# At 18:00
 	if current_time_minutes == '18:00':
 		pass
-		# Condition: pauseAllNotifications, plan fpr tomorrow contains "Beginn Theoriephase"
+	# Condition: pauseAllNotifications, plan fpr tomorrow contains "Beginn Theoriephase"

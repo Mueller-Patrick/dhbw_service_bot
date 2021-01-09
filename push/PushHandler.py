@@ -1,5 +1,7 @@
 import telegram
 from telegram import ParseMode
+from telegram import ReplyKeyboardMarkup
+from telegram import KeyboardButton
 import os
 import logging
 from datetime import datetime, timedelta
@@ -141,7 +143,35 @@ def sendLecturePushes(conn, bot, current_time_minutes):
 
 
 def sendUnpauseNotificationsPushes(conn, bot, current_time_minutes):
-	# At 18:00
-	if current_time_minutes == '18:00':
-		pass
-	# Condition: pauseAllNotifications, plan fpr tomorrow contains "Beginn Theoriephase"
+	# Get required dates
+	tomorrow = datetime.now() + timedelta(days=1)
+	weekday = int(tomorrow.weekday())
+	dateString = tomorrow.strftime("%Y-%m-%d")
+
+	# At 18:00 and if the next day is a monday because thats when theory phases start
+	if current_time_minutes == '18:00' and weekday == 0:
+		lf = LectureFetcher(conn)
+		courses = lf.getAllKnownCourses()
+		for course in courses:
+			plan = lf.getFormattedLectures(course, dateString)
+
+			if plan:
+				if "beginn theoriephase" in plan.lower():
+					cur = conn.cursor()
+					get_users_sql = """SELECT chatID, name, course FROM users WHERE course = %s AND pauseAllNotifications = true"""
+					set_expected_msg_type = """UPDATE users SET expectedMsgType = 'wantstounpausepush' WHERE course = %s AND pauseAllNotifications = true"""
+					cur.execute(get_users_sql, (course,))
+					cur.execute(set_expected_msg_type, (course,))
+					users = cur.fetchall()
+					cur.close()
+
+					for user in users:
+						chatID = user[0]
+						name = user[1]
+						course = user[2]
+
+						bot.sendMessage(chatID, ("Hi, {}! I noticed that your next theory phase starts tomorrow. Do you want to unpause the push notifications?".format(name)),
+											 reply_markup=ReplyKeyboardMarkup([[KeyboardButton('Yes'),
+																				KeyboardButton('No')]],
+																			  resize_keyboard=True,
+																			  one_time_keyboard=True))

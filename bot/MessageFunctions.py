@@ -545,6 +545,7 @@ class MessageFunctions:
 										 + " with the link for your course ❤️")
 					self.message.user.expectedMessageType = 'raplalink'
 				else:
+					lf.setUserOfCourse(self.message.user.course)
 					self.message.user.expectedMessageType = ''
 		else:
 			logging.warning(

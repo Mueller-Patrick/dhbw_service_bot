@@ -137,14 +137,20 @@ class LectureFetcher:
 			return lectures
 
 	def setUserOfCourse(self, courseName):
+		cur = self.conn.cursor()
 		if courseName.upper() not in self.linkDict:
-			cur = self.conn.cursor()
+
 			self.linkDict[courseName.upper()] = ''
 			# Insert the new course
 			course_insert_sql = """INSERT INTO courses (name) VALUES (%s)"""
 			cur.execute(course_insert_sql, (courseName.upper(),))
-			self.conn.commit()
-			cur.close()
+		else:
+			# Update the course
+			course_insert_sql = """UPDATE courses SET has_users = 1 WHERE name = %s"""
+			cur.execute(course_insert_sql, (courseName.upper(),))
+
+		self.conn.commit()
+		cur.close()
 
 	def getAllKnownCourses(self):
 		return list(self.linkDict)

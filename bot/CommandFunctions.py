@@ -102,20 +102,23 @@ class CommandFunctions:
 		self.message.user.expectedMessageType = 'menuday'
 
 	def command_getlectures(self):
-		# TODO: On fridays, options should be Today / Monday
 		isFriday = datetime.now().weekday() == 4
 		if self.message.user.course == None or self.message.user.course == '':
 			self.bot.sendMessage(self.message.user.chatID,
 								 'I don\'t know which course you are in. Please provide me this information under /settings -> Personal Information')
 		else:
 			if isFriday:
-				self.bot.sendMessage(self.message.user.chatID, 'For which day do you want the plan?',
+				self.bot.sendMessage(self.message.user.chatID,
+									 ('For which day do you want the plan? (Hint: You can also get the lectures for'
+									  + ' any day if you send me the date in the format YYYY-MM-DD, e.g. 2021-01-19)'),
 									 reply_markup=ReplyKeyboardMarkup([[KeyboardButton('Today'),
 																		KeyboardButton('Monday')]],
 																	  resize_keyboard=True,
 																	  one_time_keyboard=True))
 			else:
-				self.bot.sendMessage(self.message.user.chatID, 'For which day do you want the plan?',
+				self.bot.sendMessage(self.message.user.chatID,
+									 ('For which day do you want the plan? (Hint: You can also get the lectures for"'
+									  + ' any day if you send me the date in the format YYYY-MM-DD, e.g. 2021-01-19)'),
 									 reply_markup=ReplyKeyboardMarkup([[KeyboardButton('Today'),
 																		KeyboardButton('Tomorrow')]],
 																	  resize_keyboard=True,
@@ -170,12 +173,12 @@ class CommandFunctions:
 
 	def command_getdirections(self):
 		self.bot.sendMessage(self.message.user.chatID, "This feature is currently turned off for maintenance reasons.")
-	# if self.message.user.address is not None and self.message.user.address != '':
-	# 	self.bot.sendMessage(self.message.user.chatID, "What directions do you want?",
-	# 						 reply_markup=ReplyKeyboardMarkup([[KeyboardButton('-> DHBW')],
-	# 														   [KeyboardButton('-> Home')]], resize_keyboard=True,
-	# 														  one_time_keyboard=True))
-	# 	self.message.user.expectedMessageType = 'directionstype'
-	# else:
-	# 	self.bot.sendMessage(self.message.user.chatID,
-	# 						 "I don\'t know your address. Please provide me this with /settings -> Personal Information")
+# if self.message.user.address is not None and self.message.user.address != '':
+# 	self.bot.sendMessage(self.message.user.chatID, "What directions do you want?",
+# 						 reply_markup=ReplyKeyboardMarkup([[KeyboardButton('-> DHBW')],
+# 														   [KeyboardButton('-> Home')]], resize_keyboard=True,
+# 														  one_time_keyboard=True))
+# 	self.message.user.expectedMessageType = 'directionstype'
+# else:
+# 	self.bot.sendMessage(self.message.user.chatID,
+# 						 "I don\'t know your address. Please provide me this with /settings -> Personal Information")

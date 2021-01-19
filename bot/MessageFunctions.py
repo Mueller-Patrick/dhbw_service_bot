@@ -73,22 +73,31 @@ class MessageFunctions:
 		"""
 		Called when user sends the day he wants the lecture plan for
 		"""
+		# Regex to check if the text confirms to the format YYYY-MM-DD
+		dateRegex = re.compile("20\d{2}-(0[1-9]|1[1-2])-([0-2][1-9]|3[0-1])")
+		foundDate = re.search(dateRegex, self.message.text).group(0)
+
 		if self.message.text == 'Today':
 			day = 0
 		elif self.message.text == 'Tomorrow':
 			day = 1
 		elif self.message.text == 'Monday':
 			day = 3
+		elif len(foundDate) > 0:
+			day = -1
 		else:
 			self.bot.sendMessage(self.message.user.chatID, "Wrong input. Please try again.")
 			return
 
-		forDay = datetime.now() + timedelta(days=day)
-		dateString = forDay.strftime("%Y-%m-%d")
 		lf = LectureFetcher(self.conn)
+		# If the user sent Today, Tomorrow or Monday, we have to create the date string ourselves.
+		# If he already sent a date string in the format YYYY-MM-DD, we can use this directly
+		if day is not -1:
+			forDay = datetime.now() + timedelta(days=day)
+			dateString = forDay.strftime("%Y-%m-%d")
+		else:
+			dateString = foundDate
 		plan = lf.getFormattedLectures(self.message.user.course, dateString)
-		firstLectureTime = lf.getFirstLectureTime(self.message.user.course, dateString)
-		print(('First lecture time for {}: {}').format(dateString, firstLectureTime))
 
 		if not plan:
 			self.bot.sendMessage(self.message.user.chatID, 'No more lectures for that day.')

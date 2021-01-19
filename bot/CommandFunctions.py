@@ -117,7 +117,7 @@ class CommandFunctions:
 																	  one_time_keyboard=True))
 			else:
 				self.bot.sendMessage(self.message.user.chatID,
-									 ('For which day do you want the plan? (Hint: You can also get the lectures for"'
+									 ('For which day do you want the plan? (Hint: You can also get the lectures for'
 									  + ' any day if you send me the date in the format YYYY-MM-DD, e.g. 2021-01-19)'),
 									 reply_markup=ReplyKeyboardMarkup([[KeyboardButton('Today'),
 																		KeyboardButton('Tomorrow')]],

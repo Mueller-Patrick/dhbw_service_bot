@@ -75,7 +75,13 @@ class MessageFunctions:
 		"""
 		# Regex to check if the text confirms to the format YYYY-MM-DD
 		dateRegex = re.compile("20\d{2}-(0[1-9]|1[1-2])-([0-2][1-9]|3[0-1])")
-		foundDate = re.search(dateRegex, self.message.text).group(0)
+		foundDate = re.search(dateRegex, self.message.text)
+
+		# If the regex found a match, set the foundDate to the match. Otherwise, it has to be an empty string
+		if foundDate:
+			foundDate = foundDate.group(0)
+		else:
+			foundDate = ''
 
 		if self.message.text == 'Today':
 			day = 0

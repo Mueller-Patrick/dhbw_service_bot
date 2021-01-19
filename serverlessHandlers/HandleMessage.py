@@ -55,9 +55,9 @@ class HandleMessage:
 			logging.warning("An error occured handling the following message: %s. Error: %s, Stacktrace: %s", text, e,
 							stack)
 			bot.sendMessage(chat_id,
-							"An Error occured while trying to fulfill your request. Currently, not all commands"
-							+ " are available due to the porting. Please try again another time. You can check the progress"
-							+ " here: https://github.com/Mueller-Patrick/dhbw_service_bot")
+							"An error occured while trying to fulfill your request. If this keeps happening,"
+							+ " please file a bug report via /reportbug, create an issue on GitHub under"
+							+ " https://github.com/Mueller-Patrick/dhbw_service_bot or send a message to @P4ddy_m")
 
 		# Save user object to SQL
 		cur = conn.cursor()

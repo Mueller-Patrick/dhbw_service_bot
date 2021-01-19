@@ -23,6 +23,7 @@ def getUser(sql_row):
 	menuPushTime = menuPushTime if menuPushTime[len(menuPushTime) - 1] != ':' else ('0' + menuPushTime)[0:5]
 	lecturePushTime = str(sql_row[12])[0:5]
 	pauseAllNotifications = sql_row[13] == 1
+	wantsExamWarning = sql_row[14] == 1
 
 	user = usr.User(chatID)
 	user.userID = userID
@@ -38,6 +39,7 @@ def getUser(sql_row):
 	user.pushTimes['menu'] = menuPushTime
 	user.pushTimes['lecture'] = lecturePushTime
 	user.pauseAllNotifications = pauseAllNotifications
+	user.wantsExamWarning = wantsExamWarning
 
 	return user
 
@@ -61,6 +63,7 @@ def getUserUpdateTuple(user):
 		user.pushTimes['menu'],
 		user.pushTimes['lecture'],
 		user.pauseAllNotifications,
+		user.wantsExamWarning,
 		user.userID
 	)
 
@@ -86,7 +89,8 @@ def getUserInsertTuple(user):
 		user.wantsToRateMeals,
 		user.pushTimes['menu'],
 		user.pushTimes['lecture'],
-		user.pauseAllNotifications
+		user.pauseAllNotifications,
+		user.wantsExamWarning
 	)
 
 	return tuple

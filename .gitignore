@@ -13,6 +13,9 @@
 
 # Serverless stuff
 
+# Local testing stuff
+localTest.py
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

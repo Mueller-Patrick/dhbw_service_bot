@@ -2,8 +2,8 @@
  Bot class, an object of type bot is created in main.init() at startup with the required parameters.
 """
 
-import telegram
 import logging
+import os
 
 import bot.User as usr
 import bot.Message as msg
@@ -24,7 +24,7 @@ class HandleMessage:
 		cur = conn.cursor()
 		select_user_query = """SELECT userID, chatID, name, expectedMsgType, tempParams, wantsMenu, course, 
 		wantsLecturePlan, address, wantsTransportInfo, wantsToRateMeals, menuPushTime, lecturePushTime, 
-		pauseAllNotifications FROM users WHERE chatID = %s """
+		pauseAllNotifications, wantsExamWarning FROM users WHERE chatID = %s """
 		cur.execute(select_user_query, (chat_id,))
 		userSqlRow = cur.fetchall()
 		conn.commit()
@@ -58,6 +58,9 @@ class HandleMessage:
 							"An error occured while trying to fulfill your request. If this keeps happening,"
 							+ " please file a bug report via /reportbug, create an issue on GitHub under"
 							+ " https://github.com/Mueller-Patrick/dhbw_service_bot or send a message to @P4ddy_m")
+			bot.sendMessage(os.environ['PATRICK_TELEGRAM_ID'],
+							("The bot encountered an error.\nMessage received: {}\nError: {}\nStack: {}".format(
+								text, e, stack)))
 
 		# Save user object to SQL
 		cur = conn.cursor()
@@ -65,13 +68,13 @@ class HandleMessage:
 			print("new")
 			insert_user_query = """INSERT INTO users (chatID, name, expectedMsgType, tempParams, wantsMenu, course, 
 			wantsLecturePlan, address, wantsTransportInfo, wantsToRateMeals, menuPushTime, lecturePushTime, 
-			pauseAllNotifications, lastMessage) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, now()) """
+			pauseAllNotifications, lastMessage, wantsExamWarning) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, now(), %s) """
 			cur.execute(insert_user_query, sqlconverter.getUserInsertTuple(user))
 		else:
 			print("Update")
 			update_user_query = """UPDATE users SET name = %s, expectedMsgType = %s, tempParams = %s, wantsMenu = %s, 
 			course = %s, wantsLecturePlan = %s, address = %s, wantsTransportInfo = %s, wantsToRateMeals = %s, 
-			menuPushTime = %s, lecturePushTime = %s, pauseAllNotifications = %s, lastMessage = now() WHERE userID = %s """
+			menuPushTime = %s, lecturePushTime = %s, pauseAllNotifications = %s, lastMessage = now(), wantsExamWarning = %s WHERE userID = %s """
 			cur.execute(update_user_query, sqlconverter.getUserUpdateTuple(user))
 
 		conn.commit()

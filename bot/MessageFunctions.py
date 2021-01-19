@@ -98,7 +98,7 @@ class MessageFunctions:
 		lf = LectureFetcher(self.conn)
 		# If the user sent Today, Tomorrow or Monday, we have to create the date string ourselves.
 		# If he already sent a date string in the format YYYY-MM-DD, we can use this directly
-		if day is not -1:
+		if day != -1:
 			forDay = datetime.now() + timedelta(days=day)
 			dateString = forDay.strftime("%Y-%m-%d")
 		else:
@@ -312,6 +312,11 @@ class MessageFunctions:
 			else:
 				options.append([KeyboardButton('✅ Subscribe the Lecture Plan Push')])
 
+			if self.message.user.wantsExamWarning:
+				options.append([KeyboardButton('❌ Unsubscribe the Exam Warning Push')])
+			else:
+				options.append([KeyboardButton('✅ Subscribe the Exam Warning Push')])
+
 			if self.message.user.wantsTransportInfo:
 				options.append([KeyboardButton('❌ Unsubscribe the Public Transport Info')])
 			else:
@@ -432,6 +437,22 @@ class MessageFunctions:
 																	  resize_keyboard=True,
 																	  one_time_keyboard=True))
 			self.message.user.expectedMessageType = ''
+		elif self.message.text == '❌ Unsubscribe the Exam Warning Push':
+			self.message.user.wantsExamWarning = False
+			self.bot.sendMessage(self.message.user.chatID, "💔 Unsubscribed you from the exam warning push")
+			self.message.user.expectedMessageType = ''
+		elif self.message.text == '✅ Subscribe the Exam Warning Push':
+			self.message.user.wantsExamWarning = True
+			self.bot.sendMessage(self.message.user.chatID, "❤️ Subscribed you to the exam warning push")
+			# Check if the user has already entered his course
+			if self.message.user.course == '' or self.message.user.course is None:
+				self.bot.sendMessage(self.message.user.chatID,
+									 ("‼️ You have not entered your course yet. "
+									  + "Please do that via /settings -> Personal Information."),
+									 reply_markup=ReplyKeyboardMarkup([[KeyboardButton('/settings')]],
+																	  resize_keyboard=True,
+																	  one_time_keyboard=True))
+			self.message.user.expectedMessageType = ''
 		elif self.message.text == '❌ Unsubscribe the Public Transport Info':
 			self.message.user.wantsTransportInfo = False
 			self.bot.sendMessage(self.message.user.chatID, "💔 Unsubscribed you from the public transport info")
@@ -482,6 +503,11 @@ class MessageFunctions:
 				options.append([KeyboardButton('❌ Unsubscribe the Lecture Plan Push')])
 			else:
 				options.append([KeyboardButton('✅ Subscribe the Lecture Plan Push')])
+
+			if self.message.user.wantsExamWarning:
+				options.append([KeyboardButton('❌ Unsubscribe the Exam Warning Push')])
+			else:
+				options.append([KeyboardButton('✅ Subscribe the Exam Warning Push')])
 
 			if self.message.user.wantsTransportInfo:
 				options.append([KeyboardButton('❌ Unsubscribe the Public Transport Info')])

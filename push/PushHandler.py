@@ -49,6 +49,7 @@ def sendPushes():
 	# Menu rating currently not sent because it doesnt work yet
 	# sendMenuRatingPushes(conn, bot, current_time_minutes)
 	sendLecturePushes(conn, bot, current_time_minutes)
+	sendExamWarningPushes(conn, bot, current_time_minutes)
 	sendUnpauseNotificationsPushes(conn, bot, current_time_minutes)
 
 
@@ -210,3 +211,62 @@ def sendUnpauseNotificationsPushes(conn, bot, current_time_minutes):
 																		   KeyboardButton('No')]],
 																		 resize_keyboard=True,
 																		 one_time_keyboard=True))
+
+
+def sendExamWarningPushes(conn, bot, current_time_minutes):
+	"""
+	Sends the exam warning pushes
+	@param conn: The SQL connection
+	@param bot: The bot instance
+	@param current_time_minutes: The current time
+	"""
+
+	# Run only at 18:00
+	if current_time_minutes == '18:00':
+		# Check for exam 7 days from now
+		oneWeekFromNow = datetime.now() + timedelta(days=7)
+		dateString = oneWeekFromNow.strftime("%Y-%m-%d")
+
+		lf = LectureFetcher(conn)
+		courses = lf.getAllKnownCourses()
+		courseDict = {}
+		for course in courses:
+			plan = lf.getLecturesByCourseName(course, dateString)
+			if len(plan) > 0:
+				planContainsExam = False
+				examName = ''
+				beginTime = ''
+				endTime = ''
+				for event in plan:
+					if 'Prüfung' in event.categories:
+						planContainsExam = True
+						examName = event.summary
+						beginTime = str(event.start)[11:16]
+						endTime = str(event.end)[11:16]
+
+				if planContainsExam:
+					courseDict[course] = [examName, beginTime, endTime]
+
+		# Only run the following code if at least one exam has to be announced
+		if len(list(courseDict)) > 0:
+			cur = conn.cursor()
+			get_users_sql = """SELECT chatID, name, course FROM users WHERE wantsExamWarning = true"""
+			cur.execute(get_users_sql)
+			users = cur.fetchall()
+			cur.close()
+
+			if len(users) > 0:
+				# Send the push for the users
+				for user in users:
+					chatID = user[0]
+					name = user[1]
+					course = user[2]
+
+					# Only send the push if there is an exam for the current user's course
+					if course in list(courseDict):
+						examInfo = courseDict[course]
+
+						bot.sendMessage(chatID,
+										('Howdy {}. Unfortunately, you have an exam one week from now on {}: {}.\n'
+										 + 'The exam will start at {} and end at {}. I wish you the best of luck!')
+										.format(name, dateString, examInfo[0], examInfo[1], examInfo[2]))

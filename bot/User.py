@@ -25,3 +25,4 @@ class User:
 		# Temporary variables that dont need to be persisted
 		self.sentMenuPushToday = False
 		self.sentLecturePushToday = False
+		self.wantsExamWarning = False

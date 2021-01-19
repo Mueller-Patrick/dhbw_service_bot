@@ -170,12 +170,12 @@ class CommandFunctions:
 
 	def command_getdirections(self):
 		self.bot.sendMessage(self.message.user.chatID, "This feature is currently turned off for maintenance reasons.")
-		# if self.message.user.address is not None and self.message.user.address != '':
-		# 	self.bot.sendMessage(self.message.user.chatID, "What directions do you want?",
-		# 						 reply_markup=ReplyKeyboardMarkup([[KeyboardButton('-> DHBW')],
-		# 														   [KeyboardButton('-> Home')]], resize_keyboard=True,
-		# 														  one_time_keyboard=True))
-		# 	self.message.user.expectedMessageType = 'directionstype'
-		# else:
-		# 	self.bot.sendMessage(self.message.user.chatID,
-		# 						 "I don\'t know your address. Please provide me this with /settings -> Personal Information")
+	# if self.message.user.address is not None and self.message.user.address != '':
+	# 	self.bot.sendMessage(self.message.user.chatID, "What directions do you want?",
+	# 						 reply_markup=ReplyKeyboardMarkup([[KeyboardButton('-> DHBW')],
+	# 														   [KeyboardButton('-> Home')]], resize_keyboard=True,
+	# 														  one_time_keyboard=True))
+	# 	self.message.user.expectedMessageType = 'directionstype'
+	# else:
+	# 	self.bot.sendMessage(self.message.user.chatID,
+	# 						 "I don\'t know your address. Please provide me this with /settings -> Personal Information")

@@ -17,15 +17,19 @@ class MessageFunctions:
 		self.bot = bot
 		self.conn = conn
 
-	# Called when user sends a normal message but we don't expect any input
 	def message_unknown(self):
+		"""
+		Called when user sends a normal message but we don't expect any input
+		"""
 		self.bot.sendMessage(self.message.user.chatID,
 							 'I don\'t know what to do with your input :( Use /help to get help:',
 							 reply_markup=ReplyKeyboardMarkup([[KeyboardButton('/help')]], resize_keyboard=True,
 															  one_time_keyboard=True))
 
-	# Called when user registers for the first time and sends his name
 	def message_startname(self):
+		"""
+		Called when user registers for the first time and sends his name
+		"""
 		self.message.user.name = self.message.text
 		welcomeMsg = (
 				'Hello, <b>' + self.message.text + '</b>! Pleased to meet you! To get you started, I\'ll now explain to '
@@ -47,8 +51,10 @@ class MessageFunctions:
 		self.bot.sendMessage(self.message.user.chatID, welcomeMsg, parse_mode=ParseMode.HTML)
 		self.message.user.expectedMessageType = ''
 
-	# Called when Patrick wants to broadcast something
 	def message_broadcastmessage(self):
+		"""
+		Called when Patrick wants to broadcast something
+		"""
 		users = []
 		cur = self.conn.cursor()
 		getAllUsersString = """SELECT chatID FROM users"""
@@ -63,8 +69,10 @@ class MessageFunctions:
 
 		self.message.user.expectedMessageType = ''
 
-	# Called when user sends the day he wants the lecture plan for
 	def message_lectureplanday(self):
+		"""
+		Called when user sends the day he wants the lecture plan for
+		"""
 		if self.message.text == 'Today':
 			day = 0
 		elif self.message.text == 'Tomorrow':
@@ -87,33 +95,35 @@ class MessageFunctions:
 		else:
 			self.bot.sendMessage(self.message.user.chatID, plan, parse_mode=ParseMode.HTML)
 
-			# Not available due to missing google maps API key
-			# if self.message.user.wantsTransportInfo and self.message.user.address is not None and self.message.user.address != '':
-			# 	time = datetime(int(forDay.year), int(forDay.month), int(forDay.day),
-			# 					int(firstLectureTime[:2]), int(firstLectureTime[3:]))
-			#
-			# 	if time < datetime.now():
-			# 		self.bot.sendMessage(self.message.user.chatID,
-			# 							 ('Your first lecture already began, so I suppose you '
-			# 							  + 'are at the DHBW already and don\'t need the public transport Info.'))
-			# 	else:
-			# 		try:
-			# 			direc = Directions.Direction(time, self.message.user.address)
-			# 			trainPlan = direc.create_message()
-			#
-			# 			self.bot.sendMessage(self.message.user.chatID, 'Here are the public transport directions:')
-			# 			self.bot.sendMessage(self.message.user.chatID, trainPlan, parse_mode=ParseMode.HTML)
-			# 		except IndexError:
-			# 			self.bot.sendMessage(self.message.user.chatID, (
-			# 					'Could not fetch public transport directions for your address '
-			# 					+ self.message.user.address))
-			# 			logging.warning('In MessageFunctions(): Fetching directions for address %s not successful.',
-			# 							self.message.user.address)
+		# Not available due to missing google maps API key
+		# if self.message.user.wantsTransportInfo and self.message.user.address is not None and self.message.user.address != '':
+		# 	time = datetime(int(forDay.year), int(forDay.month), int(forDay.day),
+		# 					int(firstLectureTime[:2]), int(firstLectureTime[3:]))
+		#
+		# 	if time < datetime.now():
+		# 		self.bot.sendMessage(self.message.user.chatID,
+		# 							 ('Your first lecture already began, so I suppose you '
+		# 							  + 'are at the DHBW already and don\'t need the public transport Info.'))
+		# 	else:
+		# 		try:
+		# 			direc = Directions.Direction(time, self.message.user.address)
+		# 			trainPlan = direc.create_message()
+		#
+		# 			self.bot.sendMessage(self.message.user.chatID, 'Here are the public transport directions:')
+		# 			self.bot.sendMessage(self.message.user.chatID, trainPlan, parse_mode=ParseMode.HTML)
+		# 		except IndexError:
+		# 			self.bot.sendMessage(self.message.user.chatID, (
+		# 					'Could not fetch public transport directions for your address '
+		# 					+ self.message.user.address))
+		# 			logging.warning('In MessageFunctions(): Fetching directions for address %s not successful.',
+		# 							self.message.user.address)
 
 		self.message.user.expectedMessageType = ''
 
-	# Called when user sends the day he wants the menu for
 	def message_menuday(self):
+		"""
+		Called when user sends the day he wants the menu for
+		"""
 		if self.message.text == 'Today':
 			day = 0
 		elif self.message.text == 'Tomorrow':
@@ -131,7 +141,8 @@ class MessageFunctions:
 				forDay = datetime.now() + timedelta(days=day)
 				weekday = forDay.weekday()
 				if weekday < 5:  # Because monday is 0...
-					fetchedMenu = menu.Reader(self.conn, day + 1).get_menu_as_arr()  # day+1 because 1 is today, 2 is tomorrow...
+					fetchedMenu = menu.Reader(self.conn,
+											  day + 1).get_menu_as_arr()  # day+1 because 1 is today, 2 is tomorrow...
 					self.bot.sendMessage(self.message.user.chatID, "Here you go: ")
 					for oneMenu in fetchedMenu:
 						self.bot.sendMessage(self.message.user.chatID, oneMenu)
@@ -144,8 +155,10 @@ class MessageFunctions:
 
 		self.message.user.expectedMessageType = ''
 
-	# Called when user sends the meal that he wants to rate
 	def message_mealtoberated(self):
+		"""
+		Called when user sends the meal that he wants to rate
+		"""
 		mealToBeRated = self.message.text
 
 		if mealToBeRated == 'Don\'t rate':
@@ -174,8 +187,10 @@ class MessageFunctions:
 										  [KeyboardButton('Don\'t rate')]], resize_keyboard=True,
 										 one_time_keyboard=True))
 
-	# Called when user sends the rating for his meal
 	def message_mealrating(self):
+		"""
+		Called when user sends the rating for his meal
+		"""
 		rating = self.message.text
 		mealArr = self.message.user.tempParams['ratingMealset']
 
@@ -199,16 +214,20 @@ class MessageFunctions:
 									   KeyboardButton('5 ⭐')]], resize_keyboard=True,
 									 one_time_keyboard=True))
 
-	# Called when user sends the description of a bug he encountered
 	def message_bugdescription(self):
+		"""
+		Called when user sends the description of a bug he encountered
+		"""
 		logging.warning(('Got a bug report by ' + self.message.user.name + ':\n\n' + self.message.text))
 		self.bot.sendMessage(os.environ['PATRICK_TELEGRAM_ID'],
 							 ('Got a bug report by ' + self.message.user.name + ':\n\n' + self.message.text))
 		self.bot.sendMessage(self.message.user.chatID, "Thanks for reporting this bug. We will fix it ASAP.")
 		self.message.user.expectedMessageType = ''
 
-	# DEPRECATED
 	def message_directionstype(self):
+		"""
+		@deprecated
+		"""
 		if self.message.text == '-> DHBW':
 			try:
 				direc = Directions.Direction(datetime.now(), self.message.user.address, False, True)
@@ -246,8 +265,10 @@ class MessageFunctions:
 																  resize_keyboard=True,
 																  one_time_keyboard=True))
 
-	# Called when user sends the type of settings he wants to change
 	def message_settingstype(self):
+		"""
+		Called when user sends the type of settings he wants to change
+		"""
 		if self.message.text == '️🧍 Personal Information':
 			self.bot.sendMessage(self.message.user.chatID,
 								 "Here are the Information about you that you can change:",
@@ -317,8 +338,10 @@ class MessageFunctions:
 									  [KeyboardButton('🧨 Cancel')]], resize_keyboard=True,
 									 one_time_keyboard=True))
 
-	# Called when user sends the information that he wants to change his personal info
 	def message_settingspersonalinfo(self):
+		"""
+		Called when user sends the information that he wants to change his personal info
+		"""
 		if self.message.text == '🗣 Name':
 			self.bot.sendMessage(self.message.user.chatID,
 								 "So you changed your name, huh? Interesting. Alright, send me your new one then:")
@@ -358,8 +381,10 @@ class MessageFunctions:
 									  [KeyboardButton('⏪ Back')]], resize_keyboard=True,
 									 one_time_keyboard=True))
 
-	# Called when user sends the information that he wants to change his subscription settings
 	def message_settingssubscriptions(self):
+		"""
+		Called when user sends the information that he wants to change his subscription settings
+		"""
 		if self.message.text == '🔔 Unpause all Push Notifications':
 			self.message.user.pauseAllNotifications = False
 			self.bot.sendMessage(self.message.user.chatID, "Unpaused the Push Notifications. Just for you.")
@@ -460,8 +485,10 @@ class MessageFunctions:
 								 reply_markup=ReplyKeyboardMarkup(options, resize_keyboard=True,
 																  one_time_keyboard=True))
 
-	# Called when the user sends the information which push time he wants to change
 	def message_settingstimes(self):
+		"""
+		Called when the user sends the information which push time he wants to change
+		"""
 		if '🍜 Menu Push' in self.message.text:
 			menuPushTime = self.message.user.pushTimes['menu']
 			self.bot.sendMessage(self.message.user.chatID, (
@@ -501,8 +528,10 @@ class MessageFunctions:
 									  [KeyboardButton('⏪ Back')]], resize_keyboard=True,
 									 one_time_keyboard=True))
 
-	# Called when the user sends the new info about him
 	def message_changepersonalinfo(self):
+		"""
+		Called when the user sends the new info about him
+		"""
 		type = self.message.user.tempParams['personalInfoToBeChanged']
 
 		if type == 'name':
@@ -552,8 +581,10 @@ class MessageFunctions:
 				'Wrong type for changing personal info given in MessageFunctions.message_changepersonalinfo. Given type: %s',
 				type)
 
-	# Called when the user sends the new push time
 	def message_changepushtime(self):
+		"""
+		Called when the user sends the new push time
+		"""
 		type = self.message.user.tempParams['pushtimeToBeChanged']
 
 		if type == 'menu':
@@ -607,8 +638,10 @@ class MessageFunctions:
 				'Wrong type for changing push time given in MessageFunctions.message_changepushtime. Given type: %s',
 				type)
 
-	# Called when a user sends the RaPla link for a newly created course.
 	def message_raplalink(self):
+		"""
+		Called when a user sends the RaPla link for a newly created course.
+		"""
 		if self.message.text == 'cancel':
 			self.message.user.expectedMessageType = ''
 			self.bot.sendMessage(self.message.user.chatID, 'Mission aborted, repeating: MISSION ABORTED.')
@@ -628,6 +661,9 @@ class MessageFunctions:
 				self.message.user.expectedMessageType = 'raplalink'
 
 	def message_wantstounpausepush(self):
+		"""
+		Called when the user sends an answer whether or not he wants to unpause the push notifications
+		"""
 		if self.message.text == 'Yes':
 			self.message.user.pauseAllNotifications = False
 			self.bot.sendMessage(self.message.user.chatID, "Unpaused your push notifications. Have a good start!")

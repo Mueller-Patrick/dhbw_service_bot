@@ -1,7 +1,13 @@
 import bot.User as usr
 import ast
 
+
 def getUser(sql_row):
+	"""
+	Converts a row retrieved from SQL to a user object
+	@param sql_row: The row retrieved from SQL
+	@return: The user object
+	"""
 	userID = sql_row[0]
 	chatID = sql_row[1]
 	name = sql_row[2]
@@ -14,10 +20,9 @@ def getUser(sql_row):
 	wantsTransportInfo = sql_row[9] == 1
 	wantsToRateMeals = sql_row[10] == 1
 	menuPushTime = str(sql_row[11])[0:5]
-	menuPushTime = menuPushTime if menuPushTime[len(menuPushTime)-1] != ':' else ('0' + menuPushTime)[0:5]
+	menuPushTime = menuPushTime if menuPushTime[len(menuPushTime) - 1] != ':' else ('0' + menuPushTime)[0:5]
 	lecturePushTime = str(sql_row[12])[0:5]
 	pauseAllNotifications = sql_row[13] == 1
-
 
 	user = usr.User(chatID)
 	user.userID = userID
@@ -36,7 +41,13 @@ def getUser(sql_row):
 
 	return user
 
+
 def getUserUpdateTuple(user):
+	"""
+	Converts a user object to a tuple that can be given to an SQL update query
+	@param user: The user object
+	@return: The tuple of values
+	"""
 	tuple = (
 		user.name,
 		user.expectedMessageType,
@@ -55,7 +66,13 @@ def getUserUpdateTuple(user):
 
 	return tuple
 
+
 def getUserInsertTuple(user):
+	"""
+	Converts a user object to a tuple that can be given to an SQL insert query
+	@param user: The user object
+	@return: The tuple of values
+	"""
 	tuple = (
 		user.chatID,
 		user.name,

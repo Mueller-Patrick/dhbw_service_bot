@@ -241,7 +241,8 @@ class HelperFunctions:
 				if user.address is not None and user.wantsTransportInfo and user.address != '' \
 						and not user.pauseAllNotifications:
 					now = datetime.now()
-					lectures = self.main.lfetcher.getEventObjects(user.course, datetime.now().strftime('%Y-%m-%d'))
+					lectures = self.main.lfetcher.getLecturesByCourseName(user.course,
+																		  datetime.now().strftime('%Y-%m-%d'))
 					endTime = str(lectures[len(lectures) - 1].end)[11:16]
 					time = datetime(int(now.year), int(now.month), int(now.day),
 									int(endTime[:2]), int(endTime[3:]))

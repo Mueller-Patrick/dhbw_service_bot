@@ -31,6 +31,9 @@ def configure_telegram():
 
 
 def sendPushes():
+	"""
+	Sends all push notifications that are to be sent at the current time
+	"""
 	bot = configure_telegram()
 	logging.info('Running push check and sending now')
 	current_time_minutes = str(datetime.now())[11:16]
@@ -50,6 +53,12 @@ def sendPushes():
 
 
 def sendMenuPushes(conn, bot, current_time_minutes):
+	"""
+	Sends the menu pushes
+	@param conn: The SQL connection
+	@param bot: The bot instance
+	@param current_time_minutes: The current time
+	"""
 	# For the same day
 	# Normally at 06:00 but customizable
 	cur = conn.cursor()
@@ -80,6 +89,12 @@ def sendMenuPushes(conn, bot, current_time_minutes):
 
 
 def sendReturnDirections(conn, bot, current_time_minutes):
+	"""
+	Sends the return direction pushes
+	@param conn: The SQL connection
+	@param bot: The bot instance
+	@param current_time_minutes: The current time
+	"""
 	# For the same day
 	# At 10:00
 	if current_time_minutes == '10:00':
@@ -89,7 +104,13 @@ def sendReturnDirections(conn, bot, current_time_minutes):
 # Condition: wantsTransportInfo, !pauseAllNotifications
 
 
-def sendMenuRatingPushes(conn, current_time_minutes):
+def sendMenuRatingPushes(conn, bot, current_time_minutes):
+	"""
+	Sends the menu rating pushes
+	@param conn: The SQL connection
+	@param bot: The bot instance
+	@param current_time_minutes: The current time
+	"""
 	# For the same day
 	# At 14:30
 	if current_time_minutes == '14:30':
@@ -98,6 +119,12 @@ def sendMenuRatingPushes(conn, current_time_minutes):
 
 
 def sendLecturePushes(conn, bot, current_time_minutes):
+	"""
+	Sends the lecture plan pushes
+	@param conn: The SQL connection
+	@param bot: The bot instance
+	@param current_time_minutes: The current time
+	"""
 	# For the next day
 	tomorrow = datetime.now() + timedelta(days=1)
 	weekday = int(tomorrow.weekday())
@@ -143,6 +170,12 @@ def sendLecturePushes(conn, bot, current_time_minutes):
 
 
 def sendUnpauseNotificationsPushes(conn, bot, current_time_minutes):
+	"""
+	Sends the unpause notification reminder pushes
+	@param conn: The SQL connection
+	@param bot: The bot instance
+	@param current_time_minutes: The current time
+	"""
 	# Get required dates
 	tomorrow = datetime.now() + timedelta(days=1)
 	weekday = int(tomorrow.weekday())
@@ -170,8 +203,10 @@ def sendUnpauseNotificationsPushes(conn, bot, current_time_minutes):
 						name = user[1]
 						course = user[2]
 
-						bot.sendMessage(chatID, ("Hi, {}! I noticed that your next theory phase starts tomorrow. Do you want to unpause the push notifications?".format(name)),
-											 reply_markup=ReplyKeyboardMarkup([[KeyboardButton('Yes'),
-																				KeyboardButton('No')]],
-																			  resize_keyboard=True,
-																			  one_time_keyboard=True))
+						bot.sendMessage(chatID, (
+							"Hi, {}! I noticed that your next theory phase starts tomorrow. Do you want to unpause the push notifications?".format(
+								name)),
+										reply_markup=ReplyKeyboardMarkup([[KeyboardButton('Yes'),
+																		   KeyboardButton('No')]],
+																		 resize_keyboard=True,
+																		 one_time_keyboard=True))

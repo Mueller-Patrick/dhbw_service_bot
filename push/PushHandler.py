@@ -52,6 +52,8 @@ def sendPushes():
 	sendExamWarningPushes(conn, bot, current_time_minutes)
 	sendUnpauseNotificationsPushes(conn, bot, current_time_minutes)
 
+	conn.close()
+
 
 def sendMenuPushes(conn, bot, current_time_minutes):
 	"""

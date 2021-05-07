@@ -18,21 +18,8 @@ and
 To contribute, follow the steps in `CONTRIBUTING.md`
 
 <br><br>
-Used libraries are <br>
-`telegram`<br>
-`pymysql`<br>
-`requests`<br>
-`requests_html`<br>
-`datetime`<br>
-`json`<br>
-`icalendar`<br>
-`icalevents`<br>
-`logging`.<br>
-
-These are not specifically important for development, just for us to run the bot.
-To install them, run `pip install [LIBRARY_NAME]`on your machine, given that you have already installed pip.
-
-We also used the `os` library, but this should come with vanilla python.
+Used libraries are listed in the `requirements.txt` file.
+To install them, run `pip install -r requirements.txt`on your machine, given that you have already installed pip.
 
 
 For a list of supported commands, see 

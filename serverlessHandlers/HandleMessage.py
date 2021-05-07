@@ -18,7 +18,7 @@ logger = logging.getLogger()
 
 
 class HandleMessage:
-	def __init__(self, bot, chat_id, text, message_id):
+	def __init__(self, bot, chat_id, text, message_id, user_firstname=''):
 		# Get user object from SQL
 		conn = sqlhandler.getConnection()
 		cur = conn.cursor()
@@ -59,8 +59,9 @@ class HandleMessage:
 							+ " please file a bug report via /reportbug, create an issue on GitHub under"
 							+ " https://github.com/Mueller-Patrick/dhbw_service_bot or send a message to @P4ddy_m")
 			bot.sendMessage(os.environ['PATRICK_TELEGRAM_ID'],
-							("The bot encountered an error.\nMessage received: {}\nError: {}\nStack: {}".format(
-								text, e, stack)))
+							(
+							"The bot encountered an error.\nSender: {}\nMessage received: {}\nError: {}\nStack: {}".format(
+								user_firstname, text, e, stack)))
 
 		# Save user object to SQL
 		cur = conn.cursor()

@@ -44,6 +44,9 @@ class HandleMessage:
 		try:
 			message = msg.Message(user, text, message_id)
 
+			if '🥃' in message.text:
+				bot.sendMessage(message.user.chatID, 'WHISKEEEEEYYYYYY!!! 🥃🥃🥃')
+
 			if message.isCommand:
 				cmd.Command(message, bot, conn).findCommand()
 			else:

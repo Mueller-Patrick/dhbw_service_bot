@@ -63,6 +63,7 @@ class CommandFunctions:
 		self.bot.sendMessage(self.message.user.chatID,
 							 ("📥 Your Telegram chat id is " + str(self.message.user.chatID)))
 		self.bot.sendMessage(self.message.user.chatID, ("🗣 Your name is " + str(self.message.user.name)))
+		self.bot.sendMessage(self.message.user.chatID, ("🗣 Your name as provided by telegram is " + str(self.message.user.telegram_firstName)))
 		if self.message.user.address != '' and self.message.user.address is not None:
 			self.bot.sendMessage(self.message.user.chatID,
 								 ('🚅 The address you entered is ' + self.message.user.address))

@@ -40,6 +40,9 @@ class HandleMessage:
 			newUser = True
 		cur.close()
 
+		# Write firstName from telegram into user object
+		user.telegram_firstName = user_firstname
+
 		# Process message
 		try:
 			message = msg.Message(user, text, message_id)
@@ -70,13 +73,13 @@ class HandleMessage:
 		cur = conn.cursor()
 		if newUser:
 			print("new")
-			insert_user_query = """INSERT INTO users (chatID, name, expectedMsgType, tempParams, wantsMenu, course, 
+			insert_user_query = """INSERT INTO users (chatID, name, telegram_firstName, expectedMsgType, tempParams, wantsMenu, course, 
 			wantsLecturePlan, address, wantsTransportInfo, wantsToRateMeals, menuPushTime, lecturePushTime, 
-			pauseAllNotifications, lastMessage, wantsExamWarning) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, now(), %s) """
+			pauseAllNotifications, lastMessage, wantsExamWarning) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, now(), %s) """
 			cur.execute(insert_user_query, sqlconverter.getUserInsertTuple(user))
 		else:
 			print("Update")
-			update_user_query = """UPDATE users SET name = %s, expectedMsgType = %s, tempParams = %s, wantsMenu = %s, 
+			update_user_query = """UPDATE users SET name = %s, telegram_firstName = %s, expectedMsgType = %s, tempParams = %s, wantsMenu = %s, 
 			course = %s, wantsLecturePlan = %s, address = %s, wantsTransportInfo = %s, wantsToRateMeals = %s, 
 			menuPushTime = %s, lecturePushTime = %s, pauseAllNotifications = %s, lastMessage = now(), wantsExamWarning = %s WHERE userID = %s """
 			cur.execute(update_user_query, sqlconverter.getUserUpdateTuple(user))

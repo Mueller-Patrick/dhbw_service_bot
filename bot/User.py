@@ -8,6 +8,7 @@ class User:
 		self.userID = ''
 		self.chatID = chatID
 		self.name = ''
+		self.telegram_firstName = ''
 		self.expectedMessageType = ''
 		self.tempParams = {}
 		self.wantsMenu = False

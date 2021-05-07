@@ -52,6 +52,7 @@ def getUserUpdateTuple(user):
 	"""
 	tuple = (
 		user.name,
+		user.telegram_firstName,
 		user.expectedMessageType,
 		str(user.tempParams),
 		user.wantsMenu,
@@ -79,6 +80,7 @@ def getUserInsertTuple(user):
 	tuple = (
 		user.chatID,
 		user.name,
+		user.telegram_firstName,
 		user.expectedMessageType,
 		str(user.tempParams),
 		user.wantsMenu,

@@ -134,12 +134,13 @@ class LectureFetcher:
 			logging.warning('In LectureFetcher.getFirstLectureTime(): Tried to fetch time but can\'t fetch plan')
 			return ''
 
-	def getFormattedLectures(self, courseName: str, dayString: str) -> str:
+	def getFormattedLectures(self, courseName: str, dayString: str, includeBlockers: bool = True) -> str:
 		"""
 		Returns the lectures for the given day and course in a human-friendly format ready to be sent by the bot
 
 		@param courseName: The name of the course to return the lectures for, e.g. TINF19B4
 		@param dayString: The day for which the lectures should be returned in the format YYYY-MM-DD
+		@param includeBlockers: If blockers should be treated as lectures and hence be returned
 		@return: The formatted lectures
 		"""
 		lectures = self.getLecturesByCourseName(courseName, dayString)
@@ -150,6 +151,9 @@ class LectureFetcher:
 		else:
 			retString = ''
 			for lecture in lectures:
+				if not includeBlockers and 'Sonstiger Termin' in lecture.categories:
+					continue
+
 				beginTime = str(lecture.start)[11:16]
 				endTime = str(lecture.end)[11:16]
 				if retString != '':  # To skip the first item in the list

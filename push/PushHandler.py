@@ -145,7 +145,7 @@ def sendLecturePushes(conn, bot, current_time_minutes):
 			courses = lf.getAllKnownCourses()
 			courseDict = {}
 			for course in courses:
-				plan = lf.getFormattedLectures(course, dateString)
+				plan = lf.getFormattedLectures(course, dateString, False)
 				if plan:
 					time = lf.getFirstLectureTime(course, dateString)
 					courseDict[course] = [plan, time]

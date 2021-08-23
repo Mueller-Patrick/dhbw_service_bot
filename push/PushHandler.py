@@ -79,12 +79,15 @@ def sendMenuPushes(conn, bot, current_time_minutes):
 
 			# Send the push for the users
 			for user in users:
-				chatID = user[0]
-				name = user[1]
-				bot.sendMessage(chatID,
-								"Good morning " + name + ", here is the menu for today:")
-				for oneMenu in fetchedMenu:
-					bot.sendMessage(chatID, oneMenu, parse_mode=ParseMode.HTML)
+				try:
+					chatID = user[0]
+					name = user[1]
+					bot.sendMessage(chatID,
+									"Good morning " + name + ", here is the menu for today:")
+					for oneMenu in fetchedMenu:
+						bot.sendMessage(chatID, oneMenu, parse_mode=ParseMode.HTML)
+				except telegram.error.Unauthorized:
+					continue
 		except:
 			exc_type, exc_value, exc_traceback = sys.exc_info()
 			stack = traceback.extract_tb(exc_traceback)
@@ -118,7 +121,9 @@ def sendMenuRatingPushes(conn, bot, current_time_minutes):
 	# At 14:30
 	if current_time_minutes == '14:30':
 		pass
-	# Condition: wantsMenu, wantsToRateMeals, !pauseAllNotifications
+
+
+# Condition: wantsMenu, wantsToRateMeals, !pauseAllNotifications
 
 
 def sendLecturePushes(conn, bot, current_time_minutes):
@@ -159,17 +164,21 @@ def sendLecturePushes(conn, bot, current_time_minutes):
 				course = user[2]
 
 				plan = courseDict[course][0]
-				if plan:
-					firstLectureTime = courseDict[course][1]
+				try:
+					if plan:
+						firstLectureTime = courseDict[course][1]
 
-					bot.sendMessage(chatID,
-									('Howdy {}. Tomorrow your first lecture begins '
-									 + 'at {}. Here is the plan for tomorrow:').format(name, firstLectureTime))
-					bot.sendMessage(chatID, plan, parse_mode=ParseMode.HTML)
-				else:
-					bot.sendMessage(chatID,
-									('Howdy {}. Tomorrow, you don\'t have any lectures! Enjoy your free time!').format(
-										name))
+						bot.sendMessage(chatID,
+										('Howdy {}. Tomorrow your first lecture begins '
+										 + 'at {}. Here is the plan for tomorrow:').format(name, firstLectureTime))
+						bot.sendMessage(chatID, plan, parse_mode=ParseMode.HTML)
+					else:
+						bot.sendMessage(chatID,
+										(
+											'Howdy {}. Tomorrow, you don\'t have any lectures! Enjoy your free time!').format(
+											name))
+				except telegram.error.Unauthorized:
+					continue
 
 
 def sendUnpauseNotificationsPushes(conn, bot, current_time_minutes):
@@ -206,13 +215,16 @@ def sendUnpauseNotificationsPushes(conn, bot, current_time_minutes):
 						name = user[1]
 						course = user[2]
 
-						bot.sendMessage(chatID, (
-							"Hi, {}! I noticed that your next theory phase starts tomorrow. Do you want to unpause the push notifications?".format(
-								name)),
-										reply_markup=ReplyKeyboardMarkup([[KeyboardButton('Yes'),
-																		   KeyboardButton('No')]],
-																		 resize_keyboard=True,
-																		 one_time_keyboard=True))
+						try:
+							bot.sendMessage(chatID, (
+								"Hi, {}! I noticed that your next theory phase starts tomorrow. Do you want to unpause the push notifications?".format(
+									name)),
+											reply_markup=ReplyKeyboardMarkup([[KeyboardButton('Yes'),
+																			   KeyboardButton('No')]],
+																			 resize_keyboard=True,
+																			 one_time_keyboard=True))
+						except telegram.error.Unauthorized:
+							continue
 
 
 def sendExamWarningPushes(conn, bot, current_time_minutes):
@@ -264,11 +276,14 @@ def sendExamWarningPushes(conn, bot, current_time_minutes):
 					name = user[1]
 					course = user[2]
 
-					# Only send the push if there is an exam for the current user's course
-					if course in list(courseDict):
-						examInfo = courseDict[course]
+					try:
+						# Only send the push if there is an exam for the current user's course
+						if course in list(courseDict):
+							examInfo = courseDict[course]
 
-						bot.sendMessage(chatID,
-										('Howdy {}. Unfortunately, you have an exam one week from now on {}: {}.\n'
-										 + 'The exam will start at {} and end at {}. I wish you the best of luck!')
-										.format(name, dateString, examInfo[0], examInfo[1], examInfo[2]))
+							bot.sendMessage(chatID,
+											('Howdy {}. Unfortunately, you have an exam one week from now on {}: {}.\n'
+											 + 'The exam will start at {} and end at {}. I wish you the best of luck!')
+											.format(name, dateString, examInfo[0], examInfo[1], examInfo[2]))
+					except telegram.error.Unauthorized:
+						continue

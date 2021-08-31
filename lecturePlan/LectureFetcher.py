@@ -19,7 +19,7 @@ class LectureFetcher:
 		@return: A dict with the course name as key and the RaPla link as value
 		"""
 		cur = self.conn.cursor()
-		fetch_links_sql = """SELECT name, rapla_link FROM courses"""
+		fetch_links_sql = """SELECT name, rapla_link FROM courses WHERE rapla_link != ''"""
 		linkList = {}
 		cur.execute(fetch_links_sql)
 		for course in cur.fetchall():

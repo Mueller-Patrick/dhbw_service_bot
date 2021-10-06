@@ -9,9 +9,13 @@ from dateutil.parser import parse
 
 
 class LectureFetcher:
-	def __init__(self, conn):
-		self.conn = conn
-		self.linkDict = self.getRaplaLinks()
+	def __init__(self, conn = None):
+		# For testing purposes. If no connection is given, prefill the linkDict with the 19B4 link.
+		if not conn:
+			self.linkDict = {'TINF19B4': 'https://rapla.dhbw-karlsruhe.de/rapla?page=ical&user=eisenbiegler&file=TINF19B4#5'}
+		else:
+			self.conn = conn
+			self.linkDict = self.getRaplaLinks()
 
 	def getRaplaLinks(self) -> {}:
 		"""
@@ -116,7 +120,7 @@ class LectureFetcher:
 		else:
 			return self.getLecturesByLink(link, dayString)
 
-	def getFirstLectureTime(self, courseName: str, dayString: str) -> str:
+	def getFirstLectureTime(self, courseName: str, dayString: str, includeBlockers: bool = True) -> str:
 		"""
 		Get the time when the first lecture begins for the given day and course
 		@param courseName: The name of the course to return the lectures for, e.g. TINF19B4
@@ -126,6 +130,10 @@ class LectureFetcher:
 		lectures = self.getLecturesByCourseName(courseName, dayString)
 
 		if lectures and lectures != '':
+			# Skip Blockers
+			while not includeBlockers and ('Sonstiger Termin' in lectures[0].categories or 'Präsenz' in lectures[0].summary):
+				lectures.remove(lectures[0])
+
 			beginTime = str(lectures[0].start)[
 						11:16]  # Get the substring from index 11 to index 16 of the first lecture (this
 			# substring is the HH:MM format of the begin time)
@@ -151,7 +159,7 @@ class LectureFetcher:
 		else:
 			retString = ''
 			for lecture in lectures:
-				if not includeBlockers and 'Sonstiger Termin' in lecture.categories:
+				if not includeBlockers and ('Sonstiger Termin' in lecture.categories or 'Präsenz' in lecture.summary):
 					continue
 
 				beginTime = str(lecture.start)[11:16]

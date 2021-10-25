@@ -17,20 +17,31 @@ def save_to_sql(conn: pymysql.Connection, menu: Menu):
 
 	dish_tuples = []
 	dish_ids = []
+	amount_of_dishes = 1
 
 	dish_tuples.append((menu.dish1.name, menu.dish1.price))
-	dish_tuples.append((menu.dish2.name, menu.dish2.price))
-	dish_tuples.append((menu.dish3.name, menu.dish3.price))
+	if menu.dish2 is not None:
+		dish_tuples.append((menu.dish2.name, menu.dish2.price))
+		amount_of_dishes = 2
+	if menu.dish3 is not None:
+		dish_tuples.append((menu.dish3.name, menu.dish3.price))
+		amount_of_dishes = 3
 
 	stmt = 'INSERT INTO dishes (name, price) VALUES (%s, %s) RETURNING dish_id'
 
-	for i in range(3):
+	for i in range(amount_of_dishes):
 		cur.execute(stmt, dish_tuples[i])
 		dish_ids.append(cur.fetchone()[0])
 
-	menu_tuple = (menu.date, dish_ids[0], dish_ids[1], dish_ids[2])
-
-	menu_success = cur.execute('INSERT INTO menus (date, dish1, dish2, dish3) VALUES (%s, %s, %s, %s)', menu_tuple)
+	if amount_of_dishes == 3:
+		menu_tuple = (menu.date, dish_ids[0], dish_ids[1], dish_ids[2])
+		menu_success = cur.execute('INSERT INTO menus (date, dish1, dish2, dish3) VALUES (%s, %s, %s, %s)', menu_tuple)
+	elif amount_of_dishes == 2:
+		menu_tuple = (menu.date, dish_ids[0], dish_ids[1])
+		menu_success = cur.execute('INSERT INTO menus (date, dish1, dish2) VALUES (%s, %s, %s)', menu_tuple)
+	else:
+		menu_tuple = (menu.date, dish_ids[0])
+		menu_success = cur.execute('INSERT INTO menus (date, dish1) VALUES (%s, %s)', menu_tuple)
 
 	if menu_success:
 		conn.commit()
@@ -67,6 +78,7 @@ def get_all_dishes_from_sql(conn: pymysql.Connection) -> [Dish]:
 	"""
 	pass
 
+
 def get_menu_from_sql_by_date(conn: pymysql.Connection, date: str) -> Menu:
 	"""
 	Returns the menu for the given day containing all information about the dishes of the menu
@@ -84,5 +96,5 @@ def __test():
 	dish2 = Dish.Dish('Test2')
 	dish3 = Dish.Dish('Test3')
 	menu = Menu.Menu('2021-10-25', dish1, dish2, dish3)
-	#save_to_sql(conn, menu)
+	# save_to_sql(conn, menu)
 	add_rating_to_dish(conn, 42, 1, 5)

@@ -18,11 +18,11 @@ def save_to_sql(conn: pymysql.Connection, menu: Menu):
 	dish_tuples = []
 	dish_ids = []
 
-	dish_tuples.append((menu.dish1.name))
-	dish_tuples.append((menu.dish2.name))
-	dish_tuples.append((menu.dish3.name))
+	dish_tuples.append((menu.dish1.name, menu.dish1.price))
+	dish_tuples.append((menu.dish2.name, menu.dish2.price))
+	dish_tuples.append((menu.dish3.name, menu.dish3.price))
 
-	stmt = 'INSERT INTO dishes (name) VALUES (%s) RETURNING dish_id'
+	stmt = 'INSERT INTO dishes (name, price) VALUES (%s, %s) RETURNING dish_id'
 
 	for i in range(3):
 		cur.execute(stmt, dish_tuples[i])

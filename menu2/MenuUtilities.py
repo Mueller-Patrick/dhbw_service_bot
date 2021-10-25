@@ -16,31 +16,28 @@ def save_to_sql(conn: pymysql.Connection, menu: Menu):
 	cur = conn.cursor()
 
 	dish_tuples = []
-	dish_ids = []
 	amount_of_dishes = 1
 
-	dish_tuples.append((menu.dish1.name, menu.dish1.price))
+	dish_tuples.append((menu.dish1.dish_id, menu.dish1.name, menu.dish1.price))
 	if menu.dish2 is not None:
-		dish_tuples.append((menu.dish2.name, menu.dish2.price))
+		dish_tuples.append((menu.dish2.dish_id, menu.dish2.name, menu.dish2.price))
 		amount_of_dishes = 2
 	if menu.dish3 is not None:
-		dish_tuples.append((menu.dish3.name, menu.dish3.price))
+		dish_tuples.append((menu.dish3.dish_id, menu.dish3.name, menu.dish3.price))
 		amount_of_dishes = 3
 
-	stmt = 'INSERT INTO dishes (name, price) VALUES (%s, %s) RETURNING dish_id'
+	stmt = 'INSERT INTO dishes (dish_id, name, price) VALUES (%s, %s, %s)'
 
-	for i in range(amount_of_dishes):
-		cur.execute(stmt, dish_tuples[i])
-		dish_ids.append(cur.fetchone()[0])
+	cur.executemany(stmt, dish_tuples)
 
 	if amount_of_dishes == 3:
-		menu_tuple = (menu.date, dish_ids[0], dish_ids[1], dish_ids[2])
+		menu_tuple = (menu.date, menu.dish1.dish_id, menu.dish2.dish_id, menu.dish3.dish_id)
 		menu_success = cur.execute('INSERT INTO menus (date, dish1, dish2, dish3) VALUES (%s, %s, %s, %s)', menu_tuple)
 	elif amount_of_dishes == 2:
-		menu_tuple = (menu.date, dish_ids[0], dish_ids[1])
+		menu_tuple = (menu.date, menu.dish1.dish_id, menu.dish2.dish_id)
 		menu_success = cur.execute('INSERT INTO menus (date, dish1, dish2) VALUES (%s, %s, %s)', menu_tuple)
 	else:
-		menu_tuple = (menu.date, dish_ids[0])
+		menu_tuple = (menu.date, menu.dish1.dish_id)
 		menu_success = cur.execute('INSERT INTO menus (date, dish1) VALUES (%s, %s)', menu_tuple)
 
 	if menu_success:

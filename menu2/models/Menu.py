@@ -1,5 +1,5 @@
 import datetime
-from . import Dish
+from ..models import Dish
 
 
 class Menu:
@@ -8,7 +8,7 @@ class Menu:
 	dish2: Dish
 	dish3: Dish
 
-	def __init__(self, date, dish1, dish2, dish3):
+	def __init__(self, date, dish1, dish2=None, dish3=None):
 		self.date = date
 		self.dish1 = dish1
 		self.dish2 = dish2

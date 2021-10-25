@@ -13,7 +13,7 @@ This bot is programmed and run by
 
 and
 
-`https://github.com/qt1337`.
+`https://github.com/Huh-David`.
 
 To contribute, follow the steps in `CONTRIBUTING.md`
 

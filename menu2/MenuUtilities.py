@@ -5,6 +5,7 @@ import datetime
 
 import pymysql
 
+from menu2 import WebCrawler
 from menu2.models import Menu, Dish
 from sql import SQLConnectionHandler as sqlhandler
 
@@ -163,7 +164,11 @@ def __test():
 	# menu = Menu.Menu('2021-10-25', dish1, dish2, dish3)
 	# save_to_sql(conn, menu)
 	# add_rating_to_dish(conn, 42, 1, 5)
-	get_menu_from_sql_by_date(conn, '2021-10-25')
+	get_menu_from_sql_by_date(conn, '2021-10-26')
+
+	# crawler = WebCrawler.WebCrawler()
+	# menu = crawler.get_menu()
+	# save_to_sql(conn, menu)
 
 
 if __name__ == '__main__':

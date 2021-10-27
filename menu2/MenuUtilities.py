@@ -1,8 +1,11 @@
 """
 Contains utility functions for saving / retrieving menus from / to SQL
 """
+import datetime
+
 import pymysql
 
+from menu2 import WebCrawler
 from menu2.models import Menu, Dish
 from sql import SQLConnectionHandler as sqlhandler
 
@@ -73,7 +76,10 @@ def get_all_dishes_from_sql(conn: pymysql.Connection) -> [Dish]:
 	:param conn: The pymysql connection
 	:return: The list of dishes
 	"""
-	pass
+	cur = conn.cursor()
+
+	# this method has high risk of duplicating code from the method below, try preventing that if possible
+
 
 
 def get_menu_from_sql_by_date(conn: pymysql.Connection, date: str) -> Menu:
@@ -83,15 +89,87 @@ def get_menu_from_sql_by_date(conn: pymysql.Connection, date: str) -> Menu:
 	:param date: The date in the format yyyy-MM-dd to return the menu for
 	:return: The menu
 	"""
+	cur = conn.cursor()
+
+	menu_stmt = 'SELECT dish1, dish2, dish3 FROM menus WHERE date = %s'
+	dish_stmt = 'SELECT dish_id, name, price FROM dishes WHERE dish_id IN %s'
+	rating_stmt = 'SELECT dish_id, stars FROM dish_ratings WHERE dish_id IN %s'
+
+	cur.execute(menu_stmt, date)
+	menu = cur.fetchone()
+
+	# No menu in database for the given date
+	if len(menu) < 1:
+		return Menu.Menu(date, None, None, None)
+
+	cur.execute(dish_stmt, (list(menu),))
+	dishes = cur.fetchall()
+
+	cur.execute(rating_stmt, (list(menu),))
+	ratings = cur.fetchall()
+
+	rating_map = dict()
+
+	# Map ratings so we can access the list of all ratings by dish id
+	for rating in ratings:
+		dish_id = rating[0]
+		stars = rating[1]
+
+		if dish_id in rating_map.keys():
+			rating_map[dish_id].append(stars)
+		else:
+			rating_map[dish_id] = [stars]
+
+	return_menu = Menu.Menu(date)
+
+	for dish_idx in range(len(dishes)):
+		dish = dishes[dish_idx]
+		dish_id = dish[0]
+		name = dish[1]
+		price = dish[2]
+		if dish_id in rating_map.keys():
+			ratings = rating_map[dish_id]
+			calculated_rating = sum(ratings) / len(ratings)
+		else:
+			calculated_rating = -1
+
+		dish_obj = Dish.Dish(dish_id, name, price, calculated_rating)
+
+		if dish_idx == 0:
+			return_menu.dish1 = dish_obj
+		elif dish_idx == 1:
+			return_menu.dish2 = dish_obj
+		else:
+			return_menu.dish3 = dish_obj
+
+	return return_menu
+
+
+def are_dishes_equal(dish1, dish2) -> bool:
+	"""
+	Checks the given dishes for equality and returns True if they are the same dish.
+	:param dish1: The first dish to compare
+	:param dish2: The second dish to compare
+	:return: If the two dishes are equal
+	"""
 	pass
 
 
 def __test():
 	conn = sqlhandler.getvServerConnection()
 
-	dish1 = Dish.Dish('Test1')
-	dish2 = Dish.Dish('Test2')
-	dish3 = Dish.Dish('Test3')
-	menu = Menu.Menu('2021-10-25', dish1, dish2, dish3)
+	# dish1 = Dish.Dish('Test1')
+	# dish2 = Dish.Dish('Test2')
+	# dish3 = Dish.Dish('Test3')
+	# menu = Menu.Menu('2021-10-25', dish1, dish2, dish3)
 	# save_to_sql(conn, menu)
-	add_rating_to_dish(conn, 42, 1, 5)
+	# add_rating_to_dish(conn, 42, 1, 5)
+	get_menu_from_sql_by_date(conn, '2021-10-26')
+
+	# crawler = WebCrawler.WebCrawler()
+	# menu = crawler.get_menu()
+	# save_to_sql(conn, menu)
+
+
+if __name__ == '__main__':
+	__test()

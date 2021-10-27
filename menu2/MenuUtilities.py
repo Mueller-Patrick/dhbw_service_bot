@@ -204,7 +204,7 @@ def __test():
 	while date < datetime.now():
 		try:
 			dishes = WebCrawler.get_dishes(date.strftime('%Y-%m-%d'))
-			save_to_sql(conn, dishes)
+			save_dishes_to_sql(conn, dishes)
 		except json.decoder.JSONDecodeError as e:
 			print(f'No stuff today: {e}')
 		except IndexError as e:

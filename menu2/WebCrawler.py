@@ -25,12 +25,12 @@ def get_menu(date=datetime.now().strftime('%Y-%m-%d')):
 	dish1 = Dish(
 		dish_id=meal1['id'],
 		name=meal1['name'],
-		price=meal1['prices']['students'] * 100
+		price=int(meal1['prices']['students'] * 100)
 	)
 	dish2 = Dish(
 		dish_id=meal2['id'],
 		name=meal2['name'],
-		price=meal2['prices']['students'] * 100
+		price=int(meal2['prices']['students'] * 100)
 	)
 
 	menu = Menu(

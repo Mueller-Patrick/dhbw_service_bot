@@ -1,7 +1,8 @@
 """
 Contains utility functions for saving / retrieving menus from / to SQL
 """
-import datetime
+from datetime import datetime, timedelta
+import json
 
 import pymysql
 
@@ -78,8 +79,8 @@ def get_all_dishes_from_sql(conn: pymysql.Connection) -> [Dish]:
 	"""
 	cur = conn.cursor()
 
-	# this method has high risk of duplicating code from the method below, try preventing that if possible
 
+# this method has high risk of duplicating code from the method below, try preventing that if possible
 
 
 def get_menu_from_sql_by_date(conn: pymysql.Connection, date: str) -> Menu:
@@ -164,11 +165,20 @@ def __test():
 	# menu = Menu.Menu('2021-10-25', dish1, dish2, dish3)
 	# save_to_sql(conn, menu)
 	# add_rating_to_dish(conn, 42, 1, 5)
-	get_menu_from_sql_by_date(conn, '2021-10-26')
+	# get_menu_from_sql_by_date(conn, '2021-10-26')
 
-	# crawler = WebCrawler.WebCrawler()
-	# menu = crawler.get_menu()
-	# save_to_sql(conn, menu)
+	date = datetime.strptime('2019-10-01', '%Y-%m-%d')
+
+	while date < datetime.now():
+		try:
+			menu = WebCrawler.get_menu(date.strftime('%Y-%m-%d'))
+			save_to_sql(conn, menu)
+		except json.decoder.JSONDecodeError as e:
+			print(f'No stuff today: {e}')
+		except IndexError as e:
+			print(f'No stuff today: {e}')
+		finally:
+			date = date + timedelta(days=1)
 
 
 if __name__ == '__main__':

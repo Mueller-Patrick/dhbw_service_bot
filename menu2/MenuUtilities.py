@@ -7,11 +7,11 @@ import json
 import pymysql
 
 from menu2 import WebCrawler
-from menu2.models import Menu, Dish
+from menu2.models import Dish
 from sql import SQLConnectionHandler as sqlhandler
 
 
-def save_to_sql(conn: pymysql.Connection, menu: Menu):
+def save_to_sql(conn: pymysql.Connection, menu):
 	"""
 	Saves the given menu to the database
 	:param conn: The pymysql connection
@@ -51,15 +51,17 @@ def save_to_sql(conn: pymysql.Connection, menu: Menu):
 		raise Exception('Error saving menu to database')
 
 	cur.close()
-	conn.close()
 
 
 def save_dishes_to_sql(conn: pymysql.Connection, dishes: [Dish]):
 	"""
-	Saves the given menu to the database
+	Saves the given dishes to the database
 	:param conn: The pymysql connection
-	:param menu: The menu to be saved
+	:param dishes: The dishes to be saved
 	"""
+	if len(dishes) < 1:
+		return
+
 	cur = conn.cursor()
 
 	dish_tuples = []
@@ -74,7 +76,7 @@ def save_dishes_to_sql(conn: pymysql.Connection, dishes: [Dish]):
 		'INSERT INTO dish_availability (dish, available_date, price, category) VALUES (%s, %s, %s, %s)'
 
 	dishes_success = cur.executemany(insert_dish, dish_tuples)
-	dish_availabilities_success = cur.executemany(insert_dish_availability, dish_tuples)
+	dish_availabilities_success = cur.executemany(insert_dish_availability, dish_availability_tuples)
 
 	if dishes_success and dish_availabilities_success:
 		conn.commit()
@@ -83,7 +85,6 @@ def save_dishes_to_sql(conn: pymysql.Connection, dishes: [Dish]):
 		raise Exception('Error saving menu to database')
 
 	cur.close()
-	conn.close()
 
 
 def add_rating_to_dish(conn: pymysql.Connection, dish_id: int, user_id, stars: int):
@@ -115,7 +116,7 @@ def get_all_dishes_from_sql(conn: pymysql.Connection) -> [Dish]:
 # this method has high risk of duplicating code from the method below, try preventing that if possible
 
 
-def get_menu_from_sql_by_date(conn: pymysql.Connection, date: str) -> Menu:
+def get_menu_from_sql_by_date(conn: pymysql.Connection, date: str):
 	"""
 	Returns the menu for the given day containing all information about the dishes of the menu
 	:param conn: The pymysql connection
@@ -199,17 +200,20 @@ def __test():
 	# add_rating_to_dish(conn, 42, 1, 5)
 	# get_menu_from_sql_by_date(conn, '2021-10-26')
 
-	date = datetime.strptime('2019-10-01', '%Y-%m-%d')
+	date = datetime.strptime('2019-12-20', '%Y-%m-%d')
 
-	while date < datetime.now():
+	while date <= datetime.now():
 		try:
 			dishes = WebCrawler.get_dishes(date.strftime('%Y-%m-%d'))
-			save_to_sql(conn, dishes)
+			save_dishes_to_sql(conn, dishes)
 		except json.decoder.JSONDecodeError as e:
-			print(f'No stuff today: {e}')
+			pass
+			#print(f'No stuff today: {e}')
 		except IndexError as e:
-			print(f'No stuff today: {e}')
+			pass
+			#print(f'No stuff today: {e}')
 		finally:
+			print(f'Date {date} successful')
 			date = date + timedelta(days=1)
 
 

@@ -68,10 +68,10 @@ def save_dishes_to_sql(conn: pymysql.Connection, dishes: [Dish]):
 	dish_availability_tuples = []
 
 	for dish in dishes:
-		dish_tuples.append((dish.dish_id, dish.name))
+		dish_tuples.append((dish.dish_id, dish.name, dish.dish_id))
 		dish_availability_tuples.append((dish.dish_id, dish.date, dish.price, dish.category))
 
-	insert_dish = 'INSERT IGNORE INTO dishes (dish_id, name) VALUES (%s, %s)'
+	insert_dish = 'INSERT INTO dishes (dish_id, name) VALUES (%s, %s) ON DUPLICATE KEY UPDATE dish_id = (%s)'
 	insert_dish_availability = \
 		'INSERT INTO dish_availability (dish, available_date, price, category) VALUES (%s, %s, %s, %s)'
 
@@ -208,10 +208,10 @@ def __test():
 			save_dishes_to_sql(conn, dishes)
 		except json.decoder.JSONDecodeError as e:
 			pass
-			#print(f'No stuff today: {e}')
+		# print(f'No stuff today: {e}')
 		except IndexError as e:
 			pass
-			#print(f'No stuff today: {e}')
+		# print(f'No stuff today: {e}')
 		finally:
 			print(f'Date {date} successful')
 			date = date + timedelta(days=1)

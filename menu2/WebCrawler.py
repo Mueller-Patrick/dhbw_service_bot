@@ -7,14 +7,13 @@ API_URL = 'https://openmensa.org/api/v2/canteens'
 CANTEEN_ID = 33  # 33 = Mensa Erzbergerstraße
 
 
-def get_dishes(date=datetime.now().strftime('%Y-%m-%d')) -> list[Dish]:
+def get_dishes(date=datetime.now().strftime('%Y-%m-%d')) -> [Dish]:
 	"""
 	This class is responsible for crawling the API of the Mensa.
 	It takes a date to check which dishes are available for this date. (e.g. 2021-12-31)
 
 	This method returns the menu consisting of all dishes for the date provided in constructor.
 	"""
-	date = date
 	meals_url = f'{API_URL}/{CANTEEN_ID}/days/{date}/meals'
 	meals = requests.get(meals_url).json()
 
@@ -32,8 +31,3 @@ def get_dishes(date=datetime.now().strftime('%Y-%m-%d')) -> list[Dish]:
 		)
 
 	return dishes
-
-
-class WebCrawler(object):
-	def __init__(self):
-		pass

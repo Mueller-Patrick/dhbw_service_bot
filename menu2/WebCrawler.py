@@ -1,4 +1,5 @@
 import requests
+import re
 
 from datetime import datetime
 from menu2.models.Dish import Dish
@@ -16,18 +17,31 @@ def get_dishes(date=datetime.now().strftime('%Y-%m-%d')) -> [Dish]:
 	"""
 	meals_url = f'{API_URL}/{CANTEEN_ID}/days/{date}/meals'
 	meals = requests.get(meals_url).json()
-
+	# print(meals_url)
 	dishes = []
 
 	for meal in meals:
-		dishes.append(
-			Dish(
-				dish_id=meal['id'],
-				date=date,
-				name=meal['name'],
-				price=int(float(meal['prices']['students']) * 100),
-				category=meal['category']
+		try:
+			name = re.sub(
+				r"\[.*\]",
+				"",
+				meal['name']
 			)
-		)
+
+			price = meal.get('prices', {'students': -0.01}).get('students', -0.01)
+			if price is None:
+				price = -0.01
+
+			dishes.append(
+				Dish(
+					dish_id=meal['id'],
+					date=date,
+					name=name,
+					price=int(float(price) * 100),
+					category=meal['category']
+				)
+			)
+		except Exception as e:
+			raise e
 
 	return dishes

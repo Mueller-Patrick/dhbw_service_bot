@@ -1,6 +1,7 @@
 """
 Contains utility functions for saving / retrieving menus from / to SQL
 """
+import re
 from datetime import datetime, timedelta
 import json
 
@@ -68,10 +69,16 @@ def save_dishes_to_sql(conn: pymysql.Connection, dishes: [Dish]):
 	dish_availability_tuples = []
 
 	for dish in dishes:
-		dish_tuples.append((dish.dish_id, dish.name, dish.dish_id))
+		if len([item for item in dish_tuples if item[1] == dish.name]) > 0:
+			continue
+		dish_tuples.append((dish.dish_id, dish.name))
 		dish_availability_tuples.append((dish.dish_id, dish.date, dish.price, dish.category))
 
-	insert_dish = 'INSERT INTO dishes (dish_id, name) VALUES (%s, %s) ON DUPLICATE KEY UPDATE dish_id = (%s)'
+	insert_dish = \
+		'INSERT INTO dishes (dish_id, name) ' \
+		'VALUES (%s, %s) ' \
+		'ON DUPLICATE KEY UPDATE ' \
+		'	dish_id = VALUES(dish_id);'
 	insert_dish_availability = \
 		'INSERT INTO dish_availability (dish, available_date, price, category) VALUES (%s, %s, %s, %s)'
 
@@ -200,12 +207,14 @@ def __test():
 	# add_rating_to_dish(conn, 42, 1, 5)
 	# get_menu_from_sql_by_date(conn, '2021-10-26')
 
-	date = datetime.strptime('2019-12-20', '%Y-%m-%d')
+	date = datetime.strptime('2018-02-02', '%Y-%m-%d')
 
 	while date <= datetime.now():
+		successful = False
 		try:
 			dishes = WebCrawler.get_dishes(date.strftime('%Y-%m-%d'))
 			save_dishes_to_sql(conn, dishes)
+			successful = True
 		except json.decoder.JSONDecodeError as e:
 			pass
 		# print(f'No stuff today: {e}')
@@ -213,7 +222,7 @@ def __test():
 			pass
 		# print(f'No stuff today: {e}')
 		finally:
-			print(f'Date {date} successful')
+			print(f'Date {date} {"successful" if successful else "not successful"}')
 			date = date + timedelta(days=1)
 
 

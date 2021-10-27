@@ -2,13 +2,12 @@ import requests
 
 from datetime import datetime
 from menu2.models.Dish import Dish
-from menu2.models.Menu import Menu
 
 API_URL = 'https://openmensa.org/api/v2/canteens'
 CANTEEN_ID = 33  # 33 = Mensa Erzbergerstraße
 
 
-def get_menu(date=datetime.now().strftime('%Y-%m-%d')):
+def get_dishes(date=datetime.now().strftime('%Y-%m-%d')) -> list[Dish]:
 	"""
 	This class is responsible for crawling the API of the Mensa.
 	It takes a date to check which dishes are available for this date. (e.g. 2021-12-31)
@@ -19,27 +18,20 @@ def get_menu(date=datetime.now().strftime('%Y-%m-%d')):
 	meals_url = f'{API_URL}/{CANTEEN_ID}/days/{date}/meals'
 	meals = requests.get(meals_url).json()
 
-	meal1 = list(filter(lambda meal: meal['category'] == 'Wahlessen 1', meals))[0]
-	meal2 = list(filter(lambda meal: meal['category'] == 'Wahlessen 2', meals))[0]
+	dishes = []
 
-	dish1 = Dish(
-		dish_id=meal1['id'],
-		name=meal1['name'],
-		price=int(meal1['prices']['students'] * 100)
-	)
-	dish2 = Dish(
-		dish_id=meal2['id'],
-		name=meal2['name'],
-		price=int(meal2['prices']['students'] * 100)
-	)
+	for meal in meals:
+		dishes.append(
+			Dish(
+				dish_id=meal['id'],
+				date=date,
+				name=meal['name'],
+				price=int(float(meal['prices']['students']) * 100),
+				category=meal['category']
+			)
+		)
 
-	menu = Menu(
-		date=date,
-		dish1=dish1,
-		dish2=dish2
-	)
-
-	return menu
+	return dishes
 
 
 class WebCrawler(object):

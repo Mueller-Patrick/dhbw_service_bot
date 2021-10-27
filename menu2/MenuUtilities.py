@@ -171,8 +171,8 @@ def __test():
 
 	while date < datetime.now():
 		try:
-			menu = WebCrawler.get_menu(date.strftime('%Y-%m-%d'))
-			save_to_sql(conn, menu)
+			menu = WebCrawler.get_dishes(date.strftime('%Y-%m-%d'))
+			save_to_sql(conn, menu) # TODO adjust menu to list of dishes
 		except json.decoder.JSONDecodeError as e:
 			print(f'No stuff today: {e}')
 		except IndexError as e:

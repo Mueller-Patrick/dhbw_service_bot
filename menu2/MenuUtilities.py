@@ -54,6 +54,38 @@ def save_to_sql(conn: pymysql.Connection, menu: Menu):
 	conn.close()
 
 
+def save_dishes_to_sql(conn: pymysql.Connection, dishes: [Dish]):
+	"""
+	Saves the given menu to the database
+	:param conn: The pymysql connection
+	:param menu: The menu to be saved
+	"""
+	cur = conn.cursor()
+
+	dish_tuples = []
+	dish_availability_tuples = []
+
+	for dish in dishes:
+		dish_tuples.append((dish.dish_id, dish.name))
+		dish_availability_tuples.append((dish.dish_id, dish.date, dish.price, dish.category))
+
+	insert_dish = 'INSERT INTO dishes (dish_id, name) VALUES (%s, %s)'
+	insert_dish_availability = \
+		'INSERT INTO dish_availability (dish, available_date, price, category) VALUES (%s, %s, %s, %s)'
+
+	dishes_success = cur.executemany(insert_dish, dish_tuples)
+	dish_availabilities_success = cur.executemany(insert_dish_availability, dish_tuples)
+
+	if dishes_success and dish_availabilities_success:
+		conn.commit()
+	else:
+		conn.rollback()
+		raise Exception('Error saving menu to database')
+
+	cur.close()
+	conn.close()
+
+
 def add_rating_to_dish(conn: pymysql.Connection, dish_id: int, user_id, stars: int):
 	"""
 	Adds a rating to the given dish
@@ -171,8 +203,8 @@ def __test():
 
 	while date < datetime.now():
 		try:
-			menu = WebCrawler.get_dishes(date.strftime('%Y-%m-%d'))
-			save_to_sql(conn, menu) # TODO adjust menu to list of dishes
+			dishes = WebCrawler.get_dishes(date.strftime('%Y-%m-%d'))
+			save_to_sql(conn, dishes)
 		except json.decoder.JSONDecodeError as e:
 			print(f'No stuff today: {e}')
 		except IndexError as e:

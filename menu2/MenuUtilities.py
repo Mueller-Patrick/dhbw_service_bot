@@ -199,7 +199,7 @@ def are_dishes_equal(dish1, dish2) -> bool:
 def __test():
 	conn = sqlhandler.getvServerConnection()
 
-	date = datetime.strptime('2012-01-01', '%Y-%m-%d')
+	date = datetime.strptime('2019-10-01', '%Y-%m-%d')
 
 	while date <= datetime.now():
 		successful = False
@@ -209,10 +209,10 @@ def __test():
 			successful = True
 		except json.decoder.JSONDecodeError as e:
 			pass
-		# print(f'No stuff today: {e}')
 		except IndexError as e:
 			pass
-		# print(f'No stuff today: {e}')
+		except ValueError as e:
+			pass
 		finally:
 			print(f'Date {date} {"successful" if successful else "not successful"}')
 			date = date + timedelta(days=1)

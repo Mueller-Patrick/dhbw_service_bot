@@ -71,12 +71,12 @@ def save_dishes_to_sql(conn: pymysql.Connection, dishes: [Dish]):
 	for dish in dishes:
 		if len([item for item in dish_tuples if item[1] == dish.name]) > 0:
 			continue
-		dish_tuples.append((dish.dish_id, dish.name))
+		dish_tuples.append((dish.dish_id, dish.name, dish.comparable_name))
 		dish_availability_tuples.append((dish.dish_id, dish.date, dish.price, dish.category))
 
 	insert_dish = \
-		'INSERT INTO dishes (dish_id, name) ' \
-		'VALUES (%s, %s) ' \
+		'INSERT INTO dishes (dish_id, name, comparable_name) ' \
+		'VALUES (%s, %s, %s) ' \
 		'ON DUPLICATE KEY UPDATE ' \
 		'	dish_id = VALUES(dish_id);'
 	insert_dish_availability = \
@@ -199,15 +199,7 @@ def are_dishes_equal(dish1, dish2) -> bool:
 def __test():
 	conn = sqlhandler.getvServerConnection()
 
-	# dish1 = Dish.Dish('Test1')
-	# dish2 = Dish.Dish('Test2')
-	# dish3 = Dish.Dish('Test3')
-	# menu = Menu.Menu('2021-10-25', dish1, dish2, dish3)
-	# save_to_sql(conn, menu)
-	# add_rating_to_dish(conn, 42, 1, 5)
-	# get_menu_from_sql_by_date(conn, '2021-10-26')
-
-	date = datetime.strptime('2018-02-02', '%Y-%m-%d')
+	date = datetime.strptime('2012-01-01', '%Y-%m-%d')
 
 	while date <= datetime.now():
 		successful = False

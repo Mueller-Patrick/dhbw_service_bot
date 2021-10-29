@@ -7,19 +7,72 @@ from menu2.models.Dish import Dish
 API_URL = 'https://openmensa.org/api/v2/canteens'
 CANTEEN_ID = 33  # 33 = Mensa Erzbergerstraße
 
+NUMBERS = [str(x) for x in range(10)]
+
 LIST_OF_WORDS_TO_REMOVE = [
 	'frites',  # so "pommes frites" becomes "pommes"
 	'mit',
 	'den',
+	'dem',
+	'jede',
+	'jeder',
+	'jedem',
+	'jeden',
+	'jedes',
+	'ein',
+	'eine',
+	'einer',
+	'eines',
+	'einen',
+	'einem',
+	'pastawerk',
+	'mensa',
+	'oktoberfest',
+	'spezial',
+	'con',
+	'al',
+	'all',
+	'nach',
+	'aktion',
+	'wir',
+	'reichen',
+	'überwiegend',
+	'ueberwiegend',
+	'wildaktion',
+	'solidaritätsessen',
+	'solidaritätsgericht',
+	'gericht',
+	'dazu',
 	'in',
+	'im',
 	'von',
 	'vom',
 	'oder',
 	'der',
 	'die',
 	'das',
-	'im',
 	'und',
+	'e',
+	'alaska',
+	'stück',
+	'stueck',
+	'steakhouse',
+	'verschiedene',
+	'verschiedenes',
+	'verschiedener',
+	'verschiedenen',
+	'frisch',
+	'frische',
+	'frisches',
+	'frischer',
+	'frischen',
+	'frischem',
+	'gebraten',
+	'gebratene',
+	'gebratenes',
+	'gebratener',
+	'gebratenen',
+	'gebratenem',
 	'u.',
 	'jumbo',
 	'zu',
@@ -35,6 +88,7 @@ LIST_OF_WORDS_TO_REMOVE = [
 
 LIST_OF_CHARS_TO_REMOVE = [
 	';',
+	':',
 	',',
 	'.',
 	'&',
@@ -100,7 +154,7 @@ def _make_comparable_text(text: str) -> str:
 
 	# Remove unwanted words
 	for word in text.split(" "):
-		if word not in LIST_OF_WORDS_TO_REMOVE:
+		if word.lower() not in LIST_OF_WORDS_TO_REMOVE:
 			comparable_words.append(word)
 
 	# Replace unwanted strings
@@ -129,8 +183,8 @@ def _make_comparable_text(text: str) -> str:
 	if '' in comparable_words_encoded:
 		comparable_words_encoded.remove('')
 
-	for idx, word in enumerate(comparable_words):
-		if idx + 1 != len(comparable_words):
+	for idx, word in enumerate(comparable_words_encoded):
+		if idx + 1 != len(comparable_words_encoded):
 			comparable_text += f'{word} '
 		else:
 			comparable_text += word

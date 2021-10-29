@@ -78,7 +78,8 @@ def save_dishes_to_sql(conn: pymysql.Connection, dishes: [Dish]):
 		'INSERT INTO dishes (dish_id, name, comparable_name) ' \
 		'VALUES (%s, %s, %s) ' \
 		'ON DUPLICATE KEY UPDATE ' \
-		'	dish_id = VALUES(dish_id);'
+		'	dish_id = VALUES(dish_id),' \
+		'	name = VALUES(name)'  # TODO fix (421 rows expected)
 	insert_dish_availability = \
 		'INSERT INTO dish_availability (dish, available_date, price, category) VALUES (%s, %s, %s, %s)'
 

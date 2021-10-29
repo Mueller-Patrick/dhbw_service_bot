@@ -7,6 +7,8 @@ from menu2.models.Dish import Dish
 API_URL = 'https://openmensa.org/api/v2/canteens'
 CANTEEN_ID = 33  # 33 = Mensa Erzbergerstraße
 
+NUMBERS = [x for x in range(10)]
+
 LIST_OF_WORDS_TO_REMOVE = [
 	'frites',  # so "pommes frites" becomes "pommes"
 	'mit',

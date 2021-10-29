@@ -123,30 +123,30 @@ def get_all_dishes_from_sql(conn: pymysql.Connection) -> [Dish]:
 # this method has high risk of duplicating code from the method below, try preventing that if possible
 
 
-def get_menu_from_sql_by_date(conn: pymysql.Connection, date: str):
+def get_dishes_from_sql_by_date(conn: pymysql.Connection, date: str):
 	"""
-	Returns the menu for the given day containing all information about the dishes of the menu
+	Returns the dishes for the given day containing all relevant information like the rating
 	:param conn: The pymysql connection
 	:param date: The date in the format yyyy-MM-dd to return the menu for
 	:return: The menu
 	"""
 	cur = conn.cursor()
 
-	menu_stmt = 'SELECT dish1, dish2, dish3 FROM menus WHERE date = %s'
-	dish_stmt = 'SELECT dish_id, name, price FROM dishes WHERE dish_id IN %s'
+	dish_stmt = \
+		'SELECT d.dish_id, da.available_date, d.name, da.price, da.category FROM dish_availability da ' \
+		'LEFT OUTER JOIN dishes d ON da.dish = d.dish_id ' \
+		'WHERE da.available_date = %s ' \
+		'ORDER BY da.category'
 	rating_stmt = 'SELECT dish_id, stars FROM dish_ratings WHERE dish_id IN %s'
 
-	cur.execute(menu_stmt, date)
-	menu = cur.fetchone()
-
-	# No menu in database for the given date
-	if len(menu) < 1:
-		return Menu.Menu(date, None, None, None)
-
-	cur.execute(dish_stmt, (list(menu),))
+	cur.execute(dish_stmt, date)
 	dishes = cur.fetchall()
 
-	cur.execute(rating_stmt, (list(menu),))
+	dish_ids = []
+	for dish in dishes:
+		dish_ids.append(dish[0])
+
+	cur.execute(rating_stmt, (list(dish_ids),))
 	ratings = cur.fetchall()
 
 	rating_map = dict()
@@ -161,39 +161,25 @@ def get_menu_from_sql_by_date(conn: pymysql.Connection, date: str):
 		else:
 			rating_map[dish_id] = [stars]
 
-	return_menu = Menu.Menu(date)
+	return_dishes = []
 
-	for dish_idx in range(len(dishes)):
-		dish = dishes[dish_idx]
+	for dish in dishes:
 		dish_id = dish[0]
-		name = dish[1]
-		price = dish[2]
+		available_date = dish[1]
+		name = dish[2]
+		price = dish[3]
+		category = dish[4]
 		if dish_id in rating_map.keys():
 			ratings = rating_map[dish_id]
 			calculated_rating = sum(ratings) / len(ratings)
 		else:
 			calculated_rating = -1
 
-		dish_obj = Dish.Dish(dish_id, name, price, calculated_rating)
+		dish_obj = Dish.Dish(dish_id, available_date, name, '', price, category, calculated_rating)
 
-		if dish_idx == 0:
-			return_menu.dish1 = dish_obj
-		elif dish_idx == 1:
-			return_menu.dish2 = dish_obj
-		else:
-			return_menu.dish3 = dish_obj
+		return_dishes.append(dish_obj)
 
-	return return_menu
-
-
-def are_dishes_equal(dish1, dish2) -> bool:
-	"""
-	Checks the given dishes for equality and returns True if they are the same dish.
-	:param dish1: The first dish to compare
-	:param dish2: The second dish to compare
-	:return: If the two dishes are equal
-	"""
-	pass
+	return return_dishes
 
 
 def __test():

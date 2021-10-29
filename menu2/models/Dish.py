@@ -10,7 +10,7 @@ class Dish:
 	price: int  # cent
 	category: str
 
-	def __init__(self, dish_id, date, name,comparable_name, price, category, rating=0):
+	def __init__(self, dish_id, date, name, comparable_name, price, category, rating=0):
 		self.dish_id = int(dish_id)
 		self.date = date
 		self.name = name

@@ -1,3 +1,4 @@
+import menu2.MenuUtilities
 from menu import MenuSaver as menu
 from datetime import datetime
 import os
@@ -151,8 +152,9 @@ class CommandFunctions:
 		self.message.user.expectedMessageType = 'settingstype'
 
 	def command_adminrate(self):
+		# TODO adjust
 		if str(self.message.user.chatID) == os.environ.get('PATRICK_TELEGRAM_ID'):
-			mealArr = menu.Reader(1).get_food_with_ratings_as_string_array()
+			mealArr = menu2.MenuUtilities.get_dishes_from_sql_by_date()
 
 			mealString = ("Meal 1:\n" + mealArr[0] + "\nMeal 2:\n" + mealArr[1] + "\nMeal 3:\n" + mealArr[2])
 			for user in self.bot.users:

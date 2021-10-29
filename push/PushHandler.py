@@ -5,6 +5,8 @@ from telegram import KeyboardButton
 import os
 import logging
 from datetime import datetime, timedelta
+
+import menu2.MenuUtilities
 import sql.SQLConnectionHandler as sqlhandler
 from lecturePlan.LectureFetcher import LectureFetcher
 import menu.MenuSaver as menu
@@ -73,9 +75,8 @@ def sendMenuPushes(conn, bot, current_time_minutes):
 	if len(users) > 0:
 		# Try-catch so we don't send anything if not menu has been fetched
 		try:
-			# TODO Fix formatting, this doesnt work yet!
-			fetchedMenu = menu.Reader(1).get_menu_as_arr()
-			print(fetchedMenu)
+			today_date = datetime.now().strftime('%Y-%m-%d')
+			fetchedMenu = menu2.MenuUtilities.get_dishes_from_sql_by_date(conn, today_date)
 
 			# Send the push for the users
 			for user in users:
@@ -85,7 +86,8 @@ def sendMenuPushes(conn, bot, current_time_minutes):
 					bot.sendMessage(chatID,
 									"Good morning " + name + ", here is the menu for today:")
 					for oneMenu in fetchedMenu:
-						bot.sendMessage(chatID, oneMenu, parse_mode=ParseMode.HTML)
+						# TODO we need to format this and add price and category!
+						bot.sendMessage(chatID, oneMenu.name, parse_mode=ParseMode.HTML)
 				except telegram.error.Unauthorized:
 					continue
 		except:
@@ -120,7 +122,9 @@ def sendMenuRatingPushes(conn, bot, current_time_minutes):
 	# For the same day
 	# At 14:30
 	if current_time_minutes == '14:30':
-		pass
+		today_date = datetime.now().strftime('')
+		meals = menu2.MenuUtilities.get_dishes_from_sql_by_date(conn, )
+	# TODO implement this
 
 
 # Condition: wantsMenu, wantsToRateMeals, !pauseAllNotifications

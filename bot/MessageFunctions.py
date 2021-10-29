@@ -1,3 +1,4 @@
+import menu2.MenuUtilities
 from menu import MenuSaver as menu
 from datetime import datetime, timedelta
 from maps import Directions
@@ -212,8 +213,10 @@ class MessageFunctions:
 		rating = int(rating[:1])
 
 		if rating in (0, 1, 2, 3, 4, 5):
+			# Adjust rating logic here, we need to somehow get the meal ID
 			ratedMeal = mealArr[int(self.message.user.tempParams['ratedMeal'][5]) - 1]
-			Rater.Rater(ratedMeal, rating)
+			# TODO adjust the following method call
+			menu2.MenuUtilities.add_rating_to_dish(self.conn, None, self.message.user.userID, rating)
 			self.bot.sendMessage(self.message.user.chatID, "Thank you for rating! 😁")
 			self.message.user.tempParams['ratingMealset'] = ''
 			self.message.user.tempParams['ratedMeal'] = ''

@@ -5,6 +5,8 @@ from telegram import KeyboardButton
 import os
 import logging
 from datetime import datetime, timedelta
+
+import menu2
 import sql.SQLConnectionHandler as sqlhandler
 from lecturePlan.LectureFetcher import LectureFetcher
 import menu.MenuSaver as menu
@@ -120,7 +122,15 @@ def sendMenuRatingPushes(conn, bot, current_time_minutes):
 	# For the same day
 	# At 14:30
 	if current_time_minutes == '14:30':
-		pass
+		today_date = datetime.now().strftime('%Y-%m-%d')
+		meals = menu2.MenuUtilities.get_dishes_from_sql_by_date(conn, today_date)
+		users_query = 'SELECT chatID, name FROM users WHERE wantsToRateMeals = 1 AND pauseAllNotifications = 0'
+		cur = conn.cursor()
+		cur.execute(users_query)
+		users = cur.fetchall()
+
+		for user in users:
+			pass
 
 
 # Condition: wantsMenu, wantsToRateMeals, !pauseAllNotifications

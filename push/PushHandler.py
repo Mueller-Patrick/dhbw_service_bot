@@ -153,16 +153,18 @@ def sendMenuRatingPushes(conn, bot, current_time_minutes):
 			expected_type = user[3]
 			temp_params = ast.literal_eval(user[4])
 
-			expected_type = 'mealtoberated'
+			expected_type = 'meal_category'
 
 			temp_params['ratingMealset'] = {}
 
-			reply_buttons = []
-
 			for categ_dishes in dishes.values():
 				for dish in categ_dishes:
-					temp_params['ratingMealset'][dish.name] = dish.dish_id
+					temp_params['ratingMealset'][dish.name] = {
+						'dish_id': dish.dish_id,
+						'category': dish.category
+					}
 
+			reply_buttons = []
 			for categ in dishes.keys():
 				reply_buttons.append(KeyboardButton(categ))
 

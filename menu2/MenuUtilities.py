@@ -9,6 +9,7 @@ import pymysql
 from menu2 import WebCrawler
 from menu2.models import Dish
 from sql import SQLConnectionHandler as sqlhandler
+import serverlessHandlers.HandleMessage as messageHandler
 from push import PushHandler as ph
 
 
@@ -180,9 +181,16 @@ def __test_push():
 	# ph.sendMenuRatingPushes(conn, bot, '14:30')
 	ph.sendMenuRatingPushes(conn, bot, '14:30')
 
+def __test_message():
+	bot = ph.configure_telegram()
+	conn = sqlhandler.getvServerConnection()
+
+	messageHandler.HandleMessage(bot, '230970888', '5 ⭐', '', '')
+
 
 if __name__ == '__main__':
 	conn = sqlhandler.getvServerConnection()
 
 	#print(get_formatted_dishes(conn, '2021-11-04'))
-	__test_push()
+	#__test_push()
+	__test_message()

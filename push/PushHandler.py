@@ -6,11 +6,12 @@ import os
 import logging
 from datetime import datetime, timedelta
 
-import menu2
+from menu2 import MenuUtilities, WebCrawler
 import sql.SQLConnectionHandler as sqlhandler
 from lecturePlan.LectureFetcher import LectureFetcher
 import menu.MenuSaver as menu
 import sys
+import ast
 import traceback
 
 
@@ -42,8 +43,9 @@ def sendPushes():
 
 	conn = sqlhandler.getvServerConnection()
 
-	# Menu currently not sent because it doesnt work yet
-	# sendMenuPushes(conn, bot, current_time_minutes)
+	fetch_latest_dishes(conn, current_time_minutes)
+
+	sendMenuPushes(conn, bot, current_time_minutes)
 
 	# Directions not supported currently due to shutdown of google maps API key
 	# sendReturnDirections(conn, bot, current_time_minutes)
@@ -55,6 +57,20 @@ def sendPushes():
 	sendUnpauseNotificationsPushes(conn, bot, current_time_minutes)
 
 	conn.close()
+
+
+def fetch_latest_dishes(conn, current_time_minutes):
+	"""
+	Fetches and saves the dishes for the next days
+	@param conn: The pymysql connection
+	"""
+	if current_time_minutes == '00:15':
+		try:
+			date = datetime.now() + timedelta(days=7)
+			dishes = WebCrawler.get_dishes(date.strftime('%Y-%m-%d'))
+			MenuUtilities.save_dishes_to_sql(conn, dishes)
+		except:
+			pass
 
 
 def sendMenuPushes(conn, bot, current_time_minutes):
@@ -75,9 +91,8 @@ def sendMenuPushes(conn, bot, current_time_minutes):
 	if len(users) > 0:
 		# Try-catch so we don't send anything if not menu has been fetched
 		try:
-			# TODO Fix formatting, this doesnt work yet!
-			fetchedMenu = menu.Reader(1).get_menu_as_arr()
-			print(fetchedMenu)
+			today_date = datetime.now().strftime('%Y-%m-%d')
+			fetchedMenu = MenuUtilities.get_formatted_dishes(conn, '2012-10-04')
 
 			# Send the push for the users
 			for user in users:
@@ -85,9 +100,8 @@ def sendMenuPushes(conn, bot, current_time_minutes):
 					chatID = user[0]
 					name = user[1]
 					bot.sendMessage(chatID,
-									"Good morning " + name + ", here is the menu for today:")
-					for oneMenu in fetchedMenu:
-						bot.sendMessage(chatID, oneMenu, parse_mode=ParseMode.HTML)
+									"Good morning {}, here is the menu for today:".format(name))
+					bot.sendMessage(chatID, fetchedMenu, parse_mode=ParseMode.HTML)
 				except telegram.error.Unauthorized:
 					continue
 		except:
@@ -123,17 +137,46 @@ def sendMenuRatingPushes(conn, bot, current_time_minutes):
 	# At 14:30
 	if current_time_minutes == '14:30':
 		today_date = datetime.now().strftime('%Y-%m-%d')
-		meals = menu2.MenuUtilities.get_dishes_from_sql_by_date(conn, today_date)
-		users_query = 'SELECT chatID, name FROM users WHERE wantsToRateMeals = 1 AND pauseAllNotifications = 0'
+		dishes = MenuUtilities.get_dishes_from_sql_by_date(conn, today_date)
+		menu = MenuUtilities.get_formatted_dishes(conn, today_date, dishes)
+		users_query = 'SELECT userID, chatID, name, expectedMsgType, tempParams FROM users WHERE wantsToRateMeals = 1 AND pauseAllNotifications = 0'
 		cur = conn.cursor()
 		cur.execute(users_query)
 		users = cur.fetchall()
 
+		update_users = []
+
 		for user in users:
-			pass
+			user_id = user[0]
+			chat_id = user[1]
+			name = user[2]
+			expected_type = user[3]
+			temp_params = ast.literal_eval(user[4])
 
+			expected_type = 'mealtoberated'
 
-# Condition: wantsMenu, wantsToRateMeals, !pauseAllNotifications
+			temp_params['ratingMealset'] = {}
+
+			reply_buttons = []
+
+			for categ_dishes in dishes.values():
+				for dish in categ_dishes:
+					temp_params['ratingMealset'][dish.name] = dish.dish_id
+
+			for categ in dishes.keys():
+				reply_buttons.append(KeyboardButton(categ))
+
+			bot.sendMessage(chat_id, "Please rate your meal today. The available meals were:\n\n" + menu,
+							parse_mode=ParseMode.HTML,
+							reply_markup=ReplyKeyboardMarkup([reply_buttons,
+															  [KeyboardButton('Don\'t rate')]], resize_keyboard=True,
+															 one_time_keyboard=True))
+
+			update_users.append((expected_type, str(temp_params), user_id))
+
+		update_stmt = 'UPDATE users SET expectedMsgType = %s, tempParams = %s WHERE userID = %s'
+		cur.executemany(update_stmt, update_users)
+		conn.commit()
 
 
 def sendLecturePushes(conn, bot, current_time_minutes):

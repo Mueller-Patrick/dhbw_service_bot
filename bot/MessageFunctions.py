@@ -9,6 +9,7 @@ import bot.User as usr
 from telegram import ReplyKeyboardMarkup, KeyboardButton, ParseMode
 import logging
 from lecturePlan.LectureFetcher import LectureFetcher
+from menu2 import MenuUtilities
 
 
 class MessageFunctions:
@@ -140,30 +141,26 @@ class MessageFunctions:
 		Called when user sends the day he wants the menu for
 		"""
 		if self.message.text == 'Today':
-			day = 0
+			forDay = datetime.now()
 		elif self.message.text == 'Tomorrow':
-			day = 1
+			forDay = datetime.now() + timedelta(days=1)
 		else:
-			day = 0
+			try:
+				forDay = datetime.strptime(self.message.text, '%Y-%m-%d')
+			except ValueError as e:
+				self.bot.sendMessage(self.message.user.chatID, 'Invalid date format. Please try again.')
+				return
 
 		# Try-except to catch any errors during menu fetching and not cause the bug to crash
 		try:
-			# If it's sunday and the user requests the menu for monday, inform him that the menu for next week can not be fetched yet.
-			if datetime.now().weekday() == 6 and day == 1:
-				self.bot.sendMessage(self.message.user.chatID,
-									 "The menu for next week is not yet available, check back tomorrow.")
+			weekday = forDay.weekday()
+			if weekday < 5:  # Because monday is 0...
+				fetchedMenu = MenuUtilities.get_formatted_dishes(self.conn, forDay.strftime('%Y-%m-%d'))
+				self.bot.sendMessage(self.message.user.chatID, "Here you go: ")
+				self.bot.sendMessage(self.message.user.chatID, fetchedMenu, parse_mode=ParseMode.HTML)
 			else:
-				forDay = datetime.now() + timedelta(days=day)
-				weekday = forDay.weekday()
-				if weekday < 5:  # Because monday is 0...
-					fetchedMenu = menu.Reader(self.conn,
-											  day + 1).get_menu_as_arr()  # day+1 because 1 is today, 2 is tomorrow...
-					self.bot.sendMessage(self.message.user.chatID, "Here you go: ")
-					for oneMenu in fetchedMenu:
-						self.bot.sendMessage(self.message.user.chatID, oneMenu)
-				else:
-					self.bot.sendMessage(self.message.user.chatID,
-										 "The canteen is closed there. Hence no menu for you.")
+				self.bot.sendMessage(self.message.user.chatID,
+									 "The canteen is closed there. Hence no menu for you.")
 		except:
 			self.bot.sendMessage(self.message.user.chatID,
 								 "There was an error during the fetching process. Please try again later.")

@@ -1,7 +1,6 @@
 """
 Contains utility functions for saving / retrieving menus from / to SQL
 """
-import re
 from datetime import datetime, timedelta
 import json
 
@@ -10,48 +9,7 @@ import pymysql
 from menu2 import WebCrawler
 from menu2.models import Dish
 from sql import SQLConnectionHandler as sqlhandler
-
-
-def save_to_sql(conn: pymysql.Connection, menu):
-	"""
-	Saves the given menu to the database
-	:param conn: The pymysql connection
-	:param menu: The menu to be saved
-	"""
-	cur = conn.cursor()
-
-	dish_tuples = []
-	amount_of_dishes = 1
-
-	dish_tuples.append((menu.dish1.dish_id, menu.dish1.name, menu.dish1.price))
-	if menu.dish2 is not None:
-		dish_tuples.append((menu.dish2.dish_id, menu.dish2.name, menu.dish2.price))
-		amount_of_dishes = 2
-	if menu.dish3 is not None:
-		dish_tuples.append((menu.dish3.dish_id, menu.dish3.name, menu.dish3.price))
-		amount_of_dishes = 3
-
-	stmt = 'INSERT INTO dishes (dish_id, name, price) VALUES (%s, %s, %s)'
-
-	cur.executemany(stmt, dish_tuples)
-
-	if amount_of_dishes == 3:
-		menu_tuple = (menu.date, menu.dish1.dish_id, menu.dish2.dish_id, menu.dish3.dish_id)
-		menu_success = cur.execute('INSERT INTO menus (date, dish1, dish2, dish3) VALUES (%s, %s, %s, %s)', menu_tuple)
-	elif amount_of_dishes == 2:
-		menu_tuple = (menu.date, menu.dish1.dish_id, menu.dish2.dish_id)
-		menu_success = cur.execute('INSERT INTO menus (date, dish1, dish2) VALUES (%s, %s, %s)', menu_tuple)
-	else:
-		menu_tuple = (menu.date, menu.dish1.dish_id)
-		menu_success = cur.execute('INSERT INTO menus (date, dish1) VALUES (%s, %s)', menu_tuple)
-
-	if menu_success:
-		conn.commit()
-	else:
-		conn.rollback()
-		raise Exception('Error saving menu to database')
-
-	cur.close()
+from push import PushHandler as ph
 
 
 def save_dishes_to_sql(conn: pymysql.Connection, dishes: [Dish]):
@@ -111,96 +69,92 @@ def add_rating_to_dish(conn: pymysql.Connection, dish_id: int, user_id, stars: i
 
 	conn.commit()
 
+	cur.close()
 
-def get_all_dishes_from_sql(conn: pymysql.Connection) -> [Dish]:
+
+def get_dishes_from_sql_by_date(conn: pymysql.Connection, date: str) -> {}:
 	"""
-	Fetches and returns all known dishes from the database
-	:param conn: The pymysql connection
-	:return: The list of dishes
-	"""
-	cur = conn.cursor()
-
-
-# this method has high risk of duplicating code from the method below, try preventing that if possible
-
-
-def get_menu_from_sql_by_date(conn: pymysql.Connection, date: str):
-	"""
-	Returns the menu for the given day containing all information about the dishes of the menu
-	:param conn: The pymysql connection
-	:param date: The date in the format yyyy-MM-dd to return the menu for
-	:return: The menu
+	Fetches the dishes for the given date and returns them as a dict.
+	The key is the category (e.g. Wahlessen 1) and the values are the contained dishes
+	@param conn: The pymysql connection
+	@param date: The date to fetch the dishes for
+	@return: The dishes for that day
 	"""
 	cur = conn.cursor()
 
-	menu_stmt = 'SELECT dish1, dish2, dish3 FROM menus WHERE date = %s'
-	dish_stmt = 'SELECT dish_id, name, price FROM dishes WHERE dish_id IN %s'
-	rating_stmt = 'SELECT dish_id, stars FROM dish_ratings WHERE dish_id IN %s'
+	dish_stmt = 'SELECT d.dish_id, d.name, d.comparable_name, da.category, da.price, da.available_date, AVG(dr.stars) ' \
+				'FROM dishes d ' \
+				'LEFT OUTER JOIN dish_availability da ON d.dish_id = da.dish ' \
+				'LEFT OUTER JOIN dish_ratings dr ON d.dish_id = dr.dish_id ' \
+				'WHERE da.available_date = %s ' \
+				'GROUP BY d.dish_id, da.category, da.price ' \
+				'ORDER BY da.category, da.price DESC'
 
-	cur.execute(menu_stmt, date)
-	menu = cur.fetchone()
-
-	# No menu in database for the given date
-	if len(menu) < 1:
-		return Menu.Menu(date, None, None, None)
-
-	cur.execute(dish_stmt, (list(menu),))
+	cur.execute(dish_stmt, date)
 	dishes = cur.fetchall()
 
-	cur.execute(rating_stmt, (list(menu),))
-	ratings = cur.fetchall()
+	cur.close()
 
-	rating_map = dict()
+	return_dishes = {}
 
-	# Map ratings so we can access the list of all ratings by dish id
-	for rating in ratings:
-		dish_id = rating[0]
-		stars = rating[1]
+	for dish in dishes:
+		dish_obj = Dish.Dish(
+			dish_id=dish[0],
+			name=dish[1],
+			comparable_name=dish[2],
+			category=dish[3],
+			price=dish[4],
+			date=dish[5],
+			rating=dish[6]
+		)
 
-		if dish_id in rating_map.keys():
-			rating_map[dish_id].append(stars)
-		else:
-			rating_map[dish_id] = [stars]
+		try:
+			return_dishes[dish_obj.category].append(dish_obj)
+		except KeyError:
+			return_dishes[dish_obj.category] = [dish_obj]
 
-	return_menu = Menu.Menu(date)
-
-	for dish_idx in range(len(dishes)):
-		dish = dishes[dish_idx]
-		dish_id = dish[0]
-		name = dish[1]
-		price = dish[2]
-		if dish_id in rating_map.keys():
-			ratings = rating_map[dish_id]
-			calculated_rating = sum(ratings) / len(ratings)
-		else:
-			calculated_rating = -1
-
-		dish_obj = Dish.Dish(dish_id, name, price, calculated_rating)
-
-		if dish_idx == 0:
-			return_menu.dish1 = dish_obj
-		elif dish_idx == 1:
-			return_menu.dish2 = dish_obj
-		else:
-			return_menu.dish3 = dish_obj
-
-	return return_menu
+	return return_dishes
 
 
-def are_dishes_equal(dish1, dish2) -> bool:
+def get_formatted_dishes(conn: pymysql.Connection, date: str, dishes=None):
 	"""
-	Checks the given dishes for equality and returns True if they are the same dish.
-	:param dish1: The first dish to compare
-	:param dish2: The second dish to compare
-	:return: If the two dishes are equal
+	Fetches the dishes for the given date and returns them formatted in a fancy manner
+	@param conn: The pymysql connection
+	@param date: The date to fetch the dishes for
+	@param dishes: Optionally provide a list of dishes that will be formatted instead of fetching the dishes from sql
+	@return: The formatted string. Markup is HTML.
 	"""
-	pass
+	if dishes is None:
+		dishes = get_dishes_from_sql_by_date(conn, date)
+
+
+	if len(dishes.values()) < 1:
+		return 'No menu available for that day'
+
+	ret_str = ''
+
+	categories = dishes.keys()
+	categories = sorted(categories)
+
+	for categ_idx, category in enumerate(categories):
+		categ_dishes = dishes.get(category)
+
+		ret_str += '<u>' + category + '</u>\n'
+		for dish_idx, dish in enumerate(categ_dishes):
+			ret_str += dish.get_formatted_dish(categ_idx)
+			if dish_idx != len(categ_dishes)-1:
+				ret_str += '------\n'
+
+		ret_str += '\n'
+
+	print(ret_str)
+	return ret_str
 
 
 def __test():
 	conn = sqlhandler.getvServerConnection()
 
-	date = datetime.strptime('2019-10-01', '%Y-%m-%d')
+	date = datetime.strptime('2012-10-01', '%Y-%m-%d')
 
 	while date <= datetime.now():
 		successful = False
@@ -219,5 +173,16 @@ def __test():
 			date = date + timedelta(days=1)
 
 
+def __test_push():
+	bot = ph.configure_telegram()
+	conn = sqlhandler.getvServerConnection()
+
+	# ph.sendMenuRatingPushes(conn, bot, '14:30')
+	ph.sendMenuRatingPushes(conn, bot, '14:30')
+
+
 if __name__ == '__main__':
-	__test()
+	conn = sqlhandler.getvServerConnection()
+
+	#print(get_formatted_dishes(conn, '2021-11-04'))
+	__test_push()

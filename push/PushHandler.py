@@ -136,6 +136,11 @@ def sendMenuRatingPushes(conn, bot, current_time_minutes):
 	if current_time_minutes == '14:30':
 		today_date = datetime.now().strftime('%Y-%m-%d')
 		dishes = MenuUtilities.get_dishes_from_sql_by_date(conn, today_date)
+
+		# So days when the canteen is closed are skipped
+		if len(dishes) < 1:
+			return
+
 		menu = MenuUtilities.get_formatted_dishes(conn, today_date, dishes)
 		users_query = 'SELECT userID, chatID, name, expectedMsgType, tempParams FROM users WHERE wantsToRateMeals = 1 AND pauseAllNotifications = 0'
 		cur = conn.cursor()

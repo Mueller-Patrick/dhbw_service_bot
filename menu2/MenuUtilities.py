@@ -151,7 +151,6 @@ def get_formatted_dishes(conn: pymysql.Connection, date: str, dishes=None):
 
 		ret_str += '\n'
 
-	print(ret_str)
 	return ret_str
 
 

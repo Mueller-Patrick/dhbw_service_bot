@@ -171,11 +171,15 @@ def sendMenuRatingPushes(conn, bot, current_time_minutes):
 			for categ in dishes.keys():
 				reply_buttons.append(KeyboardButton(categ))
 
-			bot.sendMessage(chat_id, "Please rate your meal today. The available meals were:\n\n" + menu,
-							parse_mode=ParseMode.HTML,
-							reply_markup=ReplyKeyboardMarkup([reply_buttons,
-															  [KeyboardButton('Don\'t rate')]], resize_keyboard=True,
-															 one_time_keyboard=True))
+			try:
+				bot.sendMessage(chat_id, "Please rate your meal today. The available meals were:\n\n" + menu,
+								parse_mode=ParseMode.HTML,
+								reply_markup=ReplyKeyboardMarkup([reply_buttons,
+																  [KeyboardButton('Don\'t rate')]],
+																 resize_keyboard=True,
+																 one_time_keyboard=True))
+			except telegram.error.Unauthorized:
+				continue
 
 			update_users.append((expected_type, str(temp_params), user_id))
 

@@ -9,6 +9,7 @@ import bot.User as usr
 from telegram import ReplyKeyboardMarkup, KeyboardButton, ParseMode
 import logging
 from lecturePlan.LectureFetcher import LectureFetcher
+from menu2 import MenuUtilities
 
 
 class MessageFunctions:
@@ -140,35 +141,77 @@ class MessageFunctions:
 		Called when user sends the day he wants the menu for
 		"""
 		if self.message.text == 'Today':
-			day = 0
+			forDay = datetime.now()
 		elif self.message.text == 'Tomorrow':
-			day = 1
+			forDay = datetime.now() + timedelta(days=1)
 		else:
-			day = 0
+			try:
+				forDay = datetime.strptime(self.message.text, '%Y-%m-%d')
+			except ValueError as e:
+				self.bot.sendMessage(self.message.user.chatID, 'Invalid date format. Please try again.')
+				return
 
 		# Try-except to catch any errors during menu fetching and not cause the bug to crash
 		try:
-			# If it's sunday and the user requests the menu for monday, inform him that the menu for next week can not be fetched yet.
-			if datetime.now().weekday() == 6 and day == 1:
-				self.bot.sendMessage(self.message.user.chatID,
-									 "The menu for next week is not yet available, check back tomorrow.")
+			weekday = forDay.weekday()
+			if weekday < 5:  # Because monday is 0...
+				fetchedMenu = MenuUtilities.get_formatted_dishes(self.conn, forDay.strftime('%Y-%m-%d'))
+				self.bot.sendMessage(self.message.user.chatID, "Here you go: ")
+				self.bot.sendMessage(self.message.user.chatID, fetchedMenu, parse_mode=ParseMode.HTML)
 			else:
-				forDay = datetime.now() + timedelta(days=day)
-				weekday = forDay.weekday()
-				if weekday < 5:  # Because monday is 0...
-					fetchedMenu = menu.Reader(self.conn,
-											  day + 1).get_menu_as_arr()  # day+1 because 1 is today, 2 is tomorrow...
-					self.bot.sendMessage(self.message.user.chatID, "Here you go: ")
-					for oneMenu in fetchedMenu:
-						self.bot.sendMessage(self.message.user.chatID, oneMenu)
-				else:
-					self.bot.sendMessage(self.message.user.chatID,
-										 "The canteen is closed there. Hence no menu for you.")
+				self.bot.sendMessage(self.message.user.chatID,
+									 "The canteen is closed there. Hence no menu for you.")
 		except:
 			self.bot.sendMessage(self.message.user.chatID,
 								 "There was an error during the fetching process. Please try again later.")
 
 		self.message.user.expectedMessageType = ''
+
+	def message_meal_category(self):
+		"""
+		Called when the users sends the category of the meal he wants to rate
+		"""
+		meal_category = self.message.text
+
+		available_categories = []
+
+		for dish in self.message.user.tempParams['ratingMealset'].values():
+			available_categories.append(dish['category'])
+
+		available_categories = set(available_categories)
+
+		if meal_category == 'Don\'t rate':
+			self.bot.sendMessage(self.message.user.chatID, "Ok, no rating. This is fine.")
+			self.message.user.tempParams['ratingMealset'] = ''
+			self.message.user.expectedMessageType = ''
+			return
+
+		if meal_category not in available_categories:
+			reply_buttons = []
+			for categ in available_categories:
+				reply_buttons.append(KeyboardButton(categ))
+
+			self.bot.sendMessage(self.message.user.chatID, 'Wrong input. Please try again.',
+								 reply_markup=ReplyKeyboardMarkup([reply_buttons,
+																   [KeyboardButton('Don\'t rate')]],
+																  resize_keyboard=True,
+																  one_time_keyboard=True))
+			return
+
+		self.message.user.tempParams['rating_category'] = meal_category
+		self.message.user.expectedMessageType = 'mealtoberated'
+
+		reply_buttons = []
+
+		for dish_name in self.message.user.tempParams['ratingMealset'].keys():
+			dish = self.message.user.tempParams['ratingMealset'][dish_name]
+			if dish['category'] == meal_category:
+				reply_buttons.append([KeyboardButton(dish_name)])
+
+		self.bot.sendMessage(self.message.user.chatID, 'Please choose one of the available dishes to rate:',
+							 reply_markup=ReplyKeyboardMarkup(reply_buttons,
+															  resize_keyboard=True,
+															  one_time_keyboard=True))
 
 	def message_mealtoberated(self):
 		"""
@@ -176,44 +219,61 @@ class MessageFunctions:
 		"""
 		mealToBeRated = self.message.text
 
-		if mealToBeRated == 'Don\'t rate':
-			self.bot.sendMessage(self.message.user.chatID, "Ok, no rating. This is fine.")
-			self.message.user.tempParams['ratingMealset'] = ''
-			self.message.user.expectedMessageType = ''
+		available_dishes_names = self.message.user.tempParams['ratingMealset'].keys()
+
+		if mealToBeRated in available_dishes_names:
+			self.message.user.tempParams['ratedMeal'] = mealToBeRated
+			self.message.user.tempParams['rating_category'] = ''
+			self.bot.sendMessage(self.message.user.chatID, "How many stars do you give?",
+								 reply_markup=ReplyKeyboardMarkup(
+									 [[KeyboardButton('0 ⭐'),
+									   KeyboardButton('1 ⭐'),
+									   KeyboardButton('2 ⭐'),
+									   KeyboardButton('3 ⭐'),
+									   KeyboardButton('4 ⭐'),
+									   KeyboardButton('5 ⭐')]], resize_keyboard=True,
+									 one_time_keyboard=True))
+			self.message.user.expectedMessageType = 'mealrating'
 		else:
-			if mealToBeRated in ('Meal 1', 'Meal 2', 'Meal 3'):
-				self.message.user.tempParams['ratedMeal'] = mealToBeRated
-				self.bot.sendMessage(self.message.user.chatID, "How many stars do you give?",
-									 reply_markup=ReplyKeyboardMarkup(
-										 [[KeyboardButton('0 ⭐'),
-										   KeyboardButton('1 ⭐'),
-										   KeyboardButton('2 ⭐'),
-										   KeyboardButton('3 ⭐'),
-										   KeyboardButton('4 ⭐'),
-										   KeyboardButton('5 ⭐')]], resize_keyboard=True,
-										 one_time_keyboard=True))
-				self.message.user.expectedMessageType = 'mealrating'
-			else:
-				self.bot.sendMessage(self.message.user.chatID, "Wrong input. Try again",
-									 reply_markup=ReplyKeyboardMarkup(
-										 [[KeyboardButton('Meal 1'),
-										   KeyboardButton('Meal 2'),
-										   KeyboardButton('Meal 3')],
-										  [KeyboardButton('Don\'t rate')]], resize_keyboard=True,
-										 one_time_keyboard=True))
+			meal_category = self.message.user.tempParams['rating_category']
+
+			reply_buttons = []
+
+			for dish_name in self.message.user.tempParams['ratingMealset'].keys():
+				dish = self.message.user.tempParams['ratingMealset'][dish_name]
+				if dish['category'] == meal_category:
+					reply_buttons.append([KeyboardButton(dish_name)])
+
+			self.bot.sendMessage(self.message.user.chatID, 'Wrong input. Please try again:',
+								 reply_markup=ReplyKeyboardMarkup(reply_buttons,
+																  resize_keyboard=True,
+																  one_time_keyboard=True))
 
 	def message_mealrating(self):
 		"""
 		Called when user sends the rating for his meal
 		"""
 		rating = self.message.text
-		mealArr = self.message.user.tempParams['ratingMealset']
+		dishes = self.message.user.tempParams['ratingMealset']
+		rated_dish = self.message.user.tempParams['ratedMeal']
 
-		rating = int(rating[:1])
+		try:
+			rating = int(rating[:1])
+		except:
+			self.bot.sendMessage(self.message.user.chatID, "Wrong input. Try again.",
+								 reply_markup=ReplyKeyboardMarkup(
+									 [[KeyboardButton('0 ⭐'),
+									   KeyboardButton('1 ⭐'),
+									   KeyboardButton('2 ⭐'),
+									   KeyboardButton('3 ⭐'),
+									   KeyboardButton('4 ⭐'),
+									   KeyboardButton('5 ⭐')]], resize_keyboard=True,
+									 one_time_keyboard=True))
+			return
 
 		if rating in (0, 1, 2, 3, 4, 5):
-			ratedMeal = mealArr[int(self.message.user.tempParams['ratedMeal'][5]) - 1]
-			Rater.Rater(ratedMeal, rating)
+			rated_dish_id = dishes[rated_dish]['dish_id']
+			MenuUtilities.add_rating_to_dish(self.conn, rated_dish_id, self.message.user.userID, rating)
 			self.bot.sendMessage(self.message.user.chatID, "Thank you for rating! 😁")
 			self.message.user.tempParams['ratingMealset'] = ''
 			self.message.user.tempParams['ratedMeal'] = ''

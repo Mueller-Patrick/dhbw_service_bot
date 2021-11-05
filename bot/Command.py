@@ -59,6 +59,7 @@ class Command:
 			'lectureplanday': self.mfunctions.message_lectureplanday,
 			'menuday': self.mfunctions.message_menuday,
 			# Meal-rating-related stuff
+			'meal_category': self.mfunctions.message_meal_category,
 			'mealtoberated': self.mfunctions.message_mealtoberated,
 			'mealrating': self.mfunctions.message_mealrating,
 			# Expects a bug description

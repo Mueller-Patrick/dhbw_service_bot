@@ -1,3 +1,4 @@
+import telegram
 from menu import MenuSaver as menu
 from datetime import datetime, timedelta
 from maps import Directions
@@ -63,10 +64,18 @@ class MessageFunctions:
 		userRows = cur.fetchall()
 		self.conn.commit()
 
+		pausedUsers = []
+
 		for user in userRows:
-			self.bot.sendMessage(user[0], self.message.text)
+			try:
+				self.bot.sendMessage(user[0], self.message.text)
+			except telegram.error.Unauthorized:
+				pausedUsers.append(user[0])
+				continue
 
 		cur.close()
+
+		self.bot.sendMessage(os.environ.get('PATRICK_TELEGRAM_ID'), f'Users {pausedUsers} have paused the bot.')
 
 		self.message.user.expectedMessageType = ''
 

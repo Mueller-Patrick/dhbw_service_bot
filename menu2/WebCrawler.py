@@ -212,6 +212,11 @@ def get_dishes(date=datetime.now().strftime('%Y-%m-%d')) -> [Dish]:
 			name = _remove_ingredients(meal['name'])
 			comparable_name = _make_comparable_text(name)
 
+			# If the comparable name already exists in the dishes for this day, just skip this dish
+			dish_names = [x.comparable_name for x in dishes]
+			if comparable_name in dish_names:
+				continue
+
 			price = meal.get('prices', {'students': -0.01}).get('students', -0.01)
 			if price is None:
 				price = -0.01

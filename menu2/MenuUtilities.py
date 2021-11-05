@@ -9,7 +9,7 @@ import pymysql
 from menu2 import WebCrawler
 from menu2.models import Dish
 from sql import SQLConnectionHandler as sqlhandler
-import serverlessHandlers.HandleMessage as messageHandler
+#import serverlessHandlers.HandleMessage as messageHandler
 from push import PushHandler as ph
 
 
@@ -38,9 +38,12 @@ def save_dishes_to_sql(conn: pymysql.Connection, dishes: [Dish]):
 		'VALUES (%s, %s, %s) ' \
 		'ON DUPLICATE KEY UPDATE ' \
 		'	dish_id = VALUES(dish_id),' \
-		'	name = VALUES(name)'  # TODO fix (421 rows expected)
+		'	name = VALUES(name)'
+
+	# Duplicate key can in theory be ignored but update also works
 	insert_dish_availability = \
-		'INSERT INTO dish_availability (dish, available_date, price, category) VALUES (%s, %s, %s, %s)'
+		'INSERT INTO dish_availability (dish, available_date, price, category) VALUES (%s, %s, %s, %s) ' \
+		'ON DUPLICATE KEY UPDATE available_id = VALUES(available_id)'
 
 	dishes_success = cur.executemany(insert_dish, dish_tuples)
 	dish_availabilities_success = cur.executemany(insert_dish_availability, dish_availability_tuples)
@@ -155,9 +158,11 @@ def get_formatted_dishes(conn: pymysql.Connection, date: str, dishes=None):
 def __test():
 	conn = sqlhandler.getvServerConnection()
 
-	date = datetime.strptime('2012-10-01', '%Y-%m-%d')
+	# Date 2012-08-20 00:00:00 successful
 
-	while date <= datetime.now():
+	date = datetime.strptime('2012-08-20', '%Y-%m-%d')
+
+	while date <= (datetime.now() + timedelta(days=7)):
 		successful = False
 		try:
 			dishes = WebCrawler.get_dishes(date.strftime('%Y-%m-%d'))
@@ -185,7 +190,7 @@ def __test_message():
 	bot = ph.configure_telegram()
 	conn = sqlhandler.getvServerConnection()
 
-	messageHandler.HandleMessage(bot, '230970888', '5 ⭐', '', '')
+	#messageHandler.HandleMessage(bot, '230970888', '5 ⭐', '', '')
 
 
 if __name__ == '__main__':
@@ -193,4 +198,5 @@ if __name__ == '__main__':
 
 	#print(get_formatted_dishes(conn, '2021-11-04'))
 	#__test_push()
-	__test_message()
+	#__test_message()
+	__test()

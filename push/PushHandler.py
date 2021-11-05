@@ -45,13 +45,11 @@ def sendPushes():
 
 	fetch_latest_dishes(conn, current_time_minutes)
 
-	sendMenuPushes(conn, bot, current_time_minutes)
-
 	# Directions not supported currently due to shutdown of google maps API key
 	# sendReturnDirections(conn, bot, current_time_minutes)
 
-	# Menu rating currently not sent because it doesnt work yet
-	# sendMenuRatingPushes(conn, bot, current_time_minutes)
+	sendMenuPushes(conn, bot, current_time_minutes)
+	sendMenuRatingPushes(conn, bot, current_time_minutes)
 	sendLecturePushes(conn, bot, current_time_minutes)
 	sendExamWarningPushes(conn, bot, current_time_minutes)
 	sendUnpauseNotificationsPushes(conn, bot, current_time_minutes)

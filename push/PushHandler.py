@@ -90,7 +90,13 @@ def sendMenuPushes(conn, bot, current_time_minutes):
 		# Try-catch so we don't send anything if not menu has been fetched
 		try:
 			today_date = datetime.now().strftime('%Y-%m-%d')
-			fetchedMenu = MenuUtilities.get_formatted_dishes(conn, '2012-10-04')
+			dishes = MenuUtilities.get_dishes_from_sql_by_date(conn, today_date)
+
+			# So days when the canteen is closed are skipped
+			if len(dishes) < 1:
+				return
+
+			fetchedMenu = MenuUtilities.get_formatted_dishes(conn, today_date, dishes)
 
 			# Send the push for the users
 			for user in users:

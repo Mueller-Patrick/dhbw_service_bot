@@ -85,7 +85,7 @@ class HelperFunctions:
 			dateString = tomorrow.strftime("%Y-%m-%d")
 
 			if customUser.wantsLecturePlan and customUser.course != None:
-				plan = self.main.lfetcher.get_formatted_lectures(customUser.course, dateString)
+				plan = self.main.lfetcher.getFormattedLectures(customUser.course, dateString)
 				if not customUser.pauseAllNotifications:
 					firstLectureTime = self.main.lfetcher.getFirstLectureTime(customUser.course, dateString)
 

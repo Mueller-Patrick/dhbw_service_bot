@@ -1,0 +1,2 @@
+class LectureFetcher(object):
+	pass

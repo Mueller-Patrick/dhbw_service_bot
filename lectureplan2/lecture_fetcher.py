@@ -19,10 +19,7 @@ def validate_link(link: str) -> bool:
 	# https://api.plutodev.de/rapla-middleware?user=eisenbiegler&file=TINF19B4&blockers=0&wahl=4&pflicht=2
 	# https://rapla.dhbw-karlsruhe.de/rapla?page=calendar&user=eisenbiegler&file=TINF19B4
 
-	pattern = r"^(https://)?" \
-	          r"((rapla\\.dhbw-karlsruhe\\.de/rapla)" \
-	          r"|(api\\.plutodev\\.de/rapla-middleware)" \
-	          r"\?(\\w+=\\w+)(&\\w+=\\w+)*)$"
+	pattern = r"^(https://)?((rapla\.dhbw-karlsruhe\.de/rapla)|(api\.plutodev\.de/rapla-middleware))\?(\w+=\w+)(&\w+=\w+)*$"
 	if bool(re.match(pattern, link)):
 		try:
 			events(link)

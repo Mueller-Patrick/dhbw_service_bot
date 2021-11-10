@@ -24,6 +24,7 @@ def getUser(sql_row):
 	lecturePushTime = str(sql_row[12])[0:5]
 	pauseAllNotifications = sql_row[13] == 1
 	wantsExamWarning = sql_row[14] == 1
+	custom_rapla_link = sql_row[15]
 
 	user = usr.User(chatID)
 	user.userID = userID
@@ -40,6 +41,7 @@ def getUser(sql_row):
 	user.pushTimes['lecture'] = lecturePushTime
 	user.pauseAllNotifications = pauseAllNotifications
 	user.wantsExamWarning = wantsExamWarning
+	user.custom_rapla_link = custom_rapla_link
 
 	return user
 
@@ -65,6 +67,7 @@ def getUserUpdateTuple(user):
 		user.pushTimes['lecture'],
 		user.pauseAllNotifications,
 		user.wantsExamWarning,
+		user.custom_rapla_link,
 		user.userID
 	)
 
@@ -92,7 +95,8 @@ def getUserInsertTuple(user):
 		user.pushTimes['menu'],
 		user.pushTimes['lecture'],
 		user.pauseAllNotifications,
-		user.wantsExamWarning
+		user.wantsExamWarning,
+		user.custom_rapla_link
 	)
 
 	return tuple

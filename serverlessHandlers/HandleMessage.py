@@ -24,7 +24,7 @@ class HandleMessage:
 		cur = conn.cursor()
 		select_user_query = """SELECT userID, chatID, name, expectedMsgType, tempParams, wantsMenu, course, 
 		wantsLecturePlan, address, wantsTransportInfo, wantsToRateMeals, menuPushTime, lecturePushTime, 
-		pauseAllNotifications, wantsExamWarning FROM users WHERE chatID = %s """
+		pauseAllNotifications, wantsExamWarning, custom_rapla_link FROM users WHERE chatID = %s """
 		cur.execute(select_user_query, (chat_id,))
 		userSqlRow = cur.fetchall()
 		conn.commit()
@@ -75,13 +75,13 @@ class HandleMessage:
 			print("new")
 			insert_user_query = """INSERT INTO users (chatID, name, telegram_firstName, expectedMsgType, tempParams, wantsMenu, course, 
 			wantsLecturePlan, address, wantsTransportInfo, wantsToRateMeals, menuPushTime, lecturePushTime, 
-			pauseAllNotifications, lastMessage, wantsExamWarning) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, now(), %s) """
+			pauseAllNotifications, lastMessage, wantsExamWarning, custom_rapla_link) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, now(), %s, %s) """
 			cur.execute(insert_user_query, sqlconverter.getUserInsertTuple(user))
 		else:
 			print("Update")
 			update_user_query = """UPDATE users SET name = %s, telegram_firstName = %s, expectedMsgType = %s, tempParams = %s, wantsMenu = %s, 
 			course = %s, wantsLecturePlan = %s, address = %s, wantsTransportInfo = %s, wantsToRateMeals = %s, 
-			menuPushTime = %s, lecturePushTime = %s, pauseAllNotifications = %s, lastMessage = now(), wantsExamWarning = %s WHERE userID = %s """
+			menuPushTime = %s, lecturePushTime = %s, pauseAllNotifications = %s, lastMessage = now(), wantsExamWarning = %s, custom_rapla_link = %s WHERE userID = %s """
 			cur.execute(update_user_query, sqlconverter.getUserUpdateTuple(user))
 
 		conn.commit()

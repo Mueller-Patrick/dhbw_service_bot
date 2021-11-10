@@ -27,3 +27,4 @@ class User:
 		self.sentMenuPushToday = False
 		self.sentLecturePushToday = False
 		self.wantsExamWarning = False
+		self.custom_rapla_link = ''
